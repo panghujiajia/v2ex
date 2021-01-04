@@ -1,0 +1,68 @@
+{
+	"tabBar": {
+		"color": "#6D7788",
+		"selectedColor": "#000000",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/All",
+				"iconPath": "static/icons/index.png",
+				"selectedIconPath": "static/icons/index_cur.png",
+				"text": "热门"
+			},
+			{
+				"pagePath": "pages/Find",
+				"iconPath": "static/icons/all.png",
+				"selectedIconPath": "static/icons/all_cur.png",
+				"text": "节点"
+			},
+			{
+				"pagePath": "pages/Set",
+				"iconPath": "static/icons/my.png",
+				"selectedIconPath": "static/icons/my_cur.png",
+				"text": "我的"
+			}
+		]
+	},
+	"pages": [
+		{
+			"path": "pages/Find",
+			"style": {
+				"usingComponents": {
+					"van-search": "/wxcomponents/vant/search/index"
+				}
+			}
+		},
+		{
+			"path": "pages/Tag"
+		},
+		{
+			"path": "pages/All",
+			"style": {
+				"usingComponents": {
+					"we-tabs": "/wxcomponents/we-tabs/index"
+				}
+			}
+		},
+		{
+			"path": "pages/Set",
+			"style": {
+				"usingComponents": {
+					"van-cell": "/wxcomponents/vant/cell/index",
+					"van-cell-group": "/wxcomponents/vant/cell-group/index",
+					"van-icon": "/wxcomponents/vant/icon/index"
+				}
+			}
+		},
+		{
+			"path": "pages/Detail"
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "v2ex",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}
