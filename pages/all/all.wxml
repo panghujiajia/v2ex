@@ -1,0 +1,35 @@
+<van-tabs
+	class="tabs"
+	bind:click="onClick"
+	bind:change="onClick"
+	active="{{ curTag }}"
+	animated
+	swipeable
+	sticky
+	color="#000"
+>
+	<van-tab
+		class="tab"
+		wx:for="{{ tags }}"
+		wx:key="index"
+		name="{{ item.value }}"
+		title="{{ item.name }}"
+	>
+		<block wx:if="{{ loading }}">
+			<skeleton type="list"></skeleton>
+		</block>
+		<block wx:else>
+			<view
+				wx:for="{{ tagList }}"
+				wx:key="id"
+				data-id="{{ item.id }}"
+				bindtap="getTopicsDetail"
+			>
+				<topic item="{{ item }}"></topic>
+			</view>
+			<view class="noMore" wx:if="{{ totalPage == pageSize }}"
+				>没有更多了!</view
+			>
+		</block>
+	</van-tab>
+</van-tabs>

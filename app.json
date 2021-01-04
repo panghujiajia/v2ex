@@ -1,0 +1,37 @@
+{
+	"pages": [
+		"pages/index/index",
+		"pages/all/all",
+		"pages/find/find",
+		"pages/my/my",
+		"pages/detail/detail"
+	],
+	"window": {
+		"backgroundTextStyle": "light",
+		"navigationBarBackgroundColor": "#F5F5F5",
+		"navigationBarTitleText": "V2EX",
+		"navigationBarTextStyle": "black",
+		"backgroundColor": "#fff"
+	},
+	"tabBar": {
+		"color": "#6D7788",
+		"selectedColor": "#000000",
+		"backgroundColor": "#F5F5F5",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "热门",
+				"iconPath": "./imgs/icons/index.png",
+				"selectedIconPath": "./imgs/icons/index_cur.png"
+			},
+			{
+				"pagePath": "pages/all/all",
+				"text": "全部",
+				"iconPath": "./imgs/icons/all.png",
+				"selectedIconPath": "./imgs/icons/all_cur.png"
+			}
+		]
+	},
+	"sitemapLocation": "sitemap.json",
+	"style": "v2"
+}

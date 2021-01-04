@@ -1,0 +1,11 @@
+<view class="topic-wrap {{ item.beVisited ? 'cur' : '' }}">
+	<view class="title-wrap">
+		<text class="title">{{
+			item.title
+		}}</text>
+		<view class="tag"
+			><text>{{ item.nodeName }}</text></view
+		>
+	</view>
+	<user item="{{ item }}"></user>
+</view>

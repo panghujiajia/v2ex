@@ -1,0 +1,75 @@
+.top {
+	display: flex;
+	justify-content: space-between;
+	height: 40rpx;
+}
+.flex {
+	background: #f6f7f8;
+}
+.flex2 {
+	width: 20%;
+}
+.flex7 {
+	width: 70%;
+}
+.flex9 {
+	width: 90%;
+}
+.flex10 {
+	width: 100%;
+}
+.bottom {
+	margin-top: 20rpx;
+	height: 60rpx;
+	display: flex;
+	align-items: center;
+	.avatar {
+		width: 60rpx;
+		height: 60rpx;
+		border-radius: 10rpx;
+		margin-right: 10rpx;
+		background: #f6f7f8;
+	}
+	.info {
+		height: 60rpx;
+		flex: auto;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		.name_wrap,
+		.replys {
+			height: 30rpx;
+			width: 30%;
+		}
+		.replys {
+			width: 45%;
+			height: 25rpx;
+		}
+	}
+}
+.skeleton_list,
+.skeleton_detail {
+	padding: 20rpx;
+	background: #fff;
+}
+.skeleton_detail {
+	.bottom {
+		.info {
+			.name_wrap {
+				width: 100%;
+			}
+		}
+	}
+	.time {
+		height: 30rpx;
+		margin: 20rpx 0;
+	}
+	.line {
+		height: 15rpx;
+		margin: 30rpx 0;
+	}
+	.reply {
+		height: 30rpx;
+		margin-top: 20rpx;
+	}
+}

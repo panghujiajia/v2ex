@@ -1,0 +1,66 @@
+.cur {
+  color: #adadad !important;
+}
+.cur image {
+  opacity: 0.5;
+}
+.user-info {
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+}
+.user-info .avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 10rpx;
+  margin-right: 10rpx;
+}
+.user-info .info {
+  font-size: 24rpx;
+  height: 60rpx;
+  flex: auto;
+}
+.user-info .info .name-wrap {
+  height: 35rpx;
+  line-height: 35rpx;
+  font-size: 26rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.user-info .info .name-wrap .name {
+  font-weight: bold;
+  flex: 5;
+}
+.user-info .info .name-wrap .tag {
+  flex: 2;
+  text-align: right;
+}
+.user-info .info .name-wrap .tag text {
+  line-height: 40rpx;
+  padding: 0 20rpx;
+  background: #f2f2f2;
+  border-radius: 10rpx;
+  font-size: 22rpx;
+  height: 40rpx;
+  display: inline-block;
+  vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.user-info .info .time {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 25rpx;
+  line-height: 25rpx;
+  color: #adadad;
+  font-size: 22rpx;
+}
+.user-info .info .time .reply {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 60%;
+}

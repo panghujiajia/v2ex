@@ -1,0 +1,8 @@
+{
+	"usingComponents": {
+		"van-tab": "@vant/weapp/tab/index",
+		"van-tabs": "@vant/weapp/tabs/index",
+		"topic": "/components/topic/topic",
+		"skeleton": "/components/skeleton/skeleton"
+	}
+}

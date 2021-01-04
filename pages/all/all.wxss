@@ -1,0 +1,16 @@
+.tabs .van-sticky {
+  position: fixed;
+  top: 0;
+  z-index: 999;
+  width: 100%;
+}
+.tabs .tab {
+  margin-top: 44px;
+}
+.tabs .noMore {
+  padding: 10rpx 0 30rpx;
+  background: #f9f9f9;
+  text-align: center;
+  color: #999;
+  font-size: 24rpx;
+}

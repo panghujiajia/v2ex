@@ -1,0 +1,7 @@
+{
+	"usingComponents": {
+		"towxml": "/towxml/towxml",
+		"user": "/components/user/user",
+		"skeleton": "/components/skeleton/skeleton"
+	}
+}

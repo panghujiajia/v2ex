@@ -1,0 +1,16 @@
+<scroll-view scroll-y="true" class="container">
+	<block wx:if="{{ loading }}">
+		<skeleton type="list"></skeleton>
+	</block>
+	<block wx:else>
+		<view
+			wx:for="{{ hotList }}"
+			wx:key="id"
+			data-id="{{ item.id }}"
+			bindtap="getTopicsDetail"
+		>
+			<topic item="{{ item }}"></topic>
+		</view>
+		<view class="noMore">没有更多了!</view>
+	</block>
+</scroll-view>

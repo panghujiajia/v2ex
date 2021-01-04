@@ -1,0 +1,6 @@
+{
+	"usingComponents": {
+		"topic": "/components/topic/topic",
+		"skeleton": "/components/skeleton/skeleton"
+	}
+}

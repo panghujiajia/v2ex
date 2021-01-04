@@ -1,0 +1,44 @@
+<view class="container">
+	<block wx:if="{{ loading }}">
+		<skeleton type="detail"></skeleton>
+	</block>
+	<block wx:else>
+		<view class="header">
+			<user item="{{ topicsDetail }}"></user>
+			<view class="title">{{ topicsDetail.title }}</view>
+		</view>
+		<view class="content">
+			<towxml nodes="{{ topicsDetail.data }}"></towxml>
+		</view>
+		<view class="totalReplies"
+			>{{ topicsReplies.length }} 回复 | 截止 {{ endTime }}</view
+		>
+		<view class="pages" wx:for="{{ topicsReplies }}" wx:key="index">
+			<view class="user">
+				<image
+					class="avatar"
+					src="{{ item.member.avatar_large }}"
+				></image>
+				<view class="info">
+					<view class="name-wrap">
+						<text class="name">{{ item.member.username }}</text>
+						<view
+							class="tag"
+							wx:if="{{ topicsDetail.id !== item.member.id }}"
+						>
+							<text>{{ index + 1 }}楼 </text>
+						</view>
+						<view class="upTag" wx:else>
+							<text class="up">楼主</text>
+							<text class="floor">{{ index + 1 }}楼</text>
+						</view>
+					</view>
+					<view class="time">{{ item.timeBefore }}</view>
+				</view>
+			</view>
+			<view class="title">
+				<towxml nodes="{{ item.content }}"></towxml>
+			</view>
+		</view>
+	</block>
+</view>

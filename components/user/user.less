@@ -1,0 +1,71 @@
+.cur {
+	color: #adadad !important;
+	image {
+		opacity: 0.5;
+	}
+}
+.user-info {
+	height: 60rpx;
+	display: flex;
+	align-items: center;
+
+	.avatar {
+		width: 60rpx;
+		height: 60rpx;
+		border-radius: 10rpx;
+		margin-right: 10rpx;
+	}
+
+	.info {
+		font-size: 24rpx;
+		height: 60rpx;
+		flex: auto;
+
+		.name-wrap {
+			height: 35rpx;
+			line-height: 35rpx;
+			font-size: 26rpx;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			.name {
+				font-weight: bold;
+				flex: 5;
+			}
+			.tag {
+				flex: 2;
+				text-align: right;
+
+				text {
+					line-height: 40rpx;
+					padding: 0 20rpx;
+					background: #f2f2f2;
+					border-radius: 10rpx;
+					font-size: 22rpx;
+					height: 40rpx;
+					display: inline-block;
+					vertical-align: top;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+			}
+		}
+
+		.time {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			height: 25rpx;
+			line-height: 25rpx;
+			color: #adadad;
+			font-size: 22rpx;
+			.reply {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				width: 60%;
+			}
+		}
+	}
+}

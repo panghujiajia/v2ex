@@ -1,0 +1,7 @@
+.forward {
+	height: 100vh;
+	text-align: center;
+	font-weight: bold;
+	font-size: 38px;
+	line-height: 100vh;
+}

@@ -1,0 +1,95 @@
+<!-- 骨架屏 -->
+<block wx:if="{{ type == 'list' }}">
+	<view
+		class="skeleton_list"
+		wx:for="{{ [1, 1, 1, 1, 1, 1, 1, 1, 1, 1] }}"
+		wx:key="index"
+	>
+		<view class="top">
+			<view class="flex flex7"></view>
+			<view class="flex flex2"></view>
+		</view>
+		<view class="bottom">
+			<view class="avatar"></view>
+			<view class="info">
+				<view class="name_wrap flex"></view>
+				<view class="replys flex"></view>
+			</view>
+		</view>
+	</view>
+</block>
+<block wx:if="{{ type == 'detail' }}">
+	<view class="skeleton_detail">
+		<view class="bottom">
+			<view class="avatar"></view>
+			<view class="info">
+				<view class="top name_wrap">
+					<view class="flex flex7"></view>
+					<view class="flex flex2"></view>
+				</view>
+				<view class="replys flex"></view>
+			</view>
+		</view>
+		<van-divider />
+		<view class="top">
+			<view class="flex flex10"></view>
+		</view>
+		<view class="time flex flex7"></view>
+		<view class="line flex flex10"></view>
+		<view class="bottom">
+			<view class="avatar"></view>
+			<view class="info">
+				<view class="top name_wrap">
+					<view class="flex flex7"></view>
+					<view class="flex flex2"></view>
+				</view>
+				<view class="replys flex"></view>
+			</view>
+		</view>
+		<view class="reply flex flex10"></view>
+		<view class="reply flex flex7"></view>
+		<view class="reply flex flex9"></view>
+		<van-divider />
+		<view class="bottom">
+			<view class="avatar"></view>
+			<view class="info">
+				<view class="top name_wrap">
+					<view class="flex flex7"></view>
+					<view class="flex flex2"></view>
+				</view>
+				<view class="replys flex"></view>
+			</view>
+		</view>
+		<view class="reply flex flex10"></view>
+		<view class="reply flex flex7"></view>
+		<view class="reply flex flex9"></view>
+		<van-divider />
+		<view class="bottom">
+			<view class="avatar"></view>
+			<view class="info">
+				<view class="top name_wrap">
+					<view class="flex flex7"></view>
+					<view class="flex flex2"></view>
+				</view>
+				<view class="replys flex"></view>
+			</view>
+		</view>
+		<view class="reply flex flex10"></view>
+		<view class="reply flex flex7"></view>
+		<view class="reply flex flex9"></view>
+		<van-divider />
+		<view class="bottom">
+			<view class="avatar"></view>
+			<view class="info">
+				<view class="top name_wrap">
+					<view class="flex flex7"></view>
+					<view class="flex flex2"></view>
+				</view>
+				<view class="replys flex"></view>
+			</view>
+		</view>
+		<view class="reply flex flex10"></view>
+		<view class="reply flex flex7"></view>
+		<view class="reply flex flex9"></view>
+	</view>
+</block>

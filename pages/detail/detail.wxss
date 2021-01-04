@@ -1,0 +1,87 @@
+.container .user {
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+}
+.container .user .avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 10rpx;
+  margin-right: 10rpx;
+}
+.container .user .info {
+  font-size: 24rpx;
+  height: 60rpx;
+  flex: auto;
+}
+.container .user .info .name-wrap {
+  height: 35rpx;
+  line-height: 35rpx;
+  font-size: 26rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.container .user .info .name-wrap .name {
+  font-weight: bold;
+  flex: 5;
+}
+.container .user .info .name-wrap .tag {
+  flex: 2;
+  text-align: right;
+}
+.container .user .info .name-wrap .tag text {
+  background: #f2f2f2;
+  font-size: 22rpx;
+  padding: 0 8rpx;
+  border-radius: 5rpx;
+  color: #b0b0b0;
+}
+.container .user .info .time {
+  line-height: 25rpx;
+  color: #adadad;
+}
+.container .title {
+  margin-top: 20rpx;
+}
+.container .header {
+  padding: 20rpx;
+}
+.container .header .title {
+  line-height: 40rpx;
+  margin-top: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #dedede;
+}
+.container .content {
+  padding: 20rpx;
+  line-height: 40rpx;
+  border-bottom: 15rpx solid #f8f8f8;
+}
+.container .totalReplies {
+  padding: 10rpx 20rpx;
+  font-size: 24rpx;
+  border-bottom: 1rpx solid #f5f5f5;
+  color: #888;
+}
+.container .pages {
+  padding: 20rpx;
+  border-bottom: 2rpx solid #f5f5f5;
+}
+.container .pages .upTag {
+  font-size: 22rpx;
+  display: flex;
+}
+.container .pages .upTag text {
+  padding: 0 8rpx;
+}
+.container .pages .upTag .floor {
+  background: #f2f2f2;
+  border-radius: 0 5rpx 5rpx 0;
+  color: #b0b0b0;
+}
+.container .pages .upTag .up {
+  background: #d8d8d8;
+  color: #fff;
+  border-radius: 5rpx 0 0 5rpx;
+}
