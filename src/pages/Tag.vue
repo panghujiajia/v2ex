@@ -11,7 +11,7 @@
 			>
 				<Topic :item="item"></Topic>
 			</view>
-			<view class="noMore">没有更多了!</view>
+			<view v-if="noMore" class="noMore">没有更多了，休息一下吧～</view>
 		</template>
 	</view>
 </template>
@@ -36,52 +36,53 @@ export default class Tag extends Vue {
 	) => void;
 	private tagList: any = []; // 主题内容
 	private pageNum = 1; // 页码
+	private value = ''; // 参数
 	private loading = true;
+	private noMore = false; // 没有更多了
+	private loadType = 'refresh'; // 加载类型
 
 	private onLoad(options: any) {
 		uni.setNavigationBarTitle({ title: options.title });
-		this.getTagTopics(options.value);
+		const value = options.value;
+		this.value = value;
+		this.getTagTopics(value);
 	}
 	// 根据tag获取内容
 	private async getTagTopics(value: string) {
+		const tagList = this.tagList;
 		const data = await $getTagTopics({ value, pageNum: this.pageNum });
-		// 去掉换行符
-		const str = data.trim().replace(/\n|\&nbsp;|•/g, '');
-		// 拿到主题列表
-		const arr = str.match(rules.reg_item);
-		const len = arr.length;
-		// 数据
-		const tagList: any = [];
-		const visited: any = this.visited;
-		for (let i = 0; i < len; i++) {
-			const item = arr[i];
-			const titleArr = item.split(rules.reg_title);
-			const avatarArr = item.split(rules.reg_avatar);
-			const tagArr = item.split(rules.reg_tag);
-			let lastReply = '';
-			lastReply = item.split(rules.reg_repay_0)[2];
-			lastReply = lastReply.split(/\s\s(.*?)\s\s(.*?)/)[3];
-			let beVisited = false;
-			if (visited.includes(titleArr[1])) {
-				beVisited = true;
+		if (data) {
+			const visited: any = this.visited;
+			const tagArr = data.map((item: any) => {
+				let beVisited = false;
+				if (visited.includes(item.id)) {
+					beVisited = true;
+				}
+				return { ...item, beVisited };
+			});
+			// 如果是加载更多
+			if (this.loadType === 'loadMore') {
+				this.isLastPage(tagArr);
+				if (!this.noMore) {
+					this.tagList = [...tagList, ...tagArr];
+				}
+			} else {
+				this.tagList = tagArr;
+				uni.stopPullDownRefresh();
 			}
-			const tagObj = {
-				id: titleArr[1], // id
-				replyNo: titleArr[2], // 回复数
-				title: titleArr[3], // 标题
-				lastReply, // 最后回复时间
-				author: avatarArr[1], // 作者名
-				avatarUrl: avatarArr[2], // 头像地址
-				tagValue: tagArr.length && tagArr[1], // node地址
-				tagTitle: tagArr.length && tagArr[2], // node名
-				beVisited,
-			};
-			if (tagObj.id && tagObj.title) {
-				tagList.push(tagObj);
+			this.loading = false;
+		}
+	}
+	// 判断是否最后一页
+	private isLastPage(data: any) {
+		const dataLen = data.length;
+		const tagList = this.tagList;
+		const tagListLen = tagList.length;
+		if (tagListLen > dataLen) {
+			if (data[dataLen - 1].id === tagList[tagListLen - 1].id) {
+				this.noMore = true;
 			}
 		}
-		this.tagList = tagList;
-		this.loading = false;
 	}
 	// 跳转主题详情
 	private getTopicsDetail(id: string) {
@@ -103,6 +104,21 @@ export default class Tag extends Vue {
 		uni.navigateTo({
 			url: `/pages/Detail?id=${id}`,
 		});
+	}
+
+	private onPullDownRefresh() {
+		console.log('refresh');
+		this.pageNum = 1;
+		this.loadType = 'refresh';
+		this.noMore = false;
+		const value = this.value;
+		this.getTagTopics(value);
+	}
+	private onReachBottom() {
+		this.pageNum = ++this.pageNum;
+		this.loadType = 'loadMore';
+		const value = this.value;
+		this.getTagTopics(value);
 	}
 }
 </script>

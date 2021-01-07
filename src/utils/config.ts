@@ -16,4 +16,10 @@ export default {
 
 	// 主题回复信息（没人回复） 最后回复时间
 	reg_repay_0: /<span class="small fade"><strong>(.*?)<\/strong>(.*?)<\/span>/,
+
+	// 获取登录接口的key
+	reg_login_name: /<input type="(.*?)" class="sl" name="(.*?)" value="" auto/g,
+
+	// 获取once的值
+	reg_once: /<input type="hidden" value="(.*?)" name="once" \/>/,
 };

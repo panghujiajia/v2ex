@@ -27,17 +27,6 @@
 	},
 	"pages": [
 		{
-			"path": "pages/Find",
-			"style": {
-				"usingComponents": {
-					"van-search": "/wxcomponents/vant/search/index"
-				}
-			}
-		},
-		{
-			"path": "pages/Tag"
-		},
-		{
 			"path": "pages/All",
 			"style": {
 				"usingComponents": {
@@ -56,6 +45,20 @@
 			}
 		},
 		{
+			"path": "pages/Find",
+			"style": {
+				"usingComponents": {
+					"van-search": "/wxcomponents/vant/search/index"
+				}
+			}
+		},
+		{
+			"path": "pages/Tag",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		},
+		{
 			"path": "pages/Detail"
 		}
 	],
@@ -63,6 +66,6 @@
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "v2ex",
 		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"backgroundColor": "#FFF"
 	}
 }

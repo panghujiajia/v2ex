@@ -20,13 +20,13 @@
 				:key="tabIndex"
 				:data-index="tabIndex"
 			>
-				<view class="tab-skeleton">
+				<view
+					class="tab-skeleton"
+					v-if="loading || activeTab !== tabIndex"
+				>
 					<Skeleton type="list"></Skeleton>
 				</view>
-				<view
-					v-if="!loading && activeTab == tabIndex"
-					class="tab-content"
-				>
+				<view v-else>
 					<view
 						v-for="(item, index) in tagList"
 						:key="index"
@@ -34,7 +34,7 @@
 					>
 						<Topic :item="item"></Topic>
 					</view>
-					<view class="noMore">没有更多了!</view>
+					<view class="noMore">没有更多了，看看别的节点吧～</view>
 				</view>
 			</swiper-item>
 		</swiper>
@@ -79,7 +79,7 @@ export default class All extends Vue {
 	@Mutation('updateVisited') private updateVisited!: (
 		visited: string[]
 	) => void;
-	private topTags = topTags;
+	private topTags = topTags; // tag列表
 	private curTag = 'top';
 	private tagList: any = []; // 主题内容
 	private loading = true;
@@ -87,13 +87,17 @@ export default class All extends Vue {
 
 	private onLoad() {
 		const title = this.curTag;
+		this.getData(title);
+	}
+	// 获取数据
+	private getData(title: string) {
 		// 如果没拿到数据就调接口
-		if (!this.getStorageData(title)) {
+		if (this.isExpired(title)) {
 			// 最热的帖子从接口拿
 			if (title === 'top') {
 				this.getHotList(title);
 			} else {
-				this.getTagTopics(title);
+				this.getAllTopics(title);
 			}
 		}
 	}
@@ -108,140 +112,76 @@ export default class All extends Vue {
 		const title = tags[index].value;
 		this.loading = true;
 		this.activeTab = index;
-		// 如果没拿到数据就调接口
-		if (!this.getStorageData(title)) {
-			// 最热的帖子从接口拿
-			if (title === 'top') {
-				this.getHotList(title);
-			} else {
-				this.getTagTopics(title);
-			}
-		}
+		this.getData(title);
 	}
-	// 从缓存取数据
-	private getStorageData(title: string) {
+	// 判定缓存数据是否过期
+	private isExpired(title: string) {
 		uni.showLoading({
 			title: '正在加载中...',
 			mask: true,
 		});
 		const time = this.getTagTime((TagTimeKey as any)[title]);
 		if (!time) {
-			return false;
+			return true;
 		} else {
 			const old = dayjs(time);
 			const now = dayjs();
 			// 缓存时间超过设定的时间,则重新请求数据
 			if (now.diff(old, 'minute') >= this.stroageTime) {
-				return false;
-			}
-			const tagList = this.getTagData((TagDataKey as any)[title]);
-			if (tagList.length) {
-				const visited: any = this.visited;
-				tagList.forEach((item: any) => {
-					if (visited.includes(item.id)) {
-						item.beVisited = true;
-					}
-				});
-				this.tagList = tagList;
-				this.loading = false;
-				uni.hideLoading();
 				return true;
 			}
+			this.getStorageData(title);
 		}
-		return false;
+		return true;
+	}
+	// 从缓存取数据
+	private getStorageData(title: string) {
+		const tagList = this.getTagData((TagDataKey as any)[title]);
+		if (tagList.length) {
+			const visited: any = this.visited;
+			tagList.forEach((item: any) => {
+				if (visited.includes(item.id)) {
+					item.beVisited = true;
+				}
+			});
+			this.tagList = tagList;
+			this.loading = false;
+			uni.hideLoading();
+			return false;
+		}
 	}
 	// 根据tag获取内容
-	private async getTagTopics(title: string) {
+	private async getAllTopics(title: string) {
 		const data = await $getAllTopics(title);
-		// 去掉换行符
-		const str = data.trim().replace(/\n|\&nbsp;|•/g, '');
-
-		// 拿到主题列表
-		const arr = str.match(rules.reg_item);
-		const len = arr.length;
-		// 数据
-		const tagList = [];
-		const visited: any = this.visited;
-		for (let i = 0; i < len; i++) {
-			const item = arr[i];
-			const titleArr = item.split(rules.reg_title);
-			const avatarArr = item.split(rules.reg_avatar);
-			const tagArr = item.split(rules.reg_tag);
-			let lastReply = '';
-			// 有人回复
-			if (titleArr[2] > 0) {
-				lastReply =
-					titleArr[4] && titleArr[4].split(rules.reg_repay_1)[1];
-			} else {
-				lastReply =
-					titleArr[4] && titleArr[4].split(rules.reg_repay_0)[1];
-			}
-			let beVisited = false;
-			if (visited.includes(titleArr[1])) {
-				beVisited = true;
-			}
-			const tagObj = {
-				id: titleArr[1], // id
-				replyNo: titleArr[2], // 回复数
-				title: titleArr[3], // 标题
-				lastReply, // 最后回复时间
-				author: avatarArr[1], // 作者名
-				avatarUrl: avatarArr[2], // 头像地址
-				tagValue: tagArr[1], // node地址
-				tagTitle: tagArr[2], // node名
-				beVisited,
-			};
-			if (tagObj.id && tagObj.title) {
-				tagList.push(tagObj);
-			}
+		if (data) {
+			const visited = this.visited;
+			const tagArr = data.map((item: any) => {
+				let beVisited = false;
+				if (visited.includes(item.id)) {
+					beVisited = true;
+				}
+				return { ...item, beVisited };
+			});
+			this.commonUpdate(title, tagArr);
 		}
-		uni.pageScrollTo({
-			scrollTop: 0,
-		});
-		this.updateTagData({
-			key: (TagDataKey as any)[title],
-			value: tagList,
-		});
-		this.updateTagTime({
-			key: (TagTimeKey as any)[title],
-			value: dayjs(),
-		});
-		this.tagList = tagList;
-		this.loading = false;
 	}
 	// 获取热门列表
 	private async getHotList(title: string) {
 		const data = await $getHotList();
-		if (!data) {
-			return;
+		if (data) {
+			const visited = this.visited;
+			const tagArr = data.map((item: any) => {
+				let beVisited = false;
+				if (visited.includes(item.id)) {
+					beVisited = true;
+				}
+				return { ...item, beVisited };
+			});
+			this.commonUpdate(title, tagArr);
 		}
-		const len = data.length;
-		// 数据
-		const tagArr = [];
-		const visited = this.visited;
-		for (let i = 0; i < len; i++) {
-			const item = data[i];
-			const lastReply =
-				dayjs(item.last_modified * 1000)
-					.startOf('hour')
-					.fromNow() + ' ';
-			let beVisited = false;
-			if (visited.includes(item.id)) {
-				beVisited = true;
-			}
-			const tagObj = {
-				id: item.id, // id
-				replyNo: item.replies, // 回复数
-				title: item.title, // 标题
-				lastReply, // 最后回复时间
-				author: item.member.username, // 作者名
-				avatarUrl: item.member.avatar_mini, // 头像地址
-				tagValue: item.node.name, // node地址
-				tagTitle: item.node.title, // node名
-				beVisited,
-			};
-			tagArr.push(tagObj);
-		}
+	}
+	// 更新缓存
+	private commonUpdate(title: string, tagArr: any) {
 		uni.pageScrollTo({
 			scrollTop: 0,
 		});
@@ -304,13 +244,6 @@ export default class All extends Vue {
 		position: absolute;
 		width: 100%;
 		height: 100%;
-		overflow-y: hidden;
-		z-index: 98;
-	}
-	.tab-content {
-		position: absolute;
-		width: 100%;
-		z-index: 99;
 	}
 	/deep/.weui-tabs-bar__title {
 		margin: 0px 10px;
