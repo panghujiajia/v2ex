@@ -3,6 +3,7 @@ import environments from '../environments';
 
 const http = new Request({
 	baseURL: environments.url,
+	timeout: 10000,
 	custom: {
 		loading: true, // 是否需要loading
 	},
@@ -13,7 +14,7 @@ http.interceptors.request.use(
 		// console.log(config);
 		if (config.custom.loading) {
 			uni.showLoading({
-				title: '正在加载中...',
+				title: '加载中...',
 				mask: true,
 			});
 		}

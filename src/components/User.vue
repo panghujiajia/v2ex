@@ -1,5 +1,8 @@
 <template>
-	<view class="user-info" :class="item.beVisited ? 'visited' : ''">
+	<view
+		class="user-info"
+		:class="[item.beVisited ? 'visited' : '', darkModel ? 'dark' : '']"
+	>
 		<image class="avatar" :src="item.avatarUrl"></image>
 		<view class="info">
 			<view class="name-wrap">
@@ -8,10 +11,10 @@
 					<text>{{ item.tagTitle }}</text>
 				</view>
 				<template v-else-if="item.detail === 'floor'">
-					<view class="floor" v-if="!item.isUp">
+					<view class="floor-wrap" v-if="!item.isUp">
 						<text>{{ item.index }}楼 </text>
 					</view>
-					<view class="floor" v-else>
+					<view class="floor-wrap" v-else>
 						<text class="up">楼主</text>
 						<text class="floor">{{ item.index }}楼</text>
 					</view>
@@ -28,17 +31,19 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { State } from 'vuex-class';
 @Component({
 	name: 'User',
 })
 export default class User extends Vue {
+	@State('darkModel') private darkModel!: boolean;
 	@Prop()
 	private item!: any;
 }
 </script>
 <style lang="less" scoped>
 .visited {
-	color: #adadad !important;
+	color: #5d5d5d !important;
 	image {
 		opacity: 0.5;
 	}
@@ -86,7 +91,7 @@ export default class User extends Vue {
 					white-space: nowrap;
 				}
 			}
-			.floor {
+			.floor-wrap {
 				font-size: 22rpx;
 				display: flex;
 				text {
@@ -113,7 +118,7 @@ export default class User extends Vue {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			color: #adadad;
+			color: #5d5d5d;
 			font-size: 22rpx;
 			.reply {
 				overflow: hidden;
@@ -121,6 +126,25 @@ export default class User extends Vue {
 				white-space: nowrap;
 				width: 60%;
 			}
+		}
+	}
+}
+.dark {
+	.node {
+		text {
+			background: #d1d1d1 !important;
+			color: #191919 !important;
+		}
+	}
+	.floor-wrap {
+		text {
+			background: #d1d1d1 !important;
+			color: #5d5d5d !important;
+		}
+		.up {
+			background: #adadad !important;
+			color: #d1d1d1 !important;
+			border-radius: 5rpx 0 0 5rpx;
 		}
 	}
 }

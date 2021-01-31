@@ -1,27 +1,58 @@
 <template>
-	<view>
+	<view :class="darkModel ? 'dark' : ''">
 		<template v-if="loading">
 			<Skeleton type="list"></Skeleton>
 		</template>
 		<template v-else>
-			<view
-				v-for="(item, index) in tagList"
-				:key="index"
-				@click="getTopicsDetail(item.id)"
-			>
-				<Topic :item="item"></Topic>
+			<view class="load-failed" v-if="loadFailedTime > 0">
+				<view class="reload" v-if="loadFailedTime < 2">
+					<van-empty image="error" description="加载失败">
+						<van-button
+							round
+							type="info"
+							class="bottom-button"
+							@click="getTagTopics()"
+						>
+							再试一次
+						</van-button>
+					</van-empty>
+				</view>
+				<view class="quit" v-else>
+					<van-empty
+						image="network"
+						description="抱歉，暂时连不上服务器"
+					>
+						<navigator target="miniProgram" open-type="exit">
+							<van-button round type="info" class="bottom-button">
+								等会再来
+							</van-button>
+						</navigator>
+					</van-empty>
+				</view>
 			</view>
-			<view v-if="noMore" class="noMore">没有更多了，休息一下吧～</view>
+			<template v-else>
+				<view
+					v-for="(item, index) in tagList"
+					:key="index"
+					@click="getTopicsDetail(item.id)"
+				>
+					<Topic :item="item"></Topic>
+				</view>
+				<view v-if="noMore" class="noMore">
+					没有更多了，休息一下吧～
+				</view>
+			</template>
 		</template>
 	</view>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Mixins, Vue } from 'vue-property-decorator';
 import rules from '@/utils/config';
 import Topic from '@/components/Topic.vue';
 import Skeleton from '@/components/Skeleton.vue';
 import { $getTagTopics } from '@/services/Common.http';
 import { Mutation, State } from 'vuex-class';
+import { MixinDark } from '@/mixin/Dark.mixin';
 @Component({
 	name: 'Tag',
 	components: {
@@ -29,7 +60,7 @@ import { Mutation, State } from 'vuex-class';
 		Skeleton,
 	},
 })
-export default class Tag extends Vue {
+export default class Tag extends Mixins(MixinDark) {
 	@State('visited') private visited!: string[]; // 访问过的
 	@Mutation('updateVisited') private updateVisited!: (
 		visited: string[]
@@ -40,16 +71,19 @@ export default class Tag extends Vue {
 	private loading = true;
 	private noMore = false; // 没有更多了
 	private loadType = 'refresh'; // 加载类型
+	private loadFailedTime = 0; // 失败次数
 
 	private onLoad(options: any) {
 		uni.setNavigationBarTitle({ title: options.title });
 		const value = options.value;
 		this.value = value;
-		this.getTagTopics(value);
+		this.getTagTopics();
 	}
 	// 根据tag获取内容
-	private async getTagTopics(value: string) {
+	private async getTagTopics() {
+		this.loading = true;
 		const tagList = this.tagList;
+		const value = this.value;
 		const data = await $getTagTopics({ value, pageNum: this.pageNum });
 		if (data) {
 			const visited: any = this.visited;
@@ -71,6 +105,10 @@ export default class Tag extends Vue {
 				uni.stopPullDownRefresh();
 			}
 			this.loading = false;
+			this.loadFailedTime = 0;
+		} else {
+			this.loading = false;
+			this.loadFailedTime += 1;
 		}
 	}
 	// 判断是否最后一页
@@ -88,17 +126,13 @@ export default class Tag extends Vue {
 	private getTopicsDetail(id: string) {
 		let visited = this.visited;
 		const list = this.tagList;
-		if (visited.length) {
-			if (!visited.includes(id)) {
-				visited.push(id);
-				const target = list.find((item: any) => {
-					return item.id === id;
-				});
-				target.beVisited = true;
-				this.tagList = list;
-			}
-		} else {
-			visited = [id];
+		if (!visited.includes(id)) {
+			visited.push(id);
+			const target = list.find((item: any) => {
+				return item.id === id;
+			});
+			target.beVisited = true;
+			this.tagList = list;
 		}
 		this.updateVisited(visited);
 		uni.navigateTo({
@@ -107,19 +141,25 @@ export default class Tag extends Vue {
 	}
 
 	private onPullDownRefresh() {
-		console.log('refresh');
 		this.pageNum = 1;
 		this.loadType = 'refresh';
 		this.noMore = false;
-		const value = this.value;
-		this.getTagTopics(value);
+		this.getTagTopics();
 	}
 	private onReachBottom() {
 		this.pageNum = ++this.pageNum;
 		this.loadType = 'loadMore';
-		const value = this.value;
-		this.getTagTopics(value);
+		this.getTagTopics();
 	}
 }
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.load-failed {
+	padding-top: 150rpx;
+}
+.dark {
+	background: #191919;
+	color: #d1d1d1;
+	min-height: 100vh;
+}
+</style>

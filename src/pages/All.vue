@@ -1,256 +1,198 @@
 <template>
-	<view class="container">
-		<we-tabs
-			:tabs="topTags"
-			:activeTab="activeTab"
-			swiperClass="weui-tabs-swiper"
-			@tabclick="onClick"
-			activeClass="tab-bar-title__selected"
-		>
-		</we-tabs>
-		<swiper
-			class="weui-tabs-swiper"
-			:current="activeTab"
-			duration="300"
-			@change="onChange"
-		>
-			<swiper-item
-				class="weui-tabs-swiper-item"
-				v-for="(item, tabIndex) in topTags"
-				:key="tabIndex"
-				:data-index="tabIndex"
-			>
-				<view
-					class="tab-skeleton"
-					v-if="loading || activeTab !== tabIndex"
-				>
-					<Skeleton type="list"></Skeleton>
-				</view>
-				<view v-else>
+	<view :class="darkModel ? 'dark' : ''">
+		<view class="my-tags">
+			<view>
+				<view class="title">我喜欢的</view>
+				<template>
 					<view
-						v-for="(item, index) in tagList"
-						:key="index"
-						@click="getTopicsDetail(item.id)"
+						class="my-tag"
+						:class="{
+							shake: isEdit,
+						}"
+						v-for="item in myTags"
+						:key="item.value"
+						@click="handleClick(item)"
 					>
-						<Topic :item="item"></Topic>
+						{{ item.title }}
 					</view>
-					<view class="noMore">没有更多了，看看别的节点吧～</view>
+				</template>
+				<view class="tag edit" @click="toggleEdit()">
+					{{ isEdit ? '完成' : '编辑' }}
 				</view>
-			</swiper-item>
-		</swiper>
+			</view>
+		</view>
+		<view class="tag-wrap">
+			<view v-for="key in Object.keys(tagNavs)" :key="key">
+				<view class="title">{{ key }}</view>
+				<view
+					class="tag"
+					:class="{
+						shake: isEdit,
+						cur: isEdit && item.active,
+					}"
+					v-for="item in tagNavs[key]"
+					:key="item.value"
+					@click="handleClick(item)"
+				>
+					{{ item.title }}
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import dayjs from 'dayjs';
+import { Component, Mixins } from 'vue-property-decorator';
+import { Mutation, State } from 'vuex-class';
 import rules from '@/utils/config';
-import Topic from '@/components/Topic.vue';
-import Skeleton from '@/components/Skeleton.vue';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import topTags from '@/config/topTag.config';
-import { Getter, Mutation, State } from 'vuex-class';
-import { Component } from 'vue-property-decorator';
-import { $getAllTopics, $getHotList } from '@/services/Common.http';
-import { TagData, TagDataKey, TagTime, TagTimeKey } from '@/types/index.type';
-
-dayjs.extend(relativeTime);
-
+import tagNavs from '@/config/tagNav.config';
+import { MixinDark } from '@/mixin/Dark.mixin';
 @Component({
 	name: 'All',
-	components: {
-		Topic,
-		Skeleton,
-	},
 })
-export default class All extends Vue {
-	@State('stroageTime') private stroageTime!: number; // 缓存时长
-	@State('visited') private visited!: string[]; // 访问过的
-	// 获取tag数据
-	@Getter('getTagData') private getTagData!: (key: TagDataKey) => any;
-	// 获取tag时间
-	@Getter('getTagTime') private getTagTime!: (key: TagTimeKey) => string;
-	@Mutation('updateTagTime') private updateTagTime!: (
-		tagTime: TagTime
-	) => void;
-	@Mutation('updateTagData') private updateTagData!: (
-		tagData: TagData
-	) => void;
-	@Mutation('updateVisited') private updateVisited!: (
-		visited: string[]
-	) => void;
-	private topTags = topTags; // tag列表
-	private curTag = 'top';
-	private tagList: any = []; // 主题内容
-	private loading = true;
-	private activeTab = 0;
-
+export default class All extends Mixins(MixinDark) {
+	@State('myTags') private myTags!: string[];
+	@Mutation('updateMyTags') private updateMyTags!: (data: any) => void;
+	private tagNavs = tagNavs; // 全部tag
+	private isEdit = false; // 编辑状态
 	private onLoad() {
-		const title = this.curTag;
-		this.getData(title);
+		this.getActive();
 	}
-	// 获取数据
-	private getData(title: string) {
-		// 如果没拿到数据就调接口
-		if (this.isExpired(title)) {
-			// 最热的帖子从接口拿
-			if (title === 'top') {
-				this.getHotList(title);
-			} else {
-				this.getAllTopics(title);
-			}
+	// 设置编辑状态下高量选中的
+	private getActive() {
+		const tagNavs: any = this.tagNavs;
+		const myTags: any = this.myTags;
+		const keys = Object.keys(tagNavs);
+		const newTagNavs: any = {};
+		for (const key of keys) {
+			const tags = tagNavs[key];
+			const newTags = tags.map((item: any) => {
+				item.active = false;
+				for (const myTag of myTags) {
+					if (item.title === myTag.title) {
+						item.active = true;
+					}
+				}
+				return item;
+			});
+			newTagNavs[key] = newTags;
 		}
+		this.tagNavs = newTagNavs;
 	}
-	// 点击tab
-	private onClick(e: any) {
-		this.activeTab = e.detail.index;
-	}
-	// 切换tab时
-	private onChange(e: any) {
-		const index = e.detail.current;
-		const tags = this.topTags;
-		const title = tags[index].value;
-		this.loading = true;
-		this.activeTab = index;
-		this.getData(title);
-	}
-	// 判定缓存数据是否过期
-	private isExpired(title: string) {
-		uni.showLoading({
-			title: '正在加载中...',
-			mask: true,
+	// 添加我喜欢
+	private setMyTags(tag: any) {
+		const myTags: any = this.myTags;
+		const index = myTags.findIndex((item: any) => {
+			return item.title === tag.title;
 		});
-		const time = this.getTagTime((TagTimeKey as any)[title]);
-		if (!time) {
-			return true;
+		if (index > -1) {
+			tag.active = false;
+			myTags.splice(index, 1);
 		} else {
-			const old = dayjs(time);
-			const now = dayjs();
-			// 缓存时间超过设定的时间,则重新请求数据
-			if (now.diff(old, 'minute') >= this.stroageTime) {
-				return true;
-			}
-			this.getStorageData(title);
+			tag.active = true;
+			myTags.push(tag);
 		}
-		return true;
+		this.updateMyTags(myTags);
 	}
-	// 从缓存取数据
-	private getStorageData(title: string) {
-		const tagList = this.getTagData((TagDataKey as any)[title]);
-		if (tagList.length) {
-			const visited: any = this.visited;
-			tagList.forEach((item: any) => {
-				if (visited.includes(item.id)) {
-					item.beVisited = true;
-				}
-			});
-			this.tagList = tagList;
-			this.loading = false;
-			uni.hideLoading();
-			return false;
-		}
+	// 编辑节点
+	private toggleEdit() {
+		uni.vibrateShort({});
+		const isEdit = this.isEdit;
+		this.isEdit = !isEdit;
 	}
-	// 根据tag获取内容
-	private async getAllTopics(title: string) {
-		const data = await $getAllTopics(title);
-		if (data) {
-			const visited = this.visited;
-			const tagArr = data.map((item: any) => {
-				let beVisited = false;
-				if (visited.includes(item.id)) {
-					beVisited = true;
-				}
-				return { ...item, beVisited };
-			});
-			this.commonUpdate(title, tagArr);
-		}
-	}
-	// 获取热门列表
-	private async getHotList(title: string) {
-		const data = await $getHotList();
-		if (data) {
-			const visited = this.visited;
-			const tagArr = data.map((item: any) => {
-				let beVisited = false;
-				if (visited.includes(item.id)) {
-					beVisited = true;
-				}
-				return { ...item, beVisited };
-			});
-			this.commonUpdate(title, tagArr);
-		}
-	}
-	// 更新缓存
-	private commonUpdate(title: string, tagArr: any) {
-		uni.pageScrollTo({
-			scrollTop: 0,
-		});
-		this.updateTagData({
-			key: (TagDataKey as any)[title],
-			value: tagArr,
-		});
-		this.updateTagTime({
-			key: (TagTimeKey as any)[title],
-			value: dayjs(),
-		});
-		this.tagList = tagArr;
-		this.loading = false;
-	}
-	// 跳转主题详情
-	private getTopicsDetail(id: string) {
-		let visited = this.visited;
-		const list = this.tagList;
-		if (visited.length) {
-			if (!visited.includes(id)) {
-				visited.push(id);
-				const target = list.find((item: any) => {
-					return item.id === id;
-				});
-				target.beVisited = true;
-				this.tagList = list;
-			}
+	// 点击节点
+	private handleClick(tag: any) {
+		// 编辑模式
+		if (this.isEdit) {
+			uni.vibrateShort({});
+			this.setMyTags(tag);
 		} else {
-			visited = [id];
+			this.getTags(tag);
 		}
-		this.updateVisited(visited);
+	}
+	// 跳转tag
+	private getTags(tag: any) {
 		uni.navigateTo({
-			url: `/pages/Detail?id=${id}`,
+			url: `/pages/Tag?value=${tag.value}&title=${tag.title}`,
 		});
+	}
+	private onHide() {
+		this.isEdit = false;
 	}
 }
 </script>
 
 <style lang="less" scoped>
-.container {
-	/deep/.weui-tabs-bar__wrp {
-		border-bottom: 1px solid #eee;
-		padding: 5px 0;
-		position: fixed;
-		top: 0;
-		z-index: 999;
-	}
-	.weui-tabs-swiper {
-		width: 100%;
-		height: 100vh;
-		padding-top: 45px;
-		box-sizing: border-box;
-	}
-	.weui-tabs-swiper-item {
-		height: 100vh;
-		width: 100%;
-		overflow-y: scroll;
-	}
-	.tab-skeleton {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-	}
-	/deep/.weui-tabs-bar__title {
-		margin: 0px 10px;
-	}
-	/deep/.tab-bar-title__selected {
-		font-size: 20px;
+.my-tags,
+.tag-wrap {
+	padding: 20rpx;
+	.title {
+		line-height: 80rpx;
+		margin-bottom: 20rpx;
+		font-size: 30rpx;
 		font-weight: bold;
+	}
+	.tag,
+	.my-tag {
+		line-height: 60rpx;
+		padding: 0 20rpx;
+		background: #f2f2f2;
+		border-radius: 10rpx;
+		font-size: 24rpx;
+		height: 60rpx;
+		display: inline-block;
+		vertical-align: top;
+		margin: 0 20rpx 20rpx 0;
+		&.cur {
+			background: darkgray;
+			color: #fff;
+		}
+		&.shake {
+			&:nth-child(n) {
+				animation: shake infinite alternate 0.1s;
+			}
+			&:nth-child(2n) {
+				animation-delay: 0.1s;
+			}
+			&:nth-child(3n) {
+				animation-delay: 0.2s;
+			}
+			&:nth-child(4n) {
+				animation-delay: 0.1s;
+			}
+			&:nth-child(4n) {
+				animation-delay: 0;
+			}
+		}
+		&.touch {
+			box-shadow: 0 0 13rpx #ccc;
+		}
+	}
+	.edit {
+		background: #fff;
+		border: 2rpx solid #dedede;
+		box-sizing: border-box;
+		color: #666;
+	}
+}
+.dark {
+	background: #191919;
+	.title {
+		color: #fff !important;
+	}
+	.tag,
+	.my-tag {
+		color: #191919;
+		background: #ededed;
+	}
+}
+@keyframes shake {
+	from {
+		transform: rotate(2deg);
+	}
+	to {
+		transform: rotate(-2deg);
 	}
 }
 </style>

@@ -14,8 +14,10 @@ const RootProjectPersisted = createPersistedState({
 
 export default new Vuex.Store({
 	state: {
-		stroageTime: 1, // 缓存时长
+		darkModel: false, // 夜间模式
+		stroageTime: 15, // 缓存时长 分钟
 		visited: [], // 访问过的
+		myTags: [], // 我的tag
 		top_time: '',
 		top: [],
 		all_time: '',
@@ -46,6 +48,19 @@ export default new Vuex.Store({
 		},
 	},
 	mutations: {
+		// 更新缓存时长
+		updateStroageTime(state, data) {
+			state.stroageTime = data;
+		},
+		// 更新我喜欢的tag
+		updateMyTags(state, data) {
+			state.myTags = data;
+		},
+		// 切换模式
+		toggleDarkModel(state, data) {
+			state.darkModel = data;
+		},
+		// 保存访问过的
 		updateVisited(state, visited) {
 			state.visited = visited;
 		},

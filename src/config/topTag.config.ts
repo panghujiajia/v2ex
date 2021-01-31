@@ -1,7 +1,7 @@
 // 主页的热门节点
 export default [
 	{
-		title: '热门',
+		title: 'Top10',
 		value: 'top',
 	},
 	{

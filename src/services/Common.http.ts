@@ -33,6 +33,8 @@ export const $login = async (params: any, cookie: any) => {
 		const res = await http.post('/signin', params, {
 			header: {
 				'Content-Type': 'application/x-www-form-urlencoded',
+				origin: 'https://www.v2ex.com',
+				referer: 'https://www.v2ex.com/signin',
 				cookie,
 			},
 		});

@@ -1,36 +1,38 @@
 {
 	"tabBar": {
-		"color": "#6D7788",
-		"selectedColor": "#000000",
+		"color": "#191919",
+		"selectedColor": "#2189FA",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [
 			{
-				"pagePath": "pages/All",
-				"iconPath": "static/icons/index.png",
-				"selectedIconPath": "static/icons/index_cur.png",
+				"pagePath": "pages/Hot",
+				"iconPath": "static/icons/top-bright.png",
+				"selectedIconPath": "static/icons/top-cur.png",
 				"text": "热门"
 			},
 			{
-				"pagePath": "pages/Find",
-				"iconPath": "static/icons/all.png",
-				"selectedIconPath": "static/icons/all_cur.png",
-				"text": "节点"
+				"pagePath": "pages/All",
+				"iconPath": "static/icons/all-bright.png",
+				"selectedIconPath": "static/icons/all-cur.png",
+				"text": "全部"
 			},
 			{
 				"pagePath": "pages/Set",
-				"iconPath": "static/icons/my.png",
-				"selectedIconPath": "static/icons/my_cur.png",
+				"iconPath": "static/icons/user-bright.png",
+				"selectedIconPath": "static/icons/user-cur.png",
 				"text": "我的"
 			}
 		]
 	},
 	"pages": [
 		{
-			"path": "pages/All",
+			"path": "pages/Hot",
 			"style": {
 				"usingComponents": {
-					"we-tabs": "/wxcomponents/we-tabs/index"
+					"we-tabs": "/wxcomponents/we-tabs/index",
+					"van-empty": "/wxcomponents/vant/empty/index",
+					"van-button": "/wxcomponents/vant/button/index"
 				}
 			}
 		},
@@ -38,28 +40,46 @@
 			"path": "pages/Set",
 			"style": {
 				"usingComponents": {
-					"van-cell": "/wxcomponents/vant/cell/index",
-					"van-cell-group": "/wxcomponents/vant/cell-group/index",
+					"van-switch": "/wxcomponents/vant/switch/index",
 					"van-icon": "/wxcomponents/vant/icon/index"
 				}
 			}
 		},
 		{
-			"path": "pages/Find",
+			"path": "pages/Storage",
 			"style": {
 				"usingComponents": {
-					"van-search": "/wxcomponents/vant/search/index"
+					"van-switch": "/wxcomponents/vant/switch/index",
+					"van-icon": "/wxcomponents/vant/icon/index"
+				}
+			}
+		},
+		{
+			"path": "pages/All",
+			"style": {
+				"usingComponents": {
+					"van-button": "/wxcomponents/vant/button/index"
 				}
 			}
 		},
 		{
 			"path": "pages/Tag",
 			"style": {
-				"enablePullDownRefresh": true
+				"enablePullDownRefresh": true,
+				"usingComponents": {
+					"van-empty": "/wxcomponents/vant/empty/index",
+					"van-button": "/wxcomponents/vant/button/index"
+				}
 			}
 		},
 		{
-			"path": "pages/Detail"
+			"path": "pages/Detail",
+			"style": {
+				"usingComponents": {
+					"van-empty": "/wxcomponents/vant/empty/index",
+					"van-button": "/wxcomponents/vant/button/index"
+				}
+			}
 		}
 	],
 	"globalStyle": {

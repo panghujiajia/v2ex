@@ -1,5 +1,8 @@
 <template>
-	<view class="topic-wrap" :class="item.beVisited ? 'cur' : ''">
+	<view
+		class="topic-wrap"
+		:class="[item.beVisited ? 'cur' : '', darkModel ? 'dark' : '']"
+	>
 		<view class="title-wrap">
 			<text class="title">{{ item.title }}</text>
 			<view v-if="item.tagName" class="tag">
@@ -11,6 +14,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
+import { State } from 'vuex-class';
 import User from './User.vue';
 @Component({
 	name: 'Topic',
@@ -19,19 +23,16 @@ import User from './User.vue';
 	},
 })
 export default class Topic extends Vue {
+	@State('darkModel') private darkModel!: boolean;
 	@Prop()
 	private item: any;
 }
 </script>
 <style lang="less" scoped>
-.cur {
-	color: #adadad !important;
-}
 .topic-wrap {
 	padding: 20rpx;
 	border-bottom: 20rpx solid #f9f9f9;
 	background: #fff;
-
 	.title-wrap {
 		line-height: 40rpx;
 		display: flex;
@@ -48,11 +49,9 @@ export default class Topic extends Vue {
 			text-overflow: ellipsis;
 			-webkit-line-clamp: 2;
 		}
-
 		.tag {
 			flex: 2;
 			text-align: right;
-
 			text {
 				line-height: 40rpx;
 				padding: 0 20rpx;
@@ -65,6 +64,28 @@ export default class Topic extends Vue {
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
+			}
+		}
+	}
+}
+.dark {
+	background: #191919;
+	color: #d1d1d1;
+	border-bottom: 2rpx solid #222;
+	.tag {
+		text {
+			background: #d1d1d1 !important;
+			color: #191919 !important;
+		}
+	}
+}
+.cur {
+	color: #adadad !important;
+	&.dark {
+		.tag {
+			text {
+				background: #adadad !important;
+				color: #5d5d5d !important;
 			}
 		}
 	}
