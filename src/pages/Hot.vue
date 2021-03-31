@@ -246,7 +246,7 @@ export default class Hot extends Mixins(MixinDark) {
 	}
 	// 跳转主题详情
 	private getTopicsDetail(id: string) {
-		let visited = this.visited;
+		const visited = this.visited;
 		const list = this.tagList;
 		if (!visited.includes(id)) {
 			visited.push(id);

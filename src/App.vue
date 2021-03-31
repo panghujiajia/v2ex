@@ -5,6 +5,9 @@ export default Vue.extend({
 	mpType: 'app',
 	onLaunch() {
 		console.log('App Launch');
+		wx.cloud.init({
+			env: 'common-9c2ec5', //点击开发者工具上的 云开发->设置 就看到了
+		});
 	},
 	onShow() {
 		console.log('App Show');

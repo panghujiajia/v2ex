@@ -1,4 +1,5 @@
 {
+	"cloud": true,
 	"tabBar": {
 		"color": "#191919",
 		"selectedColor": "#2189FA",

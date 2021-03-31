@@ -1,4 +1,4 @@
-import http from './index';
+import { http } from './index';
 import qs from 'qs';
 import rules from '@/utils/config';
 import dayjs from 'dayjs';

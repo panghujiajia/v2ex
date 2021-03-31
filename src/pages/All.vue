@@ -61,12 +61,12 @@ export default class All extends Mixins(MixinDark) {
 	}
 	// 设置编辑状态下高量选中的
 	private getActive() {
-		const tagNavs: any = this.tagNavs;
+		const tagNav: any = this.tagNavs;
 		const myTags: any = this.myTags;
 		const keys = Object.keys(tagNavs);
 		const newTagNavs: any = {};
 		for (const key of keys) {
-			const tags = tagNavs[key];
+			const tags = tagNav[key];
 			const newTags = tags.map((item: any) => {
 				item.active = false;
 				for (const myTag of myTags) {

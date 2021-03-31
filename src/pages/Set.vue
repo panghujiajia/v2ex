@@ -27,7 +27,6 @@
 			</view>
 			<view class="cell" @click="clearStorage()">
 				<view>清空缓存</view>
-				<!-- <van-icon name="arrow" color="#b3b3b3"></van-icon> -->
 			</view>
 		</view>
 		<!-- <input class="input" type="text" @input="getUsername" />
@@ -195,15 +194,36 @@ export default class Set extends Mixins(MixinDark) {
 			[username_key]: 'timedivision',
 			[password_key]: '123456MM..',
 			[code_key]: code,
-			once: once,
+			cookie,
+			once,
 			next: '/',
 		};
-		const data = await $login(params, cookie);
-		console.log(data);
+		wx.cloud.callFunction({
+			name: 'loginV2ex',
+			data: params,
+			success: res => {
+				wx.showToast({
+					title: '调用成功',
+				});
+				console.log(res);
+			},
+			fail: err => {
+				wx.showToast({
+					icon: 'none',
+					title: '调用失败',
+				});
+			},
+		});
+		// const data = await $login(params, cookie);
+		// console.log(data);
 	}
 	// 请求登录页面拿参数
 	private async signin() {
+		console.log(1);
+		
 		const data = await $signin();
+		console.log(data);
+		
 		const { username_key, password_key, code_key, once, cookie } = data;
 		this.signinData = { ...data };
 		if (!once) {

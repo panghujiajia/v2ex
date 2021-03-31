@@ -1,6 +1,6 @@
 <template>
 	<view :class="darkModel ? 'dark' : ''">
-		<template v-if="loading">
+		<template v-if="loading && loadType === 'refresh'">
 			<Skeleton type="list"></Skeleton>
 		</template>
 		<template v-else>
@@ -62,9 +62,8 @@ import { MixinDark } from '@/mixin/Dark.mixin';
 })
 export default class Tag extends Mixins(MixinDark) {
 	@State('visited') private visited!: string[]; // 访问过的
-	@Mutation('updateVisited') private updateVisited!: (
-		visited: string[]
-	) => void;
+	@Mutation('updateVisited')
+	private updateVisited!: (visited: string[]) => void;
 	private tagList: any = []; // 主题内容
 	private pageNum = 1; // 页码
 	private value = ''; // 参数
@@ -124,7 +123,7 @@ export default class Tag extends Mixins(MixinDark) {
 	}
 	// 跳转主题详情
 	private getTopicsDetail(id: string) {
-		let visited = this.visited;
+		const visited = this.visited;
 		const list = this.tagList;
 		if (!visited.includes(id)) {
 			visited.push(id);
