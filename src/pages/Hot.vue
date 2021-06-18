@@ -81,16 +81,14 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import dayjs from 'dayjs';
-import rules from '@/utils/config';
 import Topic from '@/components/Topic.vue';
 import Skeleton from '@/components/Skeleton.vue';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import topTags from '@/config/topTag.config';
 import { Getter, Mutation, State } from 'vuex-class';
 import { Component, Mixins } from 'vue-property-decorator';
-import { $getAllTopics, $getHotList } from '@/services/Common.http';
+import { $getTabTopics } from '@/services/Common.http';
 import { TagData, TagDataKey, TagTime, TagTimeKey } from '@/types/index.type';
 import { MixinDark } from '@/mixin/Dark.mixin';
 
@@ -135,12 +133,7 @@ export default class Hot extends Mixins(MixinDark) {
 		const title = this.curTag;
 		// 如果没拿到数据就调接口
 		if (this.isExpired(title)) {
-			// 最热的帖子从接口拿
-			if (title === 'top') {
-				this.getHotList(title);
-			} else {
-				this.getAllTopics(title);
-			}
+			this.getTabTopics(title);
 		}
 	}
 	// 点击tab
@@ -192,26 +185,8 @@ export default class Hot extends Mixins(MixinDark) {
 		}
 	}
 	// 根据tag获取内容
-	private async getAllTopics(title: string) {
-		const data = await $getAllTopics(title);
-		if (data) {
-			const visited = this.visited;
-			const tagArr = data.map((item: any) => {
-				let beVisited = false;
-				if (visited.includes(item.id)) {
-					beVisited = true;
-				}
-				return { ...item, beVisited };
-			});
-			this.commonUpdate(title, tagArr);
-		} else {
-			this.loadFailedTime += 1;
-			this.loading = false;
-		}
-	}
-	// 获取热门列表
-	private async getHotList(title: string) {
-		const data = await $getHotList();
+	private async getTabTopics(title: string) {
+		const data = await $getTabTopics(title);
 		if (data) {
 			const visited = this.visited;
 			const tagArr = data.map((item: any) => {

@@ -47,10 +47,9 @@
 </template>
 <script lang="ts">
 import { Component, Mixins, Vue } from 'vue-property-decorator';
-import rules from '@/utils/config';
 import Topic from '@/components/Topic.vue';
 import Skeleton from '@/components/Skeleton.vue';
-import { $getTagTopics } from '@/services/Common.http';
+import { $getAllTopics } from '@/services/Common.http';
 import { Mutation, State } from 'vuex-class';
 import { MixinDark } from '@/mixin/Dark.mixin';
 @Component({
@@ -76,14 +75,14 @@ export default class Tag extends Mixins(MixinDark) {
 		uni.setNavigationBarTitle({ title: options.title });
 		const value = options.value;
 		this.value = value;
-		this.getTagTopics();
+		this.getAllTopics();
 	}
 	// 根据tag获取内容
-	private async getTagTopics() {
+	private async getAllTopics() {
 		this.loading = true;
 		const tagList = this.tagList;
-		const value = this.value;
-		const data = await $getTagTopics({ value, pageNum: this.pageNum });
+		const tab = this.value;
+		const data = await $getAllTopics({ tab, p: this.pageNum });
 		if (data) {
 			const visited: any = this.visited;
 			const tagArr = data.map((item: any) => {
@@ -143,12 +142,12 @@ export default class Tag extends Mixins(MixinDark) {
 		this.pageNum = 1;
 		this.loadType = 'refresh';
 		this.noMore = false;
-		this.getTagTopics();
+		this.getAllTopics();
 	}
 	private onReachBottom() {
 		this.pageNum = ++this.pageNum;
 		this.loadType = 'loadMore';
-		this.getTagTopics();
+		this.getAllTopics();
 	}
 }
 </script>

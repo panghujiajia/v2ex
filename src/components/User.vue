@@ -3,12 +3,12 @@
 		class="user-info"
 		:class="[item.beVisited ? 'visited' : '', darkModel ? 'dark' : '']"
 	>
-		<image class="avatar" :src="item.avatarUrl"></image>
+		<image class="avatar" :src="item.avatar"></image>
 		<view class="info">
 			<view class="name-wrap">
 				<text class="name">{{ item.author }}</text>
 				<view class="node" v-if="item.detail === 'node'">
-					<text>{{ item.tagTitle }}</text>
+					<text>{{ item.tag_title }}</text>
 				</view>
 				<template v-else-if="item.detail === 'floor'">
 					<view class="floor-wrap" v-if="!item.isUp">
@@ -22,9 +22,9 @@
 			</view>
 			<view class="time">
 				<text class="reply">
-					{{ item.lastReply }}
+					{{ item.last_reply }}
 				</text>
-				<text v-if="item.replyNo">{{ item.replyNo }} 回复</text>
+				<text v-if="item.reply_num">{{ item.reply_num }} 回复</text>
 			</view>
 		</view>
 	</view>

@@ -5,8 +5,8 @@
 	>
 		<view class="title-wrap">
 			<text class="title">{{ item.title }}</text>
-			<view v-if="item.tagName" class="tag">
-				<text>{{ item.tagName }}</text>
+			<view v-if="item.tab_name" class="tag">
+				<text>{{ item.tab_name }}</text>
 			</view>
 		</view>
 		<User :item="item"></User>
