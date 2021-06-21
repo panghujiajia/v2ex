@@ -37,9 +37,7 @@
 	</view>
 </template>
 <script lang="ts">
-import { $login, $getCaptchaBase64, $signin } from '@/services/Common.http';
-import { Component, Mixins, Vue } from 'vue-property-decorator';
-import rules from '@/utils/config';
+import { Component, Mixins,  } from 'vue-property-decorator';
 import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
 import { MixinDark } from '@/mixin/Dark.mixin';
@@ -218,20 +216,20 @@ export default class Set extends Mixins(MixinDark) {
 		// console.log(data);
 	}
 	// 请求登录页面拿参数
-	private async signin() {
-		console.log(1);
+	// private async signin() {
+	// 	console.log(1);
 		
-		const data = await $signin();
-		console.log(data);
+	// 	const data = await $signin();
+	// 	console.log(data);
 		
-		const { username_key, password_key, code_key, once, cookie } = data;
-		this.signinData = { ...data };
-		if (!once) {
-			return;
-		}
-		const captchaBase64 = await $getCaptchaBase64(once, cookie);
-		this.captchaBase64 = captchaBase64 && (captchaBase64 as string);
-	}
+	// 	const { username_key, password_key, code_key, once, cookie } = data;
+	// 	this.signinData = { ...data };
+	// 	if (!once) {
+	// 		return;
+	// 	}
+	// 	const captchaBase64 = await $getCaptchaBase64(once, cookie);
+	// 	this.captchaBase64 = captchaBase64 && (captchaBase64 as string);
+	// }
 }
 </script>
 <style lang="less" scoped>

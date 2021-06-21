@@ -3,7 +3,7 @@
 		class="user-info"
 		:class="[item.beVisited ? 'visited' : '', darkModel ? 'dark' : '']"
 	>
-		<!-- <image class="avatar" :src="item.avatar"></image> -->
+		<image class="avatar" :src="item.avatar"></image>
 		<view class="info">
 			<view class="name-wrap">
 				<text class="name">{{ item.author }}</text>
