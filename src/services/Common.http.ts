@@ -28,3 +28,16 @@ export const $getAllTopics = async (params: { tab: string; p: number }) => {
 		return false;
 	}
 };
+
+export const $getTopicDetail = async (id: string) => {
+	try {
+		const res = await http.get('/api/topics/detail', {
+			params: {
+				id,
+			},
+		});
+		return res.data.data;
+	} catch (error) {
+		return false;
+	}
+};

@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { $getTopicsDetail, $getTopicReplies } from '@/services/Common.http';
+import { $getTopicDetail } from '@/services/Common.http';
 import dayjs from 'dayjs';
 import isLeapYear from 'dayjs/plugin/isLeapYear'; // 导入插件
 import 'dayjs/locale/zh-cn'; // 导入本地化语言
@@ -97,69 +97,59 @@ export default class Detail extends Mixins(MixinDark) {
 			title: '加载中...',
 			mask: true,
 		});
-		const detail = $getTopicsDetail(params.id);
-		const reply = $getTopicReplies(params.id);
 		try {
-			const res = await Promise.all([detail, reply]);
-			this.getTopicsDetail(res);
+			const res = await $getTopicDetail(params.id);
+			if (res) {
+				console.log(res);
+				const { detail, replys } = res;
+				this.getTopicsDetail(detail[0], replys);
+			}
 		} catch (error) {
 			this.loading = false;
 			this.loadFailedTime += 1;
 		}
 	}
 	// 取主题详情
-	private getTopicsDetail(res: any) {
+	private getTopicsDetail(detail: any, replys: any) {
 		let topicsDetail = null;
-		const data = res[0];
 		topicsDetail = {
-			data: data.content,
-			lastReply:
-				dayjs(data.created * 1000)
+			data: detail.content,
+			last_reply:
+				dayjs(detail.created * 1000)
 					.startOf('hour')
 					.fromNow() + ' ',
-			lastReplyBy: `由 ${data.last_reply_by} 创建`,
-			tagTitle: data.node.title,
-			title: data.title,
-			author: data.member.username,
-			avatarUrl: data.member.avatar_mini,
-			id: data.member.id,
+			tag_title: detail.node.title,
+			title: detail.title,
+			author: detail.member.username,
+			avatar: detail.member.avatar_mini,
+			id: detail.member.id,
 			detail: 'node',
 		};
 		this.topicsDetail = topicsDetail;
-		this.getTopicsReplies(res[1]);
+		this.getTopicsReplies(replys);
 	}
 	// 取主题回复
-	private getTopicsReplies(res: any) {
-		const { id } = this.topicsDetail;
-		const len = res.length;
+	private getTopicsReplies(replys: any) {
+		const len = replys.length;
 		if (!len) {
 			this.loading = false;
 			uni.hideLoading();
 			return;
 		}
 		for (let i = 0; i < len; i++) {
-			const item = res[i];
-			const isUp = item.member.id === id;
+			const item = replys[i];
 			item.content = item.content;
 			item.user = {
-				id: item.member.id,
-				index: i + 1,
-				isUp,
-				author: item.member.username,
-				avatarUrl: item.member.avatar_mini,
-				lastReply:
-					dayjs(item.last_modified * 1000)
-						.startOf('hour')
-						.fromNow() + ' ',
+				...item.user,
 				detail: 'floor',
 			};
 		}
 		const endTime =
-			res[len - 1].last_modified &&
-			dayjs(res[len - 1].last_modified * 1000).format(
+			replys[len - 1].last_modified &&
+			dayjs(replys[len - 1].last_modified * 1000).format(
 				'YYYY-MM-DD HH:mm:ss'
 			);
-		this.topicsReplies = res;
+		this.topicsReplies = replys;
 		this.endTime = endTime;
 		this.loading = false;
 		uni.hideLoading();

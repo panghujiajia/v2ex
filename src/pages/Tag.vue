@@ -11,7 +11,7 @@
 							round
 							type="info"
 							class="bottom-button"
-							@click="getTagTopics()"
+							@click="getAllTopics()"
 						>
 							再试一次
 						</van-button>
@@ -152,6 +152,11 @@ export default class Tag extends Mixins(MixinDark) {
 }
 </script>
 <style lang="less" scoped>
+.bottom-button {
+	/deep/.van-button--round {
+		padding: 0 50rpx !important;
+	}
+}
 .load-failed {
 	padding-top: 150rpx;
 }
