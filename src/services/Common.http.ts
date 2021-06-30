@@ -50,3 +50,13 @@ export const $getLoginParams = async () => {
 		return false;
 	}
 };
+
+export const $login = async (param: any, cookie: any) => {
+	try {
+		const res = await http.post('/api/login', { param, cookie });
+		console.log(res);
+		return res.data.data;
+	} catch (error) {
+		return false;
+	}
+};

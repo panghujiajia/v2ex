@@ -41,7 +41,7 @@ import { Component, Mixins } from 'vue-property-decorator';
 import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
 import { MixinDark } from '@/mixin/Dark.mixin';
-import { $getLoginParams } from '@/services/Common.http';
+import { $getLoginParams, $login } from '@/services/Common.http';
 @Component({
 	name: 'Set',
 })
@@ -197,24 +197,8 @@ export default class Set extends Mixins(MixinDark) {
 			once,
 			next: '/',
 		};
-		wx.cloud.callFunction({
-			name: 'loginV2ex',
-			data: params,
-			success: res => {
-				wx.showToast({
-					title: '调用成功',
-				});
-				console.log(res);
-			},
-			fail: err => {
-				wx.showToast({
-					icon: 'none',
-					title: '调用失败',
-				});
-			},
-		});
-		// const data = await $login(params, cookie);
-		// console.log(data);
+		const data = await $login(params, cookie);
+		console.log(data);
 	}
 	// 请求登录页面拿参数
 	private async signin() {
@@ -222,7 +206,8 @@ export default class Set extends Mixins(MixinDark) {
 		console.log(data);
 		const { codeUrl } = data;
 		this.signinData = data;
-		this.captchaBase64 = codeUrl;
+		this.captchaBase64 =
+			'data:image/png;base64,' + uni.arrayBufferToBase64(codeUrl.data);
 	}
 }
 </script>
