@@ -41,3 +41,12 @@ export const $getTopicDetail = async (id: string) => {
 		return false;
 	}
 };
+
+export const $getLoginParams = async () => {
+	try {
+		const res = await http.get('/api/getLoginParams');
+		return res.data.data;
+	} catch (error) {
+		return false;
+	}
+};
