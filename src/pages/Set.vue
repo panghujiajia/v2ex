@@ -1,6 +1,6 @@
 <template>
 	<view class="container" :class="darkModel ? 'dark' : ''">
-		<!-- <view class="header">
+		<view class="header">
 			<view class="avatar" @click="showTip()">
 				<open-data type="userAvatarUrl"></open-data>
 			</view>
@@ -9,14 +9,14 @@
 			</view>
 		</view>
 		<view class="cell-group">
-			<view class="cell">
+			<!-- <view class="cell">
 				<view>浏览历史</view>
 				<van-icon name="arrow" color="#b3b3b3"></van-icon>
 			</view>
 			<view class="cell">
 				<view>缓存设置</view>
 				<van-icon name="arrow" color="#b3b3b3"></van-icon>
-			</view>
+			</view> -->
 			<view class="cell">
 				<view>夜间模式</view>
 				<van-switch
@@ -28,12 +28,12 @@
 			<view class="cell" @click="clearStorage()">
 				<view>清空缓存</view>
 			</view>
-		</view> -->
-		<input class="input" type="text" @input="getUsername" />
+		</view>
+		<!-- <input class="input" type="text" @input="getUsername" />
 		<input class="input" type="password" @input="getPassword" />
 		<input class="input" type="text" @input="getCode" />
 		<image class="code" :src="captchaBase64" />
-		<button @click="login()">登录</button>
+		<button @click="login()">登录</button> -->
 	</view>
 </template>
 <script lang="ts">
@@ -64,7 +64,7 @@ export default class Set extends Mixins(MixinDark) {
 	private password = '';
 
 	private onLoad() {
-		this.signin();
+		// this.signin();
 	}
 	// 切换夜间模式
 	private onSwitchChange({ detail }: any) {
@@ -197,8 +197,8 @@ export default class Set extends Mixins(MixinDark) {
 			once,
 			next: '/',
 		};
-		const data = await $login(params, cookie);
-		console.log(data);
+		console.log(params);
+		const data = await $login(params);
 	}
 	// 请求登录页面拿参数
 	private async signin() {
