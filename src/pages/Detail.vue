@@ -57,7 +57,7 @@
 					{{ topicsReplies.length }}条回复
 				</view>
 				<view
-					class="topic-wrap"
+					class="topic-wrap topic-reply"
 					v-for="(item, index) in topicsReplies"
 					:key="index"
 				>
@@ -189,9 +189,6 @@ export default class Detail extends Mixins(MixinDark) {
 .load-failed {
 	padding-top: 150rpx;
 }
-.topic-header {
-	border-top: 20rpx solid #f5f5f5;
-}
 .topic-wrap {
 	padding: 25rpx 30rpx;
 	background: #fff;
@@ -261,6 +258,13 @@ export default class Detail extends Mixins(MixinDark) {
 	color: #999;
 	font-size: 22rpx;
 	font-weight: 400;
+}
+.topic-header {
+	border-top: 20rpx solid #f5f5f5;
+}
+.topic-reply {
+	border-bottom: 20rpx solid #f5f5f5;
+	padding-bottom: 0;
 }
 .dark {
 	background: #191919;
