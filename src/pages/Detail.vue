@@ -1,5 +1,5 @@
 <template>
-	<view :class="darkModel ? 'dark' : ''">
+	<view class="container" :class="darkModel ? 'dark' : ''">
 		<template v-if="loading">
 			<Skeleton type="list"></Skeleton>
 		</template>
@@ -42,7 +42,7 @@
 					</view>
 					<view class="title">{{ topicsDetail.title }}</view>
 					<view class="content" v-if="topicsDetail.data">
-						<mp-html :content="topicsDetail.data" />
+						<mp-html :content="topicsDetail.data" selectable />
 					</view>
 					<view class="tag-info">
 						<view class="tag">
@@ -61,24 +61,22 @@
 					v-for="(item, index) in topicsReplies"
 					:key="index"
 				>
-					<view class="title">
-						<view class="user-info">
-							<view class="user">
-								<text class="name">{{ item.user.author }}</text>
-								<text class="time">
-									{{ item.user.last_reply }}
-								</text>
-							</view>
-							<view class="floor">
-								{{
-									item.user.is_master
-										? '楼主'
-										: `第${item.user.index}楼`
-								}}
-							</view>
+					<view class="user-info">
+						<view class="user">
+							<text class="name">{{ item.user.author }}</text>
+							<text class="time">
+								{{ item.user.last_reply }}
+							</text>
 						</view>
-						<mp-html :content="item.content" />
+						<view class="floor">
+							{{
+								item.user.is_master
+									? '楼主'
+									: `${item.user.index}楼`
+							}}
+						</view>
 					</view>
+					<mp-html :content="item.content" selectable />
 				</view>
 			</template>
 		</template>
@@ -128,7 +126,6 @@ export default class Detail extends Mixins(MixinDark) {
 		try {
 			const res = await $getTopicDetail(params.id);
 			if (res) {
-				console.log(res);
 				const { detail, replys } = res;
 				this.getTopicsDetail(detail[0], replys);
 			}
@@ -166,11 +163,12 @@ export default class Detail extends Mixins(MixinDark) {
 		}
 		for (let i = 0; i < len; i++) {
 			const item = replys[i];
-			item.content = item.content;
-			item.user = {
-				...item.user,
-				detail: 'floor',
-			};
+			const { content } = item;
+			const newContent = content.replace(
+				/(@.*?\s)/g,
+				'<text class="user-name">$1</text>'
+			);
+			item.content = newContent;
 		}
 		const endTime =
 			replys[len - 1].last_modified &&
@@ -186,12 +184,21 @@ export default class Detail extends Mixins(MixinDark) {
 </script>
 
 <style lang="less" scoped>
+.container {
+	padding-bottom: 60rpx;
+}
+text {
+	user-select: text;
+}
 .load-failed {
 	padding-top: 150rpx;
 }
 .topic-wrap {
 	padding: 25rpx 30rpx;
 	background: #fff;
+	/deep/.user-name {
+		color: #4474ff;
+	}
 	.user-info {
 		display: flex;
 		justify-content: space-between;
@@ -264,7 +271,6 @@ export default class Detail extends Mixins(MixinDark) {
 }
 .topic-reply {
 	border-bottom: 20rpx solid #f5f5f5;
-	padding-bottom: 0;
 }
 .dark {
 	background: #191919;

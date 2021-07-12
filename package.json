@@ -72,6 +72,7 @@
     "htmlparser2": "^6.0.0",
     "luch-request": "^3.0.4",
     "regenerator-runtime": "^0.12.1",
+    "taro-navigationbar": "^2.1.1",
     "vue": "^2.6.11",
     "vue-class-component": "^6.3.2",
     "vue-property-decorator": "^8.0.0",

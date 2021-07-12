@@ -40,23 +40,34 @@ export default Vue.extend({
 </script>
 
 <style lang="less">
+@import '@/wxcomponents/vant/common/index.wxss';
 /*每个页面公共css */
 * {
 	font-family: PingFang SC, Lantinghei SC, Microsoft Yahei, Hiragino Sans GB,
 		Microsoft Sans Serif, WenQuanYi Micro Hei, sans-serif;
 }
 .cell-group {
-	padding-left: 30rpx;
+	// padding-left: 30rpx;
 	background: #fff;
 	.cell {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		height: 100rpx;
-		padding-right: 30rpx;
+		padding: 0 30rpx 0 40rpx;
 		box-sizing: border-box;
-		border-bottom: 1rpx solid #e5e5e5;
-		color: #1a1a1a;
+		// border-bottom: 1rpx solid #f0f0f0;
+		color: #282828;
+		font-size: 32rpx;
+		view {
+			// display: flex;
+			// align-items: center;
+		}
+		text {
+			font-size: 24rpx;
+			color: #999;
+			line-height: 100rpx;
+		}
 		&:last-child {
 			border-bottom: 0 none;
 		}

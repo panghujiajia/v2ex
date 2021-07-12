@@ -41,6 +41,8 @@
 		{
 			"path": "pages/Set",
 			"style": {
+				"navigationBarBackgroundColor": "#4474FF",
+				"navigationBarTextStyle": "white",
 				"usingComponents": {
 					"van-switch": "/wxcomponents/vant/switch/index",
 					"van-icon": "/wxcomponents/vant/icon/index"
@@ -87,7 +89,7 @@
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "v2ex",
-		"navigationBarBackgroundColor": "#F8F8F8",
+		"navigationBarBackgroundColor": "#fff",
 		"backgroundColor": "#FFF"
 	}
 }

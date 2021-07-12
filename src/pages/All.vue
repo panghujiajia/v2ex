@@ -1,5 +1,5 @@
 <template>
-	<view :class="darkModel ? 'dark' : ''">
+	<view class="container" :class="darkModel ? 'dark' : ''">
 		<view class="my-tags">
 			<view>
 				<view class="title">我喜欢的</view>
@@ -124,6 +124,9 @@ export default class All extends Mixins(MixinDark) {
 </script>
 
 <style lang="less" scoped>
+.container {
+	border-top: 20rpx solid #f5f5f5;
+}
 .my-tags,
 .tag-wrap {
 	padding: 20rpx;

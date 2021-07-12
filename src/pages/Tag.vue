@@ -1,5 +1,5 @@
 <template>
-	<view :class="darkModel ? 'dark' : ''">
+	<view class="container" :class="darkModel ? 'dark' : ''">
 		<template v-if="loading && loadType === 'refresh'">
 			<Skeleton type="list"></Skeleton>
 		</template>
@@ -155,6 +155,9 @@ export default class Tag extends Mixins(MixinDark) {
 }
 </script>
 <style lang="less" scoped>
+.container {
+	border-top: 20rpx solid #f5f5f5;
+}
 .bottom-button {
 	/deep/.van-button--round {
 		padding: 0 50rpx !important;

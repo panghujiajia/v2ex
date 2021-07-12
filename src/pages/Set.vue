@@ -1,23 +1,22 @@
 <template>
 	<view class="container" :class="darkModel ? 'dark' : ''">
-		<view class="header">
-			<view class="avatar" @click="showTip()">
-				<open-data type="userAvatarUrl"></open-data>
-			</view>
-			<view class="nick-name">
-				<open-data type="userNickName" lang="zh_CN"></open-data>
+		<nav-bar :title="'有返回和home'"></nav-bar>
+		<view class="top">
+			<view class="header">
+				<view class="avatar" @click="showTip()">
+					<open-data type="userAvatarUrl"></open-data>
+				</view>
+				<view class="nick-name">
+					<open-data type="userNickName" lang="zh_CN"></open-data>
+				</view>
 			</view>
 		</view>
 		<view class="cell-group">
-			<!-- <view class="cell">
-				<view>浏览历史</view>
+			<view class="cell van-hairline--bottom" is-link>
+				<view>访问记录<text>（最近30条）</text></view>
 				<van-icon name="arrow" color="#b3b3b3"></van-icon>
 			</view>
-			<view class="cell">
-				<view>缓存设置</view>
-				<van-icon name="arrow" color="#b3b3b3"></van-icon>
-			</view> -->
-			<view class="cell">
+			<view class="cell van-hairline--bottom">
 				<view>夜间模式</view>
 				<van-switch
 					size="40rpx"
@@ -25,15 +24,23 @@
 					@change="onSwitchChange"
 				/>
 			</view>
-			<view class="cell" @click="clearStorage()">
+			<view
+				class="cell van-hairline--bottom"
+				is-link
+				@click="clearStorage()"
+			>
 				<view>清空缓存</view>
+				<van-icon name="arrow" color="#b3b3b3"></van-icon>
+			</view>
+			<view
+				class="cell van-hairline--bottom"
+				is-link
+				@click="clearStorage()"
+			>
+				<view>关于</view>
+				<van-icon name="arrow" color="#b3b3b3"></van-icon>
 			</view>
 		</view>
-		<!-- <input class="input" type="text" @input="getUsername" />
-		<input class="input" type="password" @input="getPassword" />
-		<input class="input" type="text" @input="getCode" />
-		<image class="code" :src="captchaBase64" />
-		<button @click="login()">登录</button> -->
 	</view>
 </template>
 <script lang="ts">
@@ -41,28 +48,14 @@ import { Component, Mixins } from 'vue-property-decorator';
 import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
 import { MixinDark } from '@/mixin/Dark.mixin';
-import { $getLoginParams, $login } from '@/services/Common.http';
+import NavBar from 'taro-navigationbar';
+
 @Component({
 	name: 'Set',
 })
 export default class Set extends Mixins(MixinDark) {
-	@Mutation('toggleDarkModel') private toggleDarkModel!: (
-		data: boolean
-	) => void;
-	// 登录页面拿的参数
-	private signinData = {
-		username_key: '',
-		password_key: '',
-		code_key: '',
-		once: '',
-		cookie: '',
-	};
-	// 验证码的base64
-	private captchaBase64 = '';
-	private code = '';
-	private username = '';
-	private password = '';
-
+	@Mutation('toggleDarkModel')
+	private toggleDarkModel!: (data: boolean) => void;
 	private onLoad() {
 		// this.signin();
 	}
@@ -136,6 +129,16 @@ export default class Set extends Mixins(MixinDark) {
 	}
 	// 清理缓存
 	private clearStorage() {
+		uni.showActionSheet({
+			itemList: ['清除个人设置缓存', '清除访问记录', '清除所有'],
+			success(res) {
+				console.log(res.tapIndex);
+			},
+			fail(res) {
+				console.log(res.errMsg);
+			},
+		});
+		return;
 		try {
 			const res = uni.getStorageInfoSync();
 			const size = res.currentSize;
@@ -161,87 +164,59 @@ export default class Set extends Mixins(MixinDark) {
 	// 点击头像
 	private showTip() {
 		uni.showToast({
-			title: '没有任何信息',
+			title: '没有获取你任何信息哦',
 			icon: 'none',
 		});
-	}
-	// 获取输入的验证码
-	private getCode(e: any) {
-		this.code = e.detail.value;
-	}
-	// 获取输入的账号
-	private getUsername(e: any) {
-		this.username = e.detail.value;
-	}
-	// 获取输入的密码
-	private getPassword(e: any) {
-		this.password = e.detail.value;
-	}
-	// 登录请求
-	private async login() {
-		const {
-			username_key,
-			password_key,
-			code_key,
-			once,
-			cookie,
-		} = this.signinData;
-		const code = this.code;
-		const username = this.username;
-		const password = this.password;
-		const params = {
-			[username_key]: 'timedivision',
-			[password_key]: '123456MM..',
-			[code_key]: code,
-			cookie,
-			once,
-			next: '/',
-		};
-		console.log(params);
-		const data = await $login(params);
-	}
-	// 请求登录页面拿参数
-	private async signin() {
-		const data = await $getLoginParams();
-		console.log(data);
-		const { codeUrl } = data;
-		this.signinData = data;
-		this.captchaBase64 =
-			'data:image/png;base64,' + uni.arrayBufferToBase64(codeUrl.data);
 	}
 }
 </script>
 <style lang="less" scoped>
-.input {
-	height: 80rpx;
-	width: 80%;
-	border: 2rpx solid #ccc;
-}
-.code {
-	width: 400rpx;
-	height: 200rpx;
-}
 .container {
 	min-height: 100vh;
-	background: #f5f5f5;
+	background: #efefef;
 	box-sizing: border-box;
+	.top {
+		height: 661rpx;
+		background: url(https://ibao-private.oss-cn-shanghai.aliyuncs.com/yunibaoadmin/bg-user-center.png)
+			50% no-repeat;
+		background-size: 100%;
+		position: relative;
+		display: flex;
+		justify-content: center;
+		.title {
+			height: 80rpx;
+			line-height: 80rpx;
+			color: #fff;
+			font-weight: bold;
+		}
+	}
 }
 .header {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 20rpx 0;
-	margin-bottom: 20rpx;
-	background: #fff;
+	position: absolute;
+	bottom: 300rpx;
 	.avatar {
-		width: 120rpx;
-		height: 120rpx;
+		width: 200rpx;
+		height: 200rpx;
 		border-radius: 50%;
 		overflow: hidden;
 	}
 	.nick-name {
 		margin-top: 20rpx;
+		color: #fff;
 	}
+}
+.cell-group {
+	width: 690rpx;
+	margin: 0 auto;
+	margin-top: -200rpx;
+	border-radius: 16rpx 16rpx 0 0;
+	position: relative;
+	box-sizing: border-box;
+	z-index: 2;
+	min-height: calc(100vh - 461rpx);
 }
 .dark {
 	background: #111111;

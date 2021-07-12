@@ -169,7 +169,7 @@ export default class Hot extends Mixins(MixinDark) {
 			}
 			this.getStorageData(title);
 		}
-		return true;
+		return false;
 	}
 	// 从缓存取数据
 	private getStorageData(title: string) {
@@ -287,6 +287,7 @@ export default class Hot extends Mixins(MixinDark) {
 		background: #f5f5f5;
 		border-bottom: 1rpx solid #f5f5f5;
 		margin-bottom: 20rpx;
+		border-top: 20rpx solid #f5f5f5;
 		.item {
 			&:last-child {
 				/deep/.topic-wrap {
