@@ -31,24 +31,52 @@
 				</view>
 			</view>
 			<template v-else>
-				<view class="header">
-					<User :item="topicsDetail"></User>
+				<view class="topic-wrap topic-header">
+					<view class="user-info">
+						<view class="user">
+							<text class="name">{{ topicsDetail.author }}</text>
+							<text class="time">
+								{{ topicsDetail.last_reply }}
+							</text>
+						</view>
+					</view>
 					<view class="title">{{ topicsDetail.title }}</view>
+					<view class="content" v-if="topicsDetail.data">
+						<mp-html :content="topicsDetail.data" />
+					</view>
+					<view class="tag-info">
+						<view class="tag">
+							<view>
+								<text class="tag-symbol">#</text>
+								<text>{{ topicsDetail.tag_title }}</text>
+							</view>
+						</view>
+					</view>
 				</view>
-				<view class="content" v-if="topicsDetail.data">
-					<mp-html :content="topicsDetail.data" />
-				</view>
-				<view class="line"></view>
-				<view class="totalReplies">
-					{{ topicsReplies.length }} 回复 | 截止 {{ endTime }}
+				<view class="reply-num">
+					{{ topicsReplies.length }}条回复
 				</view>
 				<view
-					class="pages"
+					class="topic-wrap"
 					v-for="(item, index) in topicsReplies"
 					:key="index"
 				>
-					<User :item="item.user"></User>
 					<view class="title">
+						<view class="user-info">
+							<view class="user">
+								<text class="name">{{ item.user.author }}</text>
+								<text class="time">
+									{{ item.user.last_reply }}
+								</text>
+							</view>
+							<view class="floor">
+								{{
+									item.user.is_master
+										? '楼主'
+										: `第${item.user.index}楼`
+								}}
+							</view>
+						</view>
 						<mp-html :content="item.content" />
 					</view>
 				</view>
@@ -161,35 +189,78 @@ export default class Detail extends Mixins(MixinDark) {
 .load-failed {
 	padding-top: 150rpx;
 }
-.header {
-	padding: 20rpx;
+.topic-header {
+	border-top: 20rpx solid #f5f5f5;
+}
+.topic-wrap {
+	padding: 25rpx 30rpx;
+	background: #fff;
+	.user-info {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 40rpx;
+		margin-bottom: 20rpx;
+		.name {
+			font-size: 28rpx;
+			color: #666;
+			font-weight: 500;
+		}
+		.time {
+			font-size: 22rpx;
+			color: #999;
+			font-weight: 400;
+			margin-left: 20rpx;
+		}
+	}
 	.title {
-		line-height: 40rpx;
+		font-size: 32rpx;
+		color: #333;
+		line-height: 45rpx;
+		font-weight: 500;
+		margin-bottom: 20rpx;
+	}
+	.tag-info {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		margin-top: 20rpx;
+		.tag {
+			height: 50rpx;
+			line-height: 50rpx;
+			text-align: center;
+			color: #333;
+			font-size: 24rpx;
+			font-weight: 400;
+			view {
+				background: #f6f6f6;
+				padding: 0 20rpx;
+				border-radius: 25rpx;
+			}
+			.tag-symbol {
+				color: #4474ff;
+				font-size: 24rpx;
+				margin-right: 5rpx;
+			}
+		}
+		.reply {
+			color: #999;
+			font-size: 22rpx;
+		}
 	}
 }
-.content {
-	margin: 0 20rpx;
-	padding: 20rpx 0;
-	line-height: 40rpx;
-	border-top: 1rpx solid #dedede;
+.floor {
+	color: #999;
+	font-size: 22rpx;
 }
-.line {
-	height: 15rpx;
-	background: #f8f8f8;
-}
-.totalReplies {
-	padding: 10rpx 20rpx;
-	font-size: 24rpx;
-	border-bottom: 2rpx solid #f5f5f5;
-	color: #888;
-}
-.pages {
-	padding: 20rpx;
-	border-bottom: 2rpx solid #f5f5f5;
-	.title {
-		margin-top: 20rpx;
-	}
+.reply-num {
+	height: 50rpx;
+	line-height: 50rpx;
+	padding: 0 30rpx;
+	background: #f5f5f5;
+	color: #999;
+	font-size: 22rpx;
+	font-weight: 400;
 }
 .dark {
 	background: #191919;

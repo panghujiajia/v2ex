@@ -31,12 +31,15 @@
 				</view>
 			</view>
 			<template v-else>
-				<view
-					v-for="(item, index) in tagList"
-					:key="index"
-					@click="getTopicsDetail(item.id)"
-				>
-					<Topic :item="item"></Topic>
+				<view class="list-wrap">
+					<view
+						class="item"
+						v-for="(item, index) in tagList"
+						:key="index"
+						@click.stop="getTopicsDetail(item.id)"
+					>
+						<Topic :item="item"></Topic>
+					</view>
 				</view>
 				<view v-if="noMore" class="noMore">
 					没有更多了，休息一下吧～
@@ -155,6 +158,16 @@ export default class Tag extends Mixins(MixinDark) {
 .bottom-button {
 	/deep/.van-button--round {
 		padding: 0 50rpx !important;
+	}
+}
+.list-wrap {
+	background: #f5f5f5;
+	.item {
+		&:last-child {
+			/deep/.topic-wrap {
+				margin-bottom: 0;
+			}
+		}
 	}
 }
 .load-failed {

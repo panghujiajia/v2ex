@@ -1,8 +1,8 @@
 {
 	"cloud": true,
 	"tabBar": {
-		"color": "#191919",
-		"selectedColor": "#2189FA",
+		"color": "#999999",
+		"selectedColor": "#4474FF",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [
@@ -30,6 +30,7 @@
 		{
 			"path": "pages/Hot",
 			"style": {
+				"disableScroll": true,
 				"usingComponents": {
 					"we-tabs": "/wxcomponents/we-tabs/index",
 					"van-empty": "/wxcomponents/vant/empty/index",

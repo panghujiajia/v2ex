@@ -3,13 +3,24 @@
 		class="topic-wrap"
 		:class="[item.beVisited ? 'cur' : '', darkModel ? 'dark' : '']"
 	>
-		<view class="title-wrap">
-			<text class="title">{{ item.title }}</text>
-			<view v-if="item.tab_name" class="tag">
-				<text>{{ item.tab_name }}</text>
+		<view class="user-info">
+			<view class="user">
+				<text class="name">{{ item.author }}</text>
+				<text class="time">{{ item.last_reply }}</text>
 			</view>
 		</view>
-		<User :item="item"></User>
+		<view class="title">{{ item.title }}</view>
+		<view class="tag-info">
+			<view class="tag">
+				<view v-if="item.tab_name" @click.stop="getTags(item)">
+					<text class="tag-symbol">#</text>
+					<text>{{ item.tab_name }}</text>
+				</view>
+			</view>
+			<view class="reply" v-if="item.reply_num">
+				{{ item.reply_num }}条回复
+			</view>
+		</view>
 	</view>
 </template>
 <script lang="ts">
@@ -26,45 +37,68 @@ export default class Topic extends Vue {
 	@State('darkModel') private darkModel!: boolean;
 	@Prop()
 	private item: any;
+
+	private getTags(item: any) {
+		uni.navigateTo({
+			url: `/pages/Tag?value=${item.tag_value}&title=${item.tab_name}`,
+		});
+	}
 }
 </script>
 <style lang="less" scoped>
 .topic-wrap {
-	padding: 20rpx;
-	border-bottom: 20rpx solid #f9f9f9;
+	padding: 25rpx 30rpx;
 	background: #fff;
-	.title-wrap {
-		line-height: 40rpx;
+	margin-bottom: 20rpx;
+	.user-info {
 		display: flex;
-		align-items: flex-start;
-		margin-bottom: 10px;
-
-		.title {
-			flex: 5;
-			padding-right: 20rpx;
-			font-weight: bold;
-			display: -webkit-box;
-			overflow: hidden;
-			-webkit-box-orient: vertical;
-			text-overflow: ellipsis;
-			-webkit-line-clamp: 2;
+		justify-content: space-between;
+		align-items: center;
+		height: 40rpx;
+		.name {
+			font-size: 28rpx;
+			color: #666;
+			font-weight: 500;
 		}
+		.time {
+			font-size: 22rpx;
+			color: #999;
+			font-weight: 400;
+			margin-left: 20rpx;
+		}
+	}
+	.title {
+		font-size: 32rpx;
+		color: #333;
+		line-height: 45rpx;
+		font-weight: 500;
+	}
+	.tag-info {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 10rpx;
 		.tag {
-			flex: 2;
-			text-align: right;
-			text {
-				line-height: 40rpx;
+			height: 50rpx;
+			line-height: 50rpx;
+			text-align: center;
+			color: #333;
+			font-size: 24rpx;
+			font-weight: 400;
+			view {
+				background: #f6f6f6;
 				padding: 0 20rpx;
-				background: #f2f2f2;
-				border-radius: 10rpx;
-				font-size: 22rpx;
-				height: 40rpx;
-				display: inline-block;
-				vertical-align: top;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
+				border-radius: 25rpx;
 			}
+			.tag-symbol {
+				color: #4474ff;
+				font-size: 24rpx;
+				margin-right: 5rpx;
+			}
+		}
+		.reply {
+			color: #999;
+			font-size: 22rpx;
 		}
 	}
 }
@@ -80,14 +114,6 @@ export default class Topic extends Vue {
 	}
 }
 .cur {
-	color: #adadad !important;
-	&.dark {
-		.tag {
-			text {
-				background: #adadad !important;
-				color: #5d5d5d !important;
-			}
-		}
-	}
+	opacity: 0.5;
 }
 </style>

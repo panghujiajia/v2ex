@@ -65,12 +65,15 @@
 						</view>
 					</view>
 					<template v-else>
-						<view
-							v-for="(item, index) in tagList"
-							:key="index"
-							@click="getTopicsDetail(item.id)"
-						>
-							<Topic :item="item"></Topic>
+						<view class="list-wrap">
+							<view
+								class="item"
+								v-for="(item, index) in tagList"
+								:key="index"
+								@click.stop="getTopicsDetail(item.id)"
+							>
+								<Topic :item="item"></Topic>
+							</view>
 						</view>
 						<view class="noMore">没有更多了，看看别的节点吧～</view>
 					</template>
@@ -252,7 +255,7 @@ export default class Hot extends Mixins(MixinDark) {
 		background: #fff;
 		width: 100%;
 		height: 100vh;
-		padding-top: 45px;
+		padding-top: 41px;
 		box-sizing: border-box;
 	}
 	.weui-tabs-swiper-item {
@@ -278,6 +281,18 @@ export default class Hot extends Mixins(MixinDark) {
 	.bottom-button {
 		/deep/.van-button--round {
 			padding: 0 50rpx !important;
+		}
+	}
+	.list-wrap {
+		background: #f5f5f5;
+		border-bottom: 1rpx solid #f5f5f5;
+		margin-bottom: 20rpx;
+		.item {
+			&:last-child {
+				/deep/.topic-wrap {
+					margin-bottom: 0;
+				}
+			}
 		}
 	}
 }
