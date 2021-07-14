@@ -1,5 +1,5 @@
 <template>
-	<view :class="darkModel ? 'dark' : ''">
+	<view>
 		<!-- 骨架屏 -->
 		<template v-if="type === 'list'">
 			<view class="skeleton_list" v-for="item in 10" :key="item">
@@ -60,7 +60,6 @@ import { State } from 'vuex-class';
 	name: 'Skeleton',
 })
 export default class Skeleton extends Vue {
-	@State('darkModel') private darkModel!: boolean;
 	@Prop()
 	private type!: string;
 }
@@ -144,17 +143,6 @@ export default class Skeleton extends Vue {
 	.reply {
 		height: 30rpx;
 		margin-top: 20rpx;
-	}
-}
-.dark {
-	.skeleton_list,
-	.skeleton_detail {
-		background: #191919;
-	}
-	.flex,
-	.avatar {
-		background: #d1d1d1;
-		opacity: 0.5;
 	}
 }
 </style>

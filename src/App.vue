@@ -1,6 +1,5 @@
 <script lang="ts">
 import Vue from 'vue';
-import store from './vuex/index';
 export default Vue.extend({
 	mpType: 'app',
 	onLaunch() {
@@ -11,27 +10,6 @@ export default Vue.extend({
 	},
 	onShow() {
 		console.log('App Show');
-		// 夜间模式设置tabbar
-		const darkModel = store.state.darkModel;
-		if (darkModel) {
-			uni.setTabBarStyle({
-				color: '#d2d2d2',
-				backgroundColor: '#191919',
-				borderStyle: 'white',
-			});
-			uni.setTabBarItem({
-				index: 0,
-				iconPath: 'static/icons/top-dark.png',
-			});
-			uni.setTabBarItem({
-				index: 1,
-				iconPath: 'static/icons/all-dark.png',
-			});
-			uni.setTabBarItem({
-				index: 2,
-				iconPath: 'static/icons/user-dark.png',
-			});
-		}
 	},
 	onHide() {
 		console.log('App Hide');

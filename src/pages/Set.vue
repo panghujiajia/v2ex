@@ -1,5 +1,5 @@
 <template>
-	<view class="container" :class="darkModel ? 'dark' : ''">
+	<view class="container">
 		<nav-bar :title="'有返回和home'"></nav-bar>
 		<view class="top">
 			<view class="header">
@@ -12,31 +12,26 @@
 			</view>
 		</view>
 		<view class="cell-group">
-			<view class="cell van-hairline--bottom" is-link>
-				<view>访问记录<text>（最近30条）</text></view>
+			<view
+				class="cell van-hairline--bottom"
+				@click="navigateTo('history')"
+			>
+				<view>访问记录</view>
 				<van-icon name="arrow" color="#b3b3b3"></van-icon>
 			</view>
 			<view class="cell van-hairline--bottom">
-				<view>夜间模式</view>
+				<view>广告开关</view>
 				<van-switch
 					size="40rpx"
-					:checked="darkModel"
+					:checked="adSwitch"
 					@change="onSwitchChange"
 				/>
 			</view>
-			<view
-				class="cell van-hairline--bottom"
-				is-link
-				@click="clearStorage()"
-			>
+			<view class="cell van-hairline--bottom" @click="clearStorage()">
 				<view>清空缓存</view>
 				<van-icon name="arrow" color="#b3b3b3"></van-icon>
 			</view>
-			<view
-				class="cell van-hairline--bottom"
-				is-link
-				@click="clearStorage()"
-			>
+			<view class="cell van-hairline--bottom" @click="navigateTo()">
 				<view>关于</view>
 				<van-icon name="arrow" color="#b3b3b3"></van-icon>
 			</view>
@@ -44,122 +39,92 @@
 	</view>
 </template>
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
-import { MixinDark } from '@/mixin/Dark.mixin';
-import NavBar from 'taro-navigationbar';
 
 @Component({
 	name: 'Set',
 })
-export default class Set extends Mixins(MixinDark) {
-	@Mutation('toggleDarkModel')
-	private toggleDarkModel!: (data: boolean) => void;
-	private onLoad() {
-		// this.signin();
-	}
-	// 切换夜间模式
+export default class Set extends Vue {
+	@State('adSwitch')
+	private adSwitch!: boolean;
+	@Mutation('saveAdCloseTime')
+	private saveAdCloseTime!: () => void;
+	@Mutation('clearHistory')
+	private clearHistory!: () => void;
+	@Mutation('toggleAdSwitch')
+	private toggleAdSwitch!: (data: boolean) => void;
+	private onLoad() {}
 	private onSwitchChange({ detail }: any) {
-		// 黑夜模式
-		if (detail) {
-			uni.setNavigationBarColor({
-				frontColor: '#ffffff',
-				backgroundColor: '#191919',
-				animation: {
-					duration: 200,
-					timingFunc: 'easeIn',
-				},
+		this.toggleAdSwitch(detail);
+		if (!detail) {
+			this.saveAdCloseTime();
+			uni.showToast({
+				title: '关闭成功，本周将不会显示广告',
+				icon: 'none',
 			});
-			uni.setBackgroundColor({
-				backgroundColor: '#191919',
-				backgroundColorTop: '#191919',
-				backgroundColorBottom: '#191919',
-			});
-			uni.setTabBarStyle({
-				color: '#d2d2d2',
-				backgroundColor: '#191919',
-				borderStyle: 'white',
-			});
-			uni.setTabBarItem({
-				index: 0,
-				iconPath: 'static/icons/top-dark.png',
-			});
-			uni.setTabBarItem({
-				index: 1,
-				iconPath: 'static/icons/all-dark.png',
-			});
-			uni.setTabBarItem({
-				index: 2,
-				iconPath: 'static/icons/user-dark.png',
-			});
-		} else {
-			uni.setNavigationBarColor({
-				frontColor: '#000000',
-				backgroundColor: '#ffffff',
-				animation: {
-					duration: 200,
-					timingFunc: 'easeIn',
-				},
-			});
-			uni.setBackgroundColor({
-				backgroundColor: '#ffffff',
-				backgroundColorTop: '#ffffff',
-				backgroundColorBottom: '#ffffff',
-			});
-			uni.setTabBarStyle({
-				color: '#191919',
-				backgroundColor: '#ffffff',
-				borderStyle: 'black',
-			});
-			uni.setTabBarItem({
-				index: 0,
-				iconPath: 'static/icons/top-bright.png',
-			});
-			uni.setTabBarItem({
-				index: 1,
-				iconPath: 'static/icons/all-bright.png',
-			});
-			uni.setTabBarItem({
-				index: 2,
-				iconPath: 'static/icons/user-bright.png',
-			});
+			return;
 		}
-		this.toggleDarkModel(detail);
+		uni.showToast({
+			title: '开启成功，感谢您愿意打开广告',
+			icon: 'none',
+		});
+	}
+	private navigateTo(key: string) {
+		const urlList: any = {
+			history: '/pages/History',
+		};
+		if (!key) {
+			uni.showToast({
+				title: '还在想要放什么...',
+				icon: 'none',
+			});
+			return;
+		}
+		const url = urlList[key];
+		uni.navigateTo({ url });
 	}
 	// 清理缓存
 	private clearStorage() {
+		const res = uni.getStorageInfoSync();
+		const size = res.currentSize;
+		if (size <= 1) {
+			uni.showToast({
+				title: '已经清理干净了',
+				icon: 'none',
+			});
+			return;
+		}
 		uni.showActionSheet({
-			itemList: ['清除个人设置缓存', '清除访问记录', '清除所有'],
-			success(res) {
-				console.log(res.tapIndex);
+			itemList: ['清除访问记录', '清除所有'],
+			success: res => {
+				const { tapIndex } = res;
+				switch (tapIndex) {
+					case 0:
+						this.clearHistory();
+						uni.showToast({
+							title: '清理成功！',
+							icon: 'none',
+						});
+						break;
+					case 1:
+						this.clearHistory();
+						this.toggleAdSwitch(true);
+						uni.clearStorageSync();
+						uni.showToast({
+							title: `清理成功！共为您腾出${size}kb空间！`,
+							icon: 'none',
+						});
+						break;
+					default:
+						break;
+				}
 			},
-			fail(res) {
+			fail: res => {
 				console.log(res.errMsg);
 			},
 		});
-		return;
-		try {
-			const res = uni.getStorageInfoSync();
-			const size = res.currentSize;
-			if (size <= 1) {
-				uni.showToast({
-					title: '已经清理干净了',
-					icon: 'none',
-				});
-				return;
-			}
-			uni.clearStorageSync();
-			uni.showToast({
-				title: `清理成功！共为您腾出${size}kb空间！`,
-				icon: 'none',
-			});
-		} catch (error) {
-			uni.showToast({
-				title: '清理失败，请稍后再试',
-				icon: 'none',
-			});
-		}
 	}
 	// 点击头像
 	private showTip() {
@@ -217,21 +182,5 @@ export default class Set extends Mixins(MixinDark) {
 	box-sizing: border-box;
 	z-index: 2;
 	min-height: calc(100vh - 461rpx);
-}
-.dark {
-	background: #111111;
-	.header {
-		background: #191919;
-		.nick-name {
-			color: #d1d1d1;
-		}
-	}
-	.cell-group {
-		background: #191919;
-		.cell {
-			color: #d1d1d1;
-			border-bottom-color: #242424;
-		}
-	}
 }
 </style>

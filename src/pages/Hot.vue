@@ -1,15 +1,14 @@
 <template>
-	<view class="container" :class="darkModel ? 'dark' : ''">
+	<view class="container">
 		<we-tabs
 			:tabs="topTags"
 			:activeTab="activeTab"
 			@tabclick="onClick"
 			activeClass="tab-bar-title__selected"
-			:model="darkModel ? 'dark' : 'bright'"
-			:tabUnderlineColor="darkModel ? '#d1d1d1' : '#191919'"
-			:tabActiveTextColor="darkModel ? '#d1d1d1' : '#191919'"
-			:tabInactiveTextColor="darkModel ? '#d1d1d1' : '#191919'"
-			:tabBackgroundColor="darkModel ? '#191919' : '#fff'"
+			tabUnderlineColor="#4474FF"
+			tabActiveTextColor="#4474FF"
+			tabInactiveTextColor="#666666"
+			tabBackgroundColor="#fff"
 		>
 		</we-tabs>
 		<swiper
@@ -74,6 +73,9 @@
 							>
 								<Topic :item="item"></Topic>
 							</view>
+							<view v-if="adSwitch" class="item">
+								<ad unit-id="adunit-1f991a273d575025"></ad>
+							</view>
 						</view>
 						<view class="noMore">没有更多了，看看别的节点吧～</view>
 					</template>
@@ -90,10 +92,9 @@ import Skeleton from '@/components/Skeleton.vue';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import topTags from '@/config/topTag.config';
 import { Getter, Mutation, State } from 'vuex-class';
-import { Component, Mixins } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import { $getTabTopics } from '@/services/Common.http';
 import { TagData, TagDataKey, TagTime, TagTimeKey } from '@/types/index.type';
-import { MixinDark } from '@/mixin/Dark.mixin';
 
 dayjs.extend(relativeTime);
 
@@ -104,22 +105,27 @@ dayjs.extend(relativeTime);
 		Skeleton,
 	},
 })
-export default class Hot extends Mixins(MixinDark) {
-	@State('stroageTime') private stroageTime!: number; // 缓存时长
-	@State('visited') private visited!: string[]; // 访问过的
+export default class Hot extends Vue {
+	@State('adSwitch')
+	private adSwitch!: boolean;
+	@State('stroageTime')
+	private stroageTime!: number; // 缓存时长
+	@State('visited')
+	private visited!: string[]; // 访问过的
 	// 获取tag数据
-	@Getter('getTagData') private getTagData!: (key: TagDataKey) => any;
+	@Getter('getTagData')
+	private getTagData!: (key: TagDataKey) => any;
 	// 获取tag时间
-	@Getter('getTagTime') private getTagTime!: (key: TagTimeKey) => string;
-	@Mutation('updateTagTime') private updateTagTime!: (
-		tagTime: TagTime
-	) => void;
-	@Mutation('updateTagData') private updateTagData!: (
-		tagData: TagData
-	) => void;
-	@Mutation('updateVisited') private updateVisited!: (
-		visited: string[]
-	) => void;
+	@Getter('getTagTime')
+	private getTagTime!: (key: TagTimeKey) => string;
+	@Mutation('updateAdSwitch')
+	private updateAdSwitch!: () => void;
+	@Mutation('updateTagTime')
+	private updateTagTime!: (tagTime: TagTime) => void;
+	@Mutation('updateTagData')
+	private updateTagData!: (tagData: TagData) => void;
+	@Mutation('updateVisited')
+	private updateVisited!: (visited: string[]) => void;
 	private topTags = topTags; // tag列表
 	private curTag = 'top';
 	private tagList: any = []; // 主题内容
@@ -127,6 +133,9 @@ export default class Hot extends Mixins(MixinDark) {
 	private activeTab = 0;
 	private loadFailedTime = 0; // 失败次数
 
+	private onShow() {
+		this.updateAdSwitch();
+	}
 	private onLoad() {
 		this.getData();
 	}
@@ -295,23 +304,6 @@ export default class Hot extends Mixins(MixinDark) {
 				}
 			}
 		}
-	}
-}
-.dark {
-	background: #191919;
-	.weui-tabs-swiper {
-		background: #191919;
-	}
-	/deep/.weui-tabs-bar__wrp {
-		background: #191919;
-		color: #d1d1d1;
-		border-bottom: 2rpx solid #242424;
-	}
-	.weui-tabs-swiper {
-		padding-top: 40px;
-	}
-	.noMore {
-		background: #191919;
 	}
 }
 </style>

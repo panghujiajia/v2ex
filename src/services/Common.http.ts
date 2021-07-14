@@ -1,6 +1,4 @@
 import { http } from './index';
-import qs from 'qs';
-import rules from '@/utils/config';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);

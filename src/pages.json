@@ -31,6 +31,7 @@
 			"path": "pages/Hot",
 			"style": {
 				"disableScroll": true,
+				"navigationBarTitleText": "热门",
 				"usingComponents": {
 					"we-tabs": "/wxcomponents/we-tabs/index",
 					"van-empty": "/wxcomponents/vant/empty/index",
@@ -43,6 +44,7 @@
 			"style": {
 				"navigationBarBackgroundColor": "#4474FF",
 				"navigationBarTextStyle": "white",
+				"navigationBarTitleText": "我的",
 				"usingComponents": {
 					"van-switch": "/wxcomponents/vant/switch/index",
 					"van-icon": "/wxcomponents/vant/icon/index"
@@ -50,17 +52,18 @@
 			}
 		},
 		{
-			"path": "pages/Storage",
+			"path": "pages/History",
 			"style": {
+				"navigationBarTitleText": "历史记录",
 				"usingComponents": {
-					"van-switch": "/wxcomponents/vant/switch/index",
-					"van-icon": "/wxcomponents/vant/icon/index"
+					"van-empty": "/wxcomponents/vant/empty/index"
 				}
 			}
 		},
 		{
 			"path": "pages/All",
 			"style": {
+				"navigationBarTitleText": "节点",
 				"usingComponents": {
 					"van-button": "/wxcomponents/vant/button/index"
 				}

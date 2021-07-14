@@ -1,5 +1,5 @@
 <template>
-	<view class="container" :class="darkModel ? 'dark' : ''">
+	<view class="container">
 		<template v-if="loading && loadType === 'refresh'">
 			<Skeleton type="list"></Skeleton>
 		</template>
@@ -31,6 +31,18 @@
 				</view>
 			</view>
 			<template v-else>
+				<view class="topic-header">
+					<view class="header-top">
+						<text class="name">{{ title }}</text>
+						主题总数 {{ nodeInfo.topic_count || 0 }}
+					</view>
+					<view class="header-bottom">
+						{{
+							nodeInfo.topic_intro ||
+							'World is powered by solitude'
+						}}
+					</view>
+				</view>
 				<view class="list-wrap">
 					<view
 						class="item"
@@ -49,12 +61,11 @@
 	</view>
 </template>
 <script lang="ts">
-import { Component, Mixins, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import Topic from '@/components/Topic.vue';
 import Skeleton from '@/components/Skeleton.vue';
 import { $getAllTopics } from '@/services/Common.http';
 import { Mutation, State } from 'vuex-class';
-import { MixinDark } from '@/mixin/Dark.mixin';
 @Component({
 	name: 'Tag',
 	components: {
@@ -62,22 +73,29 @@ import { MixinDark } from '@/mixin/Dark.mixin';
 		Skeleton,
 	},
 })
-export default class Tag extends Mixins(MixinDark) {
-	@State('visited') private visited!: string[]; // 访问过的
+export default class Tag extends Vue {
+	@State('visited')
+	private visited!: string[]; // 访问过的
 	@Mutation('updateVisited')
 	private updateVisited!: (visited: string[]) => void;
 	private tagList: any = []; // 主题内容
+	private nodeInfo: any = {
+		topic_count: 0,
+		topic_intro: '',
+	};
 	private pageNum = 1; // 页码
 	private value = ''; // 参数
+	private title = '';
 	private loading = true;
 	private noMore = false; // 没有更多了
 	private loadType = 'refresh'; // 加载类型
 	private loadFailedTime = 0; // 失败次数
 
 	private onLoad(options: any) {
-		uni.setNavigationBarTitle({ title: options.title });
-		const value = options.value;
+		const { value, title } = options;
+		uni.setNavigationBarTitle({ title });
 		this.value = value;
+		this.title = title;
 		this.getAllTopics();
 	}
 	// 根据tag获取内容
@@ -85,9 +103,11 @@ export default class Tag extends Mixins(MixinDark) {
 		this.loading = true;
 		const tagList = this.tagList;
 		const tab = this.value;
-		const data = await $getAllTopics({ tab, p: this.pageNum });
-		if (data) {
+		const res = await $getAllTopics({ tab, p: this.pageNum });
+		if (res) {
 			const visited: any = this.visited;
+			const { data, nodeInfo } = res;
+			this.nodeInfo = nodeInfo;
 			const tagArr = data.map((item: any) => {
 				let beVisited = false;
 				if (visited.includes(item.id)) {
@@ -155,16 +175,38 @@ export default class Tag extends Mixins(MixinDark) {
 }
 </script>
 <style lang="less" scoped>
-.container {
-	border-top: 20rpx solid #f5f5f5;
-}
 .bottom-button {
 	/deep/.van-button--round {
 		padding: 0 50rpx !important;
 	}
 }
+.topic-header {
+	min-height: 200rpx;
+	background: url(https://ibao-private.oss-cn-shanghai.aliyuncs.com/yunibaoadmin/bg-topic.jpg)
+		50% no-repeat;
+	background-size: cover;
+	padding: 30rpx;
+	box-sizing: border-box;
+	color: #fff;
+	display: flex;
+	flex-direction: column;
+	font-weight: 400;
+	.header-top {
+		font-size: 26rpx;
+		.name {
+			font-size: 38rpx;
+			margin-right: 20rpx;
+			font-weight: 500;
+		}
+	}
+	.header-bottom {
+		font-size: 28rpx;
+		margin-top: 15rpx;
+	}
+}
 .list-wrap {
 	background: #f5f5f5;
+	border-top: 20rpx solid #f5f5f5;
 	.item {
 		&:last-child {
 			/deep/.topic-wrap {
@@ -175,10 +217,5 @@ export default class Tag extends Mixins(MixinDark) {
 }
 .load-failed {
 	padding-top: 150rpx;
-}
-.dark {
-	background: #191919;
-	color: #d1d1d1;
-	min-height: 100vh;
 }
 </style>

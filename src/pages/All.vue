@@ -1,5 +1,5 @@
 <template>
-	<view class="container" :class="darkModel ? 'dark' : ''">
+	<view class="container">
 		<view class="my-tags">
 			<view>
 				<view class="title">我喜欢的</view>
@@ -43,17 +43,17 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { Component, Mixins } from 'vue-property-decorator';
+import { Component } from 'vue-property-decorator';
 import { Mutation, State } from 'vuex-class';
-import rules from '@/utils/config';
 import tagNavs from '@/config/tagNav.config';
-import { MixinDark } from '@/mixin/Dark.mixin';
 @Component({
 	name: 'All',
 })
-export default class All extends Mixins(MixinDark) {
-	@State('myTags') private myTags!: string[];
-	@Mutation('updateMyTags') private updateMyTags!: (data: any) => void;
+export default class All extends Vue {
+	@State('myTags')
+	private myTags!: string[];
+	@Mutation('updateMyTags')
+	private updateMyTags!: (data: any) => void;
 	private tagNavs = tagNavs; // 全部tag
 	private isEdit = false; // 编辑状态
 	private onLoad() {
@@ -124,7 +124,7 @@ export default class All extends Mixins(MixinDark) {
 </script>
 
 <style lang="less" scoped>
-.container {
+.my-tags {
 	border-top: 20rpx solid #f5f5f5;
 }
 .my-tags,
@@ -177,17 +177,6 @@ export default class All extends Mixins(MixinDark) {
 		border: 2rpx solid #dedede;
 		box-sizing: border-box;
 		color: #666;
-	}
-}
-.dark {
-	background: #191919;
-	.title {
-		color: #fff !important;
-	}
-	.tag,
-	.my-tag {
-		color: #191919;
-		background: #ededed;
 	}
 }
 @keyframes shake {

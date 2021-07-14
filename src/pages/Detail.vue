@@ -1,5 +1,5 @@
 <template>
-	<view class="container" :class="darkModel ? 'dark' : ''">
+	<view class="container">
 		<template v-if="loading">
 			<Skeleton type="list"></Skeleton>
 		</template>
@@ -48,7 +48,7 @@
 						<view class="tag">
 							<view>
 								<text class="tag-symbol">#</text>
-								<text>{{ topicsDetail.tag_title }}</text>
+								<text>{{ topicsDetail.tab_name }}</text>
 							</view>
 						</view>
 					</view>
@@ -92,19 +92,16 @@ dayjs.extend(isLeapYear); // 使用插件
 dayjs.locale('zh-cn'); // 使用本地化语言
 
 import Vue from 'vue';
-import { Component, Mixins } from 'vue-property-decorator';
-import User from '@/components/User.vue';
+import { Component } from 'vue-property-decorator';
 import Skeleton from '@/components/Skeleton.vue';
 import mpHtml from '@/components/mp-html/mp-html.vue';
-import { MixinDark } from '@/mixin/Dark.mixin';
+import { Mutation } from 'vuex-class';
 @Component({
 	name: 'Detail',
-	components: {
-		User,
-		Skeleton,
-	},
 })
-export default class Detail extends Mixins(MixinDark) {
+export default class Detail extends Vue {
+	@Mutation('saveHistoryTopics')
+	private saveHistoryTopics!: (data: any) => void;
 	private topicsDetail: any = {}; // 主题详情
 	private topicsReplies = []; // 主题回复
 	private endTime = ''; // 回复截止时间
@@ -143,15 +140,16 @@ export default class Detail extends Mixins(MixinDark) {
 				dayjs(detail.created * 1000)
 					.startOf('hour')
 					.fromNow() + ' ',
-			tag_title: detail.node.title,
+			tab_name: detail.node.title,
+			tag_value: detail.node.name,
 			title: detail.title,
 			author: detail.member.username,
 			avatar: detail.member.avatar_mini,
 			id: detail.member.id,
-			detail: 'node',
 		};
 		this.topicsDetail = topicsDetail;
 		this.getTopicsReplies(replys);
+		this.saveHistoryTopics({ ...topicsDetail });
 	}
 	// 取主题回复
 	private getTopicsReplies(replys: any) {
@@ -271,23 +269,8 @@ text {
 }
 .topic-reply {
 	border-bottom: 20rpx solid #f5f5f5;
-}
-.dark {
-	background: #191919;
-	color: #d1d1d1;
-	min-height: 100vh;
-	.content {
-		border-top: 2rpx solid #222;
-	}
-	.totalReplies {
-		border-bottom: 2rpx solid #333;
-	}
-	.pages {
-		border-bottom: 2rpx solid #222;
-	}
-	.line {
-		height: 2rpx;
-		background: #333;
+	/deep/text {
+		font-weight: 500;
 	}
 }
 </style>

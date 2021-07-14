@@ -1,8 +1,5 @@
 <template>
-	<view
-		class="topic-wrap"
-		:class="[item.beVisited ? 'cur' : '', darkModel ? 'dark' : '']"
-	>
+	<view class="topic-wrap" :class="[item.beVisited ? 'cur' : '']">
 		<view class="user-info">
 			<view class="user">
 				<text class="name">{{ item.author }}</text>
@@ -25,16 +22,10 @@
 </template>
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
-import { State } from 'vuex-class';
-import User from './User.vue';
 @Component({
 	name: 'Topic',
-	components: {
-		User,
-	},
 })
 export default class Topic extends Vue {
-	@State('darkModel') private darkModel!: boolean;
 	@Prop()
 	private item: any;
 
@@ -99,17 +90,6 @@ export default class Topic extends Vue {
 		.reply {
 			color: #999;
 			font-size: 22rpx;
-		}
-	}
-}
-.dark {
-	background: #191919;
-	color: #d1d1d1;
-	border-bottom: 2rpx solid #222;
-	.tag {
-		text {
-			background: #d1d1d1 !important;
-			color: #191919 !important;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 import { TagData, TagDataKey, TagTime, TagTimeKey } from '@/types/index.type';
+import dayjs from 'dayjs';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
@@ -14,7 +15,9 @@ const RootProjectPersisted = createPersistedState({
 
 export default new Vuex.Store({
 	state: {
-		darkModel: false, // 夜间模式
+		historyTopic: [],
+		adSwitch: true, // 广告
+		adCloseTime: '',
 		stroageTime: 15, // 缓存时长 分钟
 		visited: [], // 访问过的
 		myTags: [], // 我的tag
@@ -57,8 +60,8 @@ export default new Vuex.Store({
 			state.myTags = data;
 		},
 		// 切换模式
-		toggleDarkModel(state, data) {
-			state.darkModel = data;
+		toggleAdSwitch(state, data) {
+			state.adSwitch = data;
 		},
 		// 保存访问过的
 		updateVisited(state, visited) {
@@ -71,6 +74,35 @@ export default new Vuex.Store({
 		// 更新tag时间
 		updateTagTime(state, tagTime: TagTime) {
 			state[tagTime.key] = tagTime.value;
+		},
+		saveHistoryTopics(state, data: any) {
+			let historyTopic: any = state.historyTopic.reverse();
+			historyTopic = historyTopic.filter((item: any) => {
+				return item.id !== data.id;
+			});
+			historyTopic.push(data);
+			state.historyTopic = historyTopic.slice(-30).reverse();
+		},
+		clearHistory(state) {
+			state.historyTopic = [];
+			state.visited = [];
+		},
+		saveAdCloseTime(state) {
+			state.adCloseTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+		},
+		updateAdSwitch(state) {
+			const adCloseTime = state.adCloseTime;
+			if (!adCloseTime) {
+				state.adSwitch = true;
+				return;
+			}
+			// 如果今天是周一
+			if (dayjs().day() === 1) {
+				// 不是当天关闭广告的
+				if (dayjs().isAfter(adCloseTime, 'day')) {
+					state.adSwitch = true;
+				}
+			}
 		},
 	},
 	actions: {},
