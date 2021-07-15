@@ -46,7 +46,6 @@
 				"navigationBarTextStyle": "white",
 				"navigationBarTitleText": "我的",
 				"usingComponents": {
-					"van-switch": "/wxcomponents/vant/switch/index",
 					"van-icon": "/wxcomponents/vant/icon/index"
 				}
 			}
@@ -64,9 +63,7 @@
 			"path": "pages/All",
 			"style": {
 				"navigationBarTitleText": "节点",
-				"usingComponents": {
-					"van-button": "/wxcomponents/vant/button/index"
-				}
+				"usingComponents": {}
 			}
 		},
 		{

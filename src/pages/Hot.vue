@@ -279,6 +279,7 @@ export default class Hot extends Vue {
 		height: 100vh;
 		width: 100%;
 		overflow-y: scroll;
+		-webkit-overflow-scrolling: touch;
 	}
 	.tab-skeleton {
 		position: absolute;
