@@ -98,6 +98,9 @@ import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation } from 'vuex-class';
 @Component({
 	name: 'Detail',
+	components: {
+		Skeleton,
+	},
 })
 export default class Detail extends Vue {
 	@Mutation('saveHistoryTopics')
@@ -177,6 +180,15 @@ export default class Detail extends Vue {
 		this.endTime = endTime;
 		this.loading = false;
 		uni.hideLoading();
+	}
+	onShareAppMessage(e: any) {
+		const { id } = this.params;
+		return {
+			title: 'Fake v2ex',
+			path: `/pages/Detail?id=${id}`,
+			success: (res: any) => {},
+			fail: (res: any) => {},
+		};
 	}
 }
 </script>

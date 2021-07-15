@@ -19,14 +19,14 @@
 				<view>访问记录</view>
 				<van-icon name="arrow" color="#b3b3b3"></van-icon>
 			</view>
-			<view class="cell van-hairline--bottom">
+			<!-- <view class="cell van-hairline--bottom">
 				<view>广告开关</view>
 				<van-switch
 					size="40rpx"
 					:checked="adSwitch"
 					@change="onSwitchChange"
 				/>
-			</view>
+			</view> -->
 			<view class="cell van-hairline--bottom" @click="clearStorage()">
 				<view>清空缓存</view>
 				<van-icon name="arrow" color="#b3b3b3"></van-icon>
@@ -132,6 +132,14 @@ export default class Set extends Vue {
 			title: '没有获取你任何信息哦',
 			icon: 'none',
 		});
+	}
+	onShareAppMessage(e: any) {
+		return {
+			title: 'Fake v2ex',
+			path: '/pages/Hot',
+			success: (res: any) => {},
+			fail: (res: any) => {},
+		};
 	}
 }
 </script>

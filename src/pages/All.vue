@@ -120,6 +120,14 @@ export default class All extends Vue {
 	private onHide() {
 		this.isEdit = false;
 	}
+	onShareAppMessage(e: any) {
+		return {
+			title: 'Fake v2ex',
+			path: '/pages/Hot',
+			success: (res: any) => {},
+			fail: (res: any) => {},
+		};
+	}
 }
 </script>
 

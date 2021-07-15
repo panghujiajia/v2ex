@@ -73,7 +73,7 @@
 							>
 								<Topic :item="item"></Topic>
 							</view>
-							<view v-if="adSwitch" class="item">
+							<view class="item">
 								<ad unit-id="adunit-1f991a273d575025"></ad>
 							</view>
 						</view>
@@ -247,6 +247,14 @@ export default class Hot extends Vue {
 		uni.navigateTo({
 			url: `/pages/Detail?id=${id}`,
 		});
+	}
+	onShareAppMessage(e: any) {
+		return {
+			title: 'Fake v2ex',
+			path: '/pages/Hot',
+			success: (res: any) => {},
+			fail: (res: any) => {},
+		};
 	}
 }
 </script>

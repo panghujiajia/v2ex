@@ -172,6 +172,14 @@ export default class Tag extends Vue {
 		this.loadType = 'loadMore';
 		this.getAllTopics();
 	}
+	onShareAppMessage(e: any) {
+		return {
+			title: 'Fake v2ex',
+			path: `/pages/Tag?value=${this.value}&title=${this.title}`,
+			success: (res: any) => {},
+			fail: (res: any) => {},
+		};
+	}
 }
 </script>
 <style lang="less" scoped>
