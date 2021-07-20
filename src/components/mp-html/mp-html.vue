@@ -1,8 +1,8 @@
 <template>
-  <view :class="(selectable?'_select ':'')+'_root'">
+  <view id="_root" :class="(selectable?'_select ':'')+'_root'" :style="containerStyle">
     <slot v-if="!nodes[0]" />
     <!-- #ifndef APP-PLUS-NVUE -->
-    <node v-else :childs="nodes" :opts="[lazyLoad,loadingImg,errorImg,showImgMenu]" />
+    <node v-else :childs="nodes" :opts="[lazyLoad,loadingImg,errorImg,showImgMenu]" name="span" />
     <!-- #endif -->
     <!-- #ifdef APP-PLUS-NVUE -->
     <web-view ref="web" src="/static/app-plus/mp-html/local.html" :style="'margin-top:-2px;height:' + height + 'px'" @onPostMessage="_onMessage" />
@@ -12,9 +12,10 @@
 
 <script>
 /**
- * mp-html v2.0.0
+ * mp-html v2.1.4
  * @description 富文本组件
  * @tutorial https://github.com/jin-yufeng/mp-html
+ * @property {String} container-style 容器的样式
  * @property {String} content 用于渲染的 html 字符串
  * @property {Boolean} copy-link 是否允许外部链接被点击时自动复制
  * @property {String} domain 主域名，用于拼接链接
@@ -24,7 +25,7 @@
  * @property {Boolean} pause-video 是否在播放一个视频时自动暂停其他视频
  * @property {Boolean} preview-img 是否允许图片被点击时自动预览
  * @property {Boolean} scroll-table 是否给每个表格添加一个滚动层使其能单独横向滚动
- * @property {Boolean} selectable 是否开启长按复制
+ * @property {Boolean | String} selectable 是否开启长按复制
  * @property {Boolean} set-title 是否将 title 标签的内容设置到页面标题
  * @property {Boolean} show-img-menu 是否允许图片被长按时显示菜单
  * @property {Object} tag-style 标签的默认样式
@@ -35,57 +36,68 @@
  * @event {Function} linkTap 链接被点击时触发
  * @event {Function} error 媒体加载出错时触发
  */
-const plugins=[]
-const parser = require('./parser')
 // #ifndef APP-PLUS-NVUE
 import node from './node/node'
 // #endif
+const plugins=[require('./markdown/index.js'),require('./highlight/index.js'),]
+const Parser = require('./parser')
 // #ifdef APP-PLUS-NVUE
 const dom = weex.requireModule('dom')
 // #endif
 export default {
   name: 'mp-html',
-  data() {
+  data () {
     return {
       nodes: [],
       // #ifdef APP-PLUS-NVUE
-      height: 0
+      height: 3
       // #endif
     }
   },
   props: {
-    // #ifdef APP-PLUS-NVUE
-    bgColor: String,
-    // #endif
+    markdown: Boolean,
+    containerStyle: {
+      type: String,
+      default: ''
+    },
     content: String,
     copyLink: {
-      type: Boolean,
+      type: [Boolean, String],
       default: true
     },
     domain: String,
-    errorImg: String,
-    lazyLoad: Boolean,
-    loadingImg: String,
+    errorImg: {
+      type: String,
+      default: ''
+    },
+    lazyLoad: {
+      type: [Boolean, String],
+      default: false
+    },
+    loadingImg: {
+      type: String,
+      default: ''
+    },
     pauseVideo: {
-      type: Boolean,
+      type: [Boolean, String],
       default: true
     },
     previewImg: {
-      type: Boolean,
+      type: [Boolean, String],
+      default: true
+    },
+    scrollTable: [Boolean, String],
+    selectable: [Boolean, String],
+    setTitle: {
+      type: [Boolean, String],
       default: true
     },
     showImgMenu: {
-      type: Boolean,
+      type: [Boolean, String],
       default: true
     },
-    scrollTable: Boolean,
-    selectable: Boolean,
-    setTitle: {
-      type: Boolean,
-      value: true
-    },
     tagStyle: Object,
-    useAnchor: null,
+    useAnchor: [Boolean, Number]
   },
   // #ifndef APP-PLUS-NVUE
   components: {
@@ -93,20 +105,22 @@ export default {
   },
   // #endif
   watch: {
-    content(content) {
+    content (content) {
       this.setContent(content)
     }
   },
-  created() {
+  created () {
     this.plugins = []
-    for (var i = plugins.length; i--;)
+    for (let i = plugins.length; i--;) {
       this.plugins.push(new plugins[i](this))
+    }
   },
-  mounted() {
-    if (this.content && !this.nodes.length)
+  mounted () {
+    if (this.content && !this.nodes.length) {
       this.setContent(this.content)
+    }
   },
-  beforeDestroy() {
+  beforeDestroy () {
     this._hook('onDetached')
     clearInterval(this._timer)
   },
@@ -117,14 +131,15 @@ export default {
      * @param {String} selector scroll-view 的选择器
      * @param {String} scrollTop scroll-view scroll-top 属性绑定的变量名
      */
-    in(page, selector, scrollTop) {
+    in (page, selector, scrollTop) {
       // #ifndef APP-PLUS-NVUE
-      if (page && selector && scrollTop)
+      if (page && selector && scrollTop) {
         this._in = {
           page,
           selector,
           scrollTop
         }
+      }
       // #endif
     },
 
@@ -134,10 +149,13 @@ export default {
      * @param {Number} offset 跳转位置的偏移量
      * @returns {Promise}
      */
-    navigateTo(id, offset) {
+    navigateTo (id, offset) {
+      id = this._ids[decodeURI(id)] || id
       return new Promise((resolve, reject) => {
-        if (!this.useAnchor)
-          return reject('Anchor is disabled')
+        if (!this.useAnchor) {
+          reject(Error('Anchor is disabled'))
+          return
+        }
         offset = offset || parseInt(this.useAnchor) || 0
         // #ifdef APP-PLUS-NVUE
         if (!id) {
@@ -155,33 +173,38 @@ export default {
         }
         // #endif
         // #ifndef APP-PLUS-NVUE
-        var deep = ' '
+        let deep = ' '
         // #ifdef MP-WEIXIN || MP-QQ || MP-TOUTIAO
         deep = '>>>'
         // #endif
-        var selector = uni.createSelectorQuery()
+        const selector = uni.createSelectorQuery()
           // #ifndef MP-ALIPAY
           .in(this._in ? this._in.page : this)
           // #endif
           .select((this._in ? this._in.selector : '._root') + (id ? `${deep}#${id}` : '')).boundingClientRect()
-        if (this._in)
+        if (this._in) {
           selector.select(this._in.selector).scrollOffset()
-            .select(this._in.selector).boundingClientRect() // 获取 scroll-view 的位置和滚动距离
-        else
+            .select(this._in.selector).boundingClientRect()
+        } else {
+          // 获取 scroll-view 的位置和滚动距离
           selector.selectViewport().scrollOffset() // 获取窗口的滚动距离
+        }
         selector.exec(res => {
-          if (!res[0])
-            return reject('Label not found')
-          var scrollTop = res[1].scrollTop + res[0].top - (res[2] ? res[2].top : 0) + offset
-          if (this._in)
+          if (!res[0]) {
+            reject(Error('Label not found'))
+            return
+          }
+          const scrollTop = res[1].scrollTop + res[0].top - (res[2] ? res[2].top : 0) + offset
+          if (this._in) {
             // scroll-view 跳转
             this._in.page[this._in.scrollTop] = scrollTop
-          else
+          } else {
             // 页面跳转
             uni.pageScrollTo({
               scrollTop,
               duration: 300
             })
+          }
           resolve()
         })
         // #endif
@@ -192,30 +215,33 @@ export default {
      * @description 获取文本内容
      * @return {String}
      */
-    getText() {
-      var text = '';
-      (function traversal(nodes) {
-        for (var i = 0; i < nodes.length; i++) {
-          var node = nodes[i]
-          if (node.type == 'text')
+    getText (nodes) {
+      let text = '';
+      (function traversal (nodes) {
+        for (let i = 0; i < nodes.length; i++) {
+          const node = nodes[i]
+          if (node.type === 'text') {
             text += node.text.replace(/&amp;/g, '&')
-          else if (node.name == 'br')
+          } else if (node.name === 'br') {
             text += '\n'
-          else {
+          } else {
             // 块级标签前后加换行
-            var isBlock = node.name == 'p' || node.name == 'div' || node.name == 'tr' || node.name == 'li' || (node.name[0] == 'h' && node.name[1] > '0' && node.name[1] < '7')
-            if (isBlock && text && text[text.length - 1] != '\n')
+            const isBlock = node.name === 'p' || node.name === 'div' || node.name === 'tr' || node.name === 'li' || (node.name[0] === 'h' && node.name[1] > '0' && node.name[1] < '7')
+            if (isBlock && text && text[text.length - 1] !== '\n') {
               text += '\n'
+            }
             // 递归获取子节点的文本
-            if (node.children)
+            if (node.children) {
               traversal(node.children)
-            if (isBlock && text[text.length - 1] != '\n')
+            }
+            if (isBlock && text[text.length - 1] !== '\n') {
               text += '\n'
-            else if (node.name == 'td' || node.name == 'th')
+            } else if (node.name === 'td' || node.name === 'th') {
               text += '\t'
+            }
           }
         }
-      })(this.nodes)
+      })(nodes || this.nodes)
       return text
     },
 
@@ -223,13 +249,13 @@ export default {
      * @description 获取内容大小和位置
      * @return {Promise}
      */
-    getRect() {
+    getRect () {
       return new Promise((resolve, reject) => {
         uni.createSelectorQuery()
           // #ifndef MP-ALIPAY
           .in(this)
           // #endif
-          .select('._root').boundingClientRect().exec(res => res[0] ? resolve(res[0]) : reject('Root label not found'))
+          .select('#_root').boundingClientRect().exec(res => res[0] ? resolve(res[0]) : reject(Error('Root label not found')))
       })
     },
 
@@ -238,18 +264,17 @@ export default {
      * @param {String} content html 内容
      * @param {Boolean} append 是否在尾部追加
      */
-    setContent(content, append) {
-      if (!append || !this.imgList)
+    setContent (content, append) {
+      if (!append || !this.imgList) {
         this.imgList = []
-      var nodes = new parser(this).parse(content)
+      }
+      const nodes = new Parser(this).parse(content)
       // #ifdef APP-PLUS-NVUE
-      if (this._ready)
+      if (this._ready) {
         this._set(nodes, append)
+      }
       // #endif
-      if (!append)
-        this.nodes = nodes
-      else
-        this.nodes = (this.nodes || []).concat(nodes)
+      this.$set(this, 'nodes', append ? (this.nodes || []).concat(nodes) : nodes)
 
       // #ifndef APP-PLUS-NVUE
       this._videos = []
@@ -259,12 +284,12 @@ export default {
       })
 
       // 等待图片加载完毕
-      var height
+      let height
       clearInterval(this._timer)
       this._timer = setInterval(() => {
         this.getRect().then(rect => {
           // 350ms 总高度无变化就触发 ready 事件
-          if (rect.height == height) {
+          if (rect.height === height) {
             this.$emit('ready', rect)
             clearInterval(this._timer)
           }
@@ -277,31 +302,34 @@ export default {
     /**
      * @description 调用插件钩子函数
      */
-    _hook(name) {
-      for (var i = plugins.length; i--;)
-        if (this.plugins[i][name])
+    _hook (name) {
+      for (let i = plugins.length; i--;) {
+        if (this.plugins[i][name]) {
           this.plugins[i][name]()
+        }
+      }
     },
 
     // #ifdef APP-PLUS-NVUE
     /**
      * @description 设置内容
      */
-    _set(nodes, append) {
-      this.$refs.web.evalJs('setContent(' + JSON.stringify(nodes) + ',' + JSON.stringify([this.bgColor, this.errorImg, this.loadingImg, this.pauseVideo, this.scrollTable, this.selectable]) + ',' + append + ')')
+    _set (nodes, append) {
+      this.$refs.web.evalJs('setContent(' + JSON.stringify(nodes) + ',' + JSON.stringify([this.containerStyle.replace(/(?:margin|padding)[^;]+/g, ''), this.errorImg, this.loadingImg, this.pauseVideo, this.scrollTable, this.selectable]) + ',' + append + ')')
     },
 
     /**
      * @description 接收到 web-view 消息
      */
-    _onMessage(e) {
-      var message = e.detail.data[0]
+    _onMessage (e) {
+      const message = e.detail.data[0]
       switch (message.action) {
         // web-view 初始化完毕
         case 'onJSBridgeReady':
           this._ready = true
-          if (this.nodes)
+          if (this.nodes) {
             this._set(this.nodes)
+          }
           break
         // 内容 dom 加载完毕
         case 'onLoad':
@@ -322,53 +350,58 @@ export default {
         // 图片点击
         case 'onImgTap':
           this.$emit('imgtap', message.attrs)
-          if (this.previewImg)
+          if (this.previewImg) {
             uni.previewImage({
               current: parseInt(message.attrs.i),
               urls: this.imgList
             })
+          }
           break
         // 链接点击
-        case 'onLinkTap':
-          var href = message.attrs.href
+        case 'onLinkTap': {
+          const href = message.attrs.href
           this.$emit('linktap', message.attrs)
           if (href) {
             // 锚点跳转
-            if (href[0] == '#') {
-              if (this.useAnchor)
+            if (href[0] === '#') {
+              if (this.useAnchor) {
                 dom.scrollToElement(this.$refs.web, {
                   offset: message.offset
                 })
-            }
-            // 打开外链
-            else if (href.includes('://')) {
-              if (this.copyLink)
+              }
+            } else if (href.includes('://')) {
+              // 打开外链
+              if (this.copyLink) {
                 plus.runtime.openWeb(href)
-            }
-            else
+              }
+            } else {
               uni.navigateTo({
                 url: href,
-                fail() {
-                  wx.switchTab({
+                fail () {
+                  uni.switchTab({
                     url: href
                   })
                 }
               })
+            }
           }
           break
+        }
         // 获取到锚点的偏移量
         case 'getOffset':
-          if (typeof message.offset == 'number') {
+          if (typeof message.offset === 'number') {
             dom.scrollToElement(this.$refs.web, {
               offset: message.offset + this._navigateTo.offset
             })
             this._navigateTo.resolve()
-          } else
-            this._navigateTo.reject('Label not found')
+          } else {
+            this._navigateTo.reject(Error('Label not found'))
+          }
           break
         // 点击
         case 'onClick':
           this.$emit('tap')
+          this.$emit('click')
           break
         // 出错
         case 'onError':
@@ -387,7 +420,9 @@ export default {
 /* #ifndef APP-PLUS-NVUE */
 /* 根节点样式 */
 ._root {
-  overflow: auto;
+  padding: 1px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
 }
 

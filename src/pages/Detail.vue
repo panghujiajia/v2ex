@@ -42,7 +42,11 @@
 					</view>
 					<view class="title">{{ topicsDetail.title }}</view>
 					<view class="content" v-if="topicsDetail.data">
-						<mp-html :content="topicsDetail.data" selectable />
+						<mp-html
+							:content="topicsDetail.data"
+							markdown
+							selectable
+						/>
 					</view>
 					<view class="tag-info">
 						<view class="tag">
@@ -76,8 +80,9 @@
 							}}
 						</view>
 					</view>
-					<mp-html :content="item.content" selectable />
+					<mp-html :content="item.content" markdown selectable />
 				</view>
+				<ad unit-id="adunit-6996f541fca34984"></ad>
 			</template>
 		</template>
 	</view>
@@ -280,9 +285,13 @@ text {
 	border-top: 20rpx solid #f5f5f5;
 }
 .topic-reply {
+	padding-bottom: 0;
 	border-bottom: 20rpx solid #f5f5f5;
 	/deep/text {
 		font-weight: 500;
+	}
+	.user-info {
+		margin-bottom: 0;
 	}
 }
 </style>
