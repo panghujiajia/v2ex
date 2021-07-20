@@ -287,7 +287,7 @@ text {
 .topic-reply {
 	padding-bottom: 0;
 	border-bottom: 20rpx solid #f5f5f5;
-	/deep/text {
+	/deep/rich-text {
 		font-weight: 500;
 	}
 	.user-info {
