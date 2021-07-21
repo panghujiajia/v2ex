@@ -31,19 +31,19 @@
 				</view>
 				<view v-else>
 					<view class="load-failed" v-if="loadFailedTime > 0">
-						<view class="reload" v-if="loadFailedTime < 2">
+						<view class="reload">
 							<van-empty image="error" description="加载失败">
 								<van-button
 									round
 									type="info"
 									class="bottom-button"
-									@click="getData()"
+									@click="getData(true)"
 								>
 									再试一次
 								</van-button>
 							</van-empty>
 						</view>
-						<view class="quit" v-else>
+						<!-- <view class="quit" v-else>
 							<van-empty
 								image="network"
 								description="抱歉，暂时连不上服务器"
@@ -61,7 +61,7 @@
 									</van-button>
 								</navigator>
 							</van-empty>
-						</view>
+						</view> -->
 					</view>
 					<template v-else>
 						<view class="list-wrap">
@@ -140,13 +140,24 @@ export default class Hot extends Vue {
 		this.getData();
 	}
 	// 获取数据
-	private getData() {
+	private getData(reget?: boolean) {
+		if (this.loadFailedTime <= 0 || reget) {
+			uni.showLoading({
+				title: '加载中...',
+				mask: true,
+			});
+		}
 		this.loading = true;
 		const title = this.curTag;
 		// 如果没拿到数据就调接口
 		if (this.isExpired(title)) {
 			this.getTabTopics(title);
 		}
+	}
+	private resetLoading(time?: number) {
+		this.loading = false;
+		time === 0 && (this.loadFailedTime = 0);
+		uni.hideLoading();
 	}
 	// 点击tab
 	private onClick(e: any) {
@@ -162,10 +173,6 @@ export default class Hot extends Vue {
 	}
 	// 判定缓存数据是否过期
 	private isExpired(title: string) {
-		uni.showLoading({
-			title: '加载中...',
-			mask: true,
-		});
 		const time = this.getTagTime((TagTimeKey as any)[title]);
 		if (!time) {
 			return true;
@@ -191,8 +198,7 @@ export default class Hot extends Vue {
 				}
 			});
 			this.tagList = tagList;
-			this.loading = false;
-			uni.hideLoading();
+			this.resetLoading(0);
 			return false;
 		}
 	}
@@ -211,7 +217,11 @@ export default class Hot extends Vue {
 			this.commonUpdate(title, tagArr);
 		} else {
 			this.loadFailedTime += 1;
-			this.loading = false;
+			if (this.loadFailedTime <= 10) {
+				this.getData();
+			} else {
+				this.resetLoading();
+			}
 		}
 	}
 	// 更新缓存
@@ -228,8 +238,7 @@ export default class Hot extends Vue {
 			value: dayjs(),
 		});
 		this.tagList = tagArr;
-		this.loading = false;
-		this.loadFailedTime = 0;
+		this.resetLoading(0);
 	}
 	// 跳转主题详情
 	private getTopicsDetail(id: string) {

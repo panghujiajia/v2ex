@@ -5,19 +5,19 @@
 		</template>
 		<template v-else>
 			<view class="load-failed" v-if="loadFailedTime > 0">
-				<view class="reload" v-if="loadFailedTime < 2">
+				<view class="reload">
 					<van-empty image="error" description="加载失败">
 						<van-button
 							round
 							type="info"
 							class="bottom-button"
-							@click="getAllTopics()"
+							@click="getAllTopics(true)"
 						>
 							再试一次
 						</van-button>
 					</van-empty>
 				</view>
-				<view class="quit" v-else>
+				<!-- <view class="quit" v-else>
 					<van-empty
 						image="network"
 						description="抱歉，暂时连不上服务器"
@@ -28,7 +28,7 @@
 							</van-button>
 						</navigator>
 					</van-empty>
-				</view>
+				</view> -->
 			</view>
 			<template v-else>
 				<view class="topic-header">
@@ -98,8 +98,19 @@ export default class Tag extends Vue {
 		this.title = title;
 		this.getAllTopics();
 	}
+	private resetLoading(time?: number) {
+		this.loading = false;
+		time === 0 && (this.loadFailedTime = 0);
+		uni.hideLoading();
+	}
 	// 根据tag获取内容
-	private async getAllTopics() {
+	private async getAllTopics(reget?: boolean) {
+		if (this.loadFailedTime <= 0 || reget) {
+			uni.showLoading({
+				title: '加载中...',
+				mask: true,
+			});
+		}
 		this.loading = true;
 		const tagList = this.tagList;
 		const tab = this.value;
@@ -125,11 +136,14 @@ export default class Tag extends Vue {
 				this.tagList = tagArr;
 				uni.stopPullDownRefresh();
 			}
-			this.loading = false;
-			this.loadFailedTime = 0;
+			this.resetLoading(0);
 		} else {
-			this.loading = false;
 			this.loadFailedTime += 1;
+			if (this.loadFailedTime <= 10) {
+				this.getAllTopics();
+			} else {
+				this.resetLoading();
+			}
 		}
 	}
 	// 判断是否最后一页

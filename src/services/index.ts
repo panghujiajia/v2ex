@@ -29,7 +29,7 @@ const createInterceptor = (instance: any) => {
 		},
 		(config: any) => {
 			// 可使用async await 做异步操作
-			uni.hideLoading();
+			// uni.hideLoading();
 			uni.showToast({
 				title: '请求错误，请稍后再试',
 				icon: 'none',
@@ -39,7 +39,7 @@ const createInterceptor = (instance: any) => {
 	);
 	instance.interceptors.response.use(
 		(response: any) => {
-			uni.hideLoading();
+			// uni.hideLoading();
 			/* 对响应成功做点什么 可使用async await 做异步操作*/
 			// if (response.config.custom.verification) { // 演示自定义参数的作用
 			//   return response.data
@@ -47,7 +47,7 @@ const createInterceptor = (instance: any) => {
 			return response;
 		},
 		(response: any) => {
-			uni.hideLoading();
+			// uni.hideLoading();
 			/*  对响应错误做点什么 （statusCode !== 200）*/
 			console.log('error response:', response);
 			uni.showToast({
@@ -63,7 +63,7 @@ export const http = new Request({
 	baseURL: environments.url,
 	timeout: 10000,
 	custom: {
-		loading: true, // 是否需要loading
+		loading: false, // 是否需要loading
 	},
 });
 

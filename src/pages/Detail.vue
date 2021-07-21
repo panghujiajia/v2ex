@@ -5,19 +5,19 @@
 		</template>
 		<template v-else>
 			<view class="load-failed" v-if="loadFailedTime > 0">
-				<view class="reload" v-if="loadFailedTime < 2">
+				<view class="reload">
 					<van-empty image="error" description="加载失败">
 						<van-button
 							round
 							type="info"
 							class="bottom-button"
-							@click="loadData()"
+							@click="loadData(true)"
 						>
 							再试一次
 						</van-button>
 					</van-empty>
 				</view>
-				<view class="quit" v-else>
+				<!-- <view class="quit" v-else>
 					<van-empty
 						image="network"
 						description="抱歉，暂时连不上服务器"
@@ -28,7 +28,7 @@
 							</van-button>
 						</navigator>
 					</van-empty>
-				</view>
+				</view> -->
 			</view>
 			<template v-else>
 				<view class="topic-wrap topic-header">
@@ -120,23 +120,32 @@ export default class Detail extends Vue {
 		this.params = options;
 		this.loadData();
 	}
+	private resetLoading(time?: number) {
+		this.loading = false;
+		time === 0 && (this.loadFailedTime = 0);
+		uni.hideLoading();
+	}
 	// 加载数据
-	private async loadData() {
+	private async loadData(reget?: boolean) {
+		if (this.loadFailedTime <= 0 || reget) {
+			uni.showLoading({
+				title: '加载中...',
+				mask: true,
+			});
+		}
 		this.loading = true;
 		const params = this.params;
-		uni.showLoading({
-			title: '加载中...',
-			mask: true,
-		});
-		try {
-			const res = await $getTopicDetail(params.id);
-			if (res) {
-				const { detail, replys } = res;
-				this.getTopicsDetail(detail[0], replys);
-			}
-		} catch (error) {
-			this.loading = false;
+		const res = await $getTopicDetail(params.id);
+		if (res) {
+			const { detail, replys } = res;
+			this.getTopicsDetail(detail[0], replys);
+		} else {
 			this.loadFailedTime += 1;
+			if (this.loadFailedTime <= 10) {
+				this.loadData();
+			} else {
+				this.resetLoading();
+			}
 		}
 	}
 	// 取主题详情
@@ -163,6 +172,7 @@ export default class Detail extends Vue {
 	private getTopicsReplies(replys: any) {
 		const len = replys.length;
 		if (!len) {
+			this.loadFailedTime = 0;
 			this.loading = false;
 			uni.hideLoading();
 			return;
@@ -183,8 +193,7 @@ export default class Detail extends Vue {
 			);
 		this.topicsReplies = replys;
 		this.endTime = endTime;
-		this.loading = false;
-		uni.hideLoading();
+		this.resetLoading(0);
 	}
 	onShareAppMessage(e: any) {
 		const { id } = this.params;
