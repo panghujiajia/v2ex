@@ -217,6 +217,11 @@ text {
 .load-failed {
 	padding-top: 150rpx;
 }
+.bottom-button {
+	/deep/.van-button--round {
+		padding: 0 50rpx !important;
+	}
+}
 .topic-wrap {
 	padding: 25rpx 30rpx;
 	background: #fff;
