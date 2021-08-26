@@ -51,6 +51,20 @@
 			}
 		},
 		{
+			"path": "pages/Login",
+			"style": {
+				"navigationBarBackgroundColor": "#4474FF",
+				"navigationBarTextStyle": "white",
+				"navigationBarTitleText": "登录",
+				"usingComponents": {
+					"van-button": "/wxcomponents/vant/button/index",
+					"van-cell-group": "/wxcomponents/vant/cell-group/index",
+					"van-cell": "/wxcomponents/vant/cell/index",
+					"van-field": "/wxcomponents/vant/field/index"
+				}
+			}
+		},
+		{
 			"path": "pages/History",
 			"style": {
 				"navigationBarTitleText": "历史记录",
