@@ -162,7 +162,7 @@ export default class Detail extends Vue {
 			title: detail.title,
 			author: detail.member.username,
 			avatar: detail.member.avatar_mini,
-			id: detail.member.id,
+			id: detail.id,
 		};
 		this.topicsDetail = topicsDetail;
 		this.getTopicsReplies(replys);
