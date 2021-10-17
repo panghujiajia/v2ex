@@ -1,4 +1,4 @@
 export default {
-	url: 'http://192.168.0.12:8888/api/',
-	// url: 'https://www.todayhub.cn/api/',
+	// url: 'http://192.168.1.23:8889/v2ex',
+	url: 'https://api.todayhub.cn/v2ex',
 };
