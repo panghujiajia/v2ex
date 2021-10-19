@@ -188,7 +188,7 @@ export default class Tag extends Vue {
 	}
 	onShareAppMessage(e: any) {
 		return {
-			title: 'Fake v2ex',
+			title: 'v2ex mini',
 			path: `/pages/Tag?value=${this.value}&title=${this.title}`,
 			success: (res: any) => {},
 			fail: (res: any) => {},

@@ -135,7 +135,7 @@ export default class Set extends Vue {
 	}
 	onShareAppMessage(e: any) {
 		return {
-			title: 'Fake v2ex',
+			title: 'v2ex mini',
 			path: '/pages/Hot',
 			success: (res: any) => {},
 			fail: (res: any) => {},

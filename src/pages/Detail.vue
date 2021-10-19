@@ -198,7 +198,7 @@ export default class Detail extends Vue {
 	onShareAppMessage(e: any) {
 		const { id } = this.params;
 		return {
-			title: 'Fake v2ex',
+			title: 'v2ex mini',
 			path: `/pages/Detail?id=${id}`,
 			success: (res: any) => {},
 			fail: (res: any) => {},
