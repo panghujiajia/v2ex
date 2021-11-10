@@ -1,25 +1,38 @@
 <template>
-	<view class="container">
-		<nav-bar :title="'有返回和home'"></nav-bar>
-		<view class="top">
-			<view class="header">
-				<view class="avatar" @click="showTip()">
-					<open-data type="userAvatarUrl"></open-data>
-				</view>
-				<view class="nick-name">
-					<open-data type="userNickName" lang="zh_CN"></open-data>
-				</view>
-			</view>
-		</view>
-		<view class="cell-group">
-			<view
-				class="cell van-hairline--bottom"
-				@click="navigateTo('history')"
-			>
-				<view>访问记录</view>
-				<van-icon name="arrow" color="#b3b3b3"></van-icon>
-			</view>
-			<!-- <view class="cell van-hairline--bottom">
+    <view class="container">
+        <nav-bar :title="'有返回和home'"></nav-bar>
+        <view class="top">
+            <view class="header">
+                <view class="avatar" @click="showTip()">
+                    <!-- #ifdef MP-WEIXIN -->
+                    <open-data type="userAvatarUrl"></open-data>
+                    <!-- #endif -->
+                    <!-- #ifndef MP-WEIXIN -->
+                    <image
+                        src="https://ibao-private.oss-cn-shanghai.aliyuncs.com/yunibaoadmin/img-user-avatar.png"
+                    >
+                    </image>
+                    <!-- #endif -->
+                </view>
+                <view class="nick-name">
+                    <!-- #ifdef MP-WEIXIN -->
+                    <open-data type="userNickName" lang="zh_CN"></open-data>
+                    <!-- #endif -->
+                    <!-- #ifndef MP-WEIXIN -->
+                    <view> V2EX </view>
+                    <!-- #endif -->
+                </view>
+            </view>
+        </view>
+        <view class="cell-group">
+            <view
+                class="cell van-hairline--bottom"
+                @click="navigateTo('history')"
+            >
+                <view>访问记录</view>
+                <view class="icon-arrow"></view>
+            </view>
+            <!-- <view class="cell van-hairline--bottom">
 				<view>广告开关</view>
 				<van-switch
 					size="40rpx"
@@ -27,16 +40,16 @@
 					@change="onSwitchChange"
 				/>
 			</view> -->
-			<view class="cell van-hairline--bottom" @click="clearStorage()">
-				<view>清空缓存</view>
-				<van-icon name="arrow" color="#b3b3b3"></van-icon>
-			</view>
-			<view class="cell van-hairline--bottom" @click="navigateTo()">
-				<view>关于</view>
-				<van-icon name="arrow" color="#b3b3b3"></van-icon>
-			</view>
-		</view>
-	</view>
+            <view class="cell van-hairline--bottom" @click="clearStorage()">
+                <view>清空缓存</view>
+                <view class="icon-arrow"></view>
+            </view>
+            <view class="cell van-hairline--bottom" @click="navigateTo()">
+                <view>关于</view>
+                <view class="icon-arrow"></view>
+            </view>
+        </view>
+    </view>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
@@ -44,151 +57,155 @@ import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
 
 @Component({
-	name: 'Set',
+    name: 'Set'
 })
 export default class Set extends Vue {
-	@State('adSwitch')
-	private adSwitch!: boolean;
-	@Mutation('saveAdCloseTime')
-	private saveAdCloseTime!: () => void;
-	@Mutation('clearHistory')
-	private clearHistory!: () => void;
-	@Mutation('toggleAdSwitch')
-	private toggleAdSwitch!: (data: boolean) => void;
-	private onLoad() {}
-	private onSwitchChange({ detail }: any) {
-		this.toggleAdSwitch(detail);
-		if (!detail) {
-			this.saveAdCloseTime();
-			uni.showToast({
-				title: '关闭成功，本周将不会显示广告',
-				icon: 'none',
-			});
-			return;
-		}
-		uni.showToast({
-			title: '开启成功，感谢您愿意打开广告',
-			icon: 'none',
-		});
-	}
-	private navigateTo(key: string) {
-		const urlList: any = {
-			history: '/pages/History',
-		};
-		if (!key) {
-			uni.showToast({
-				title: '还在想要放什么...',
-				icon: 'none',
-			});
-			return;
-		}
-		const url = urlList[key];
-		uni.navigateTo({ url });
-	}
-	// 清理缓存
-	private clearStorage() {
-		const res = uni.getStorageInfoSync();
-		const size = res.currentSize;
-		if (size <= 1) {
-			uni.showToast({
-				title: '已经清理干净了',
-				icon: 'none',
-			});
-			return;
-		}
-		uni.showActionSheet({
-			itemList: ['清除访问记录', '清除所有'],
-			success: res => {
-				const { tapIndex } = res;
-				switch (tapIndex) {
-					case 0:
-						this.clearHistory();
-						uni.showToast({
-							title: '清理成功！',
-							icon: 'none',
-						});
-						break;
-					case 1:
-						this.clearHistory();
-						this.toggleAdSwitch(true);
-						uni.clearStorageSync();
-						uni.showToast({
-							title: `清理成功！共为您腾出${size}kb空间！`,
-							icon: 'none',
-						});
-						break;
-					default:
-						break;
-				}
-			},
-			fail: res => {
-				console.log(res.errMsg);
-			},
-		});
-	}
-	// 点击头像
-	private showTip() {
-		uni.showToast({
-			title: '没有获取你任何信息哦',
-			icon: 'none',
-		});
-	}
-	onShareAppMessage(e: any) {
-		return {
-			title: 'v2ex mini',
-			path: '/pages/Hot',
-			success: (res: any) => {},
-			fail: (res: any) => {},
-		};
-	}
+    @State('adSwitch')
+    private adSwitch!: boolean;
+    @Mutation('saveAdCloseTime')
+    private saveAdCloseTime!: () => void;
+    @Mutation('clearHistory')
+    private clearHistory!: () => void;
+    @Mutation('toggleAdSwitch')
+    private toggleAdSwitch!: (data: boolean) => void;
+    private onLoad() {}
+    private onSwitchChange({ detail }: any) {
+        this.toggleAdSwitch(detail);
+        if (!detail) {
+            this.saveAdCloseTime();
+            uni.showToast({
+                title: '关闭成功，本周将不会显示广告',
+                icon: 'none'
+            });
+            return;
+        }
+        uni.showToast({
+            title: '开启成功，感谢您愿意打开广告',
+            icon: 'none'
+        });
+    }
+    private navigateTo(key: string) {
+        const urlList: any = {
+            history: '/pages/History'
+        };
+        if (!key) {
+            uni.showToast({
+                title: '...',
+                icon: 'none'
+            });
+            return;
+        }
+        const url = urlList[key];
+        uni.navigateTo({ url });
+    }
+    // 清理缓存
+    private clearStorage() {
+        const res = uni.getStorageInfoSync();
+        const size = res.currentSize;
+        if (size <= 1) {
+            uni.showToast({
+                title: '已经清理干净了',
+                icon: 'none'
+            });
+            return;
+        }
+        uni.showActionSheet({
+            itemList: ['清除访问记录', '清除所有'],
+            success: res => {
+                const { tapIndex } = res;
+                switch (tapIndex) {
+                    case 0:
+                        this.clearHistory();
+                        uni.showToast({
+                            title: '清理成功！',
+                            icon: 'none'
+                        });
+                        break;
+                    case 1:
+                        this.clearHistory();
+                        this.toggleAdSwitch(true);
+                        uni.clearStorageSync();
+                        uni.showToast({
+                            title: `清理成功！共为您腾出${size}kb空间！`,
+                            icon: 'none'
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            },
+            fail: res => {
+                console.log(res.errMsg);
+            }
+        });
+    }
+    // 点击头像
+    private showTip() {
+        uni.showToast({
+            title: '没有获取你任何信息哦',
+            icon: 'none'
+        });
+    }
+    // #ifdef MP-WEIXIN
+    private onShareAppMessage(e: any) {
+        return {
+            title: 'v2ex mini',
+            path: '/pages/Hot'
+        };
+    }
+    // #endif
 }
 </script>
 <style lang="less" scoped>
 .container {
-	min-height: 100vh;
-	background: #efefef;
-	box-sizing: border-box;
-	.top {
-		height: 661rpx;
-		background: url(https://ibao-private.oss-cn-shanghai.aliyuncs.com/yunibaoadmin/bg-user-center.png)
-			50% no-repeat;
-		background-size: 100%;
-		position: relative;
-		display: flex;
-		justify-content: center;
-		.title {
-			height: 80rpx;
-			line-height: 80rpx;
-			color: #fff;
-			font-weight: bold;
-		}
-	}
+    min-height: 100vh;
+    background: #efefef;
+    box-sizing: border-box;
+    .top {
+        height: 661rpx;
+        background: url(https://ibao-private.oss-cn-shanghai.aliyuncs.com/yunibaoadmin/bg-user-center.png)
+            50% no-repeat;
+        background-size: 100%;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        .title {
+            height: 80rpx;
+            line-height: 80rpx;
+            color: #fff;
+            font-weight: bold;
+        }
+    }
 }
 .header {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	position: absolute;
-	bottom: 300rpx;
-	.avatar {
-		width: 200rpx;
-		height: 200rpx;
-		border-radius: 50%;
-		overflow: hidden;
-	}
-	.nick-name {
-		margin-top: 20rpx;
-		color: #fff;
-	}
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    bottom: 300rpx;
+    .avatar {
+        width: 200rpx;
+        height: 200rpx;
+        border-radius: 50%;
+        overflow: hidden;
+        image {
+            width: 200rpx;
+            height: 200rpx;
+        }
+    }
+    .nick-name {
+        margin-top: 20rpx;
+        color: #fff;
+    }
 }
 .cell-group {
-	width: 690rpx;
-	margin: 0 auto;
-	margin-top: -200rpx;
-	border-radius: 16rpx 16rpx 0 0;
-	position: relative;
-	box-sizing: border-box;
-	z-index: 2;
-	min-height: calc(100vh - 461rpx);
+    width: 690rpx;
+    margin: 0 auto;
+    margin-top: -200rpx;
+    border-radius: 16rpx 16rpx 0 0;
+    position: relative;
+    box-sizing: border-box;
+    z-index: 2;
+    min-height: calc(100vh - 461rpx);
 }
 </style>
