@@ -81,7 +81,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import topTags from '@/config/topTag.config';
 import { Getter, Mutation, State } from 'vuex-class';
 import { Component, Vue } from 'vue-property-decorator';
-import { $getTabTopics } from '@/services/Common.http';
+import { $getTabTopics, $getTopTagConfig } from '@/services/Common.http';
 import { TagData, TagDataKey, TagTime, TagTimeKey } from '@/types/index.type';
 
 dayjs.extend(relativeTime);
@@ -114,7 +114,7 @@ export default class Hot extends Vue {
     private updateTagData!: (tagData: TagData) => void;
     @Mutation('updateVisited')
     private updateVisited!: (visited: string[]) => void;
-    private topTags = topTags; // tag列表
+    private topTags = []; // tag列表
     private curTag = 'top';
     private tagList: any = []; // 主题内容
     private loading = true;
@@ -125,7 +125,16 @@ export default class Hot extends Vue {
         this.updateAdSwitch();
     }
     private onLoad() {
+        this.getTopTagConfig();
         this.getData();
+    }
+    private async getTopTagConfig() {
+        const data = await $getTopTagConfig();
+        if (data) {
+            this.topTags = data;
+        } else {
+            this.topTags = topTags as any;
+        }
     }
     // 获取数据
     private getData(reget?: boolean) {
