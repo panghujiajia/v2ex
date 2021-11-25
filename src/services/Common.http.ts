@@ -68,3 +68,13 @@ export const $getTopTagConfig = async () => {
         return false;
     }
 };
+
+export const $getUserInfo = async (params: any) => {
+    try {
+        const res = await http.post('/member/username', params);
+        console.log(res);
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
