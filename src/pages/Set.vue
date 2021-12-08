@@ -2,25 +2,14 @@
     <view class="container">
         <nav-bar :title="'有返回和home'"></nav-bar>
         <view class="top">
-            <view class="header">
-                <view class="avatar" @click="showTip()">
-                    <!-- #ifdef MP-WEIXIN -->
-                    <open-data type="userAvatarUrl"></open-data>
-                    <!-- #endif -->
-                    <!-- #ifndef MP-WEIXIN -->
+            <view class="header" @click="showTip()">
+                <view class="avatar">
                     <image
-                        src="https://ibao-private.oss-cn-shanghai.aliyuncs.com/yunibaoadmin/img-user-avatar.png"
-                    >
-                    </image>
-                    <!-- #endif -->
+                        src="https://cdn.todayhub.cn/lib/image/img-user-avatar.png"
+                    />
                 </view>
                 <view class="nick-name">
-                    <!-- #ifdef MP-WEIXIN -->
-                    <open-data type="userNickName" lang="zh_CN"></open-data>
-                    <!-- #endif -->
-                    <!-- #ifndef MP-WEIXIN -->
-                    <view> V2EX </view>
-                    <!-- #endif -->
+                    <view> {{ (cookie && username) || '点击登录' }} </view>
                 </view>
             </view>
         </view>
@@ -62,6 +51,10 @@ import { Mutation, State } from 'vuex-class';
 export default class Set extends Vue {
     @State('adSwitch')
     private adSwitch!: boolean;
+    @State('username')
+    private username!: string;
+    @State('cookie')
+    private cookie!: string;
     @Mutation('saveAdCloseTime')
     private saveAdCloseTime!: () => void;
     @Mutation('clearHistory')
@@ -141,10 +134,11 @@ export default class Set extends Vue {
     }
     // 点击头像
     private showTip() {
-        uni.showToast({
-            title: '没有获取你任何信息哦',
-            icon: 'none'
-        });
+        uni.navigateTo({ url: '/pages/Login' });
+        // uni.showToast({
+        //     title: '没有获取你任何信息哦',
+        //     icon: 'none'
+        // });
     }
     // #ifdef MP-WEIXIN
     private onShareAppMessage(e: any) {

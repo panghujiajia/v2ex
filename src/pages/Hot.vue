@@ -163,7 +163,7 @@ export default class Hot extends Vue {
     // 切换tab时
     private onChange(e: any) {
         const index = e.detail.current;
-        const tags = this.topTags;
+        const tags: any = this.topTags;
         this.curTag = tags[index].value;
         this.activeTab = index;
         this.getData();

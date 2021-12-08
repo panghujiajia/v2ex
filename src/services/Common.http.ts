@@ -5,11 +5,7 @@ dayjs.extend(relativeTime);
 
 export const $getTabTopics = async (tab: string) => {
     try {
-        const res = await http.get('/topics/tab', {
-            params: {
-                tab
-            }
-        });
+        const res = await http.get(`/topics/tab/${tab}`);
         return res.data.data;
     } catch (error) {
         return false;
@@ -18,22 +14,16 @@ export const $getTabTopics = async (tab: string) => {
 
 export const $getAllTopics = async (params: { tab: string; p: number }) => {
     try {
-        const res = await http.get('/topics/all', {
-            params
-        });
+        const res = await http.get(`/topics/all/${params.tab}/${params.p}`);
         return res.data.data;
     } catch (error) {
         return false;
     }
 };
 
-export const $getTopicDetail = async (id: string) => {
+export const $getTopicDetail = async (params: { id: string; p: string }) => {
     try {
-        const res = await http.get('/topics/detail', {
-            params: {
-                id
-            }
-        });
+        const res = await http.get(`/topics/detail/${params.id}/${params.p}`);
         return res.data.data;
     } catch (error) {
         return false;
@@ -69,9 +59,13 @@ export const $getTopTagConfig = async () => {
     }
 };
 
-export const $getUserInfo = async (params: any) => {
+export const $getUserInfo = async (username: string) => {
     try {
-        const res = await http.post('/member/username', params);
+        const res = await http.get(`/member/${username}`, {
+            custom: {
+                auth: true
+            }
+        });
         console.log(res);
         return res.data.data;
     } catch (error) {

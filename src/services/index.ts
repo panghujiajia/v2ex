@@ -1,5 +1,6 @@
 import Request from 'luch-request';
 import environments from '../environments';
+import store from '../vuex';
 
 const createInterceptor = (instance: any) => {
     instance.interceptors.request.use(
@@ -12,10 +13,10 @@ const createInterceptor = (instance: any) => {
                     mask: true
                 });
             }
-            const token = 'xxxx';
             // 判断接口是否需要token
             if (config.custom.auth) {
-                if (!token) {
+                const cookie = store.state.cookie;
+                if (!cookie) {
                     uni.showToast({
                         title: '用户登录信息失效，请重新登录',
                         icon: 'none'
@@ -23,7 +24,7 @@ const createInterceptor = (instance: any) => {
                     // 如果token不存在，return Promise.reject(config) 会取消本次请求
                     return Promise.reject(config);
                 }
-                config.header.token = token;
+                config.header.cookie = cookie;
             }
             return config;
         },
@@ -50,10 +51,18 @@ const createInterceptor = (instance: any) => {
             // uni.hideLoading();
             /*  对响应错误做点什么 （statusCode !== 200）*/
             console.log('error response:', response);
-            uni.showToast({
-                title: '网络错误，请稍后再试',
-                icon: 'none'
-            });
+            const { statusCode } = response;
+            if (statusCode === 403) {
+                uni.showToast({
+                    title: 'token失效，请重新登录',
+                    icon: 'none'
+                });
+            } else {
+                uni.showToast({
+                    title: '网络错误，请稍后再试',
+                    icon: 'none'
+                });
+            }
             return Promise.reject(response);
         }
     );

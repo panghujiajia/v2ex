@@ -51,10 +51,8 @@ export default class Login extends Vue {
         this.getUserInfo();
     }
     private async getUserInfo() {
-        const data = await $getUserInfo({
-            username: this.username,
-            cookie: this.cookie
-        });
+        const data = await $getUserInfo(this.username);
+        console.log(data);
     }
     private async getLoginParams() {
         const data = await $getLoginParams();
