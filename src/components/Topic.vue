@@ -94,6 +94,6 @@ export default class Topic extends Vue {
     }
 }
 .cur {
-    opacity: 0.5;
+    opacity: 0.6;
 }
 </style>

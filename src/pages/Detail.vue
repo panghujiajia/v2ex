@@ -73,6 +73,7 @@
                 >
                     <view class="user-info">
                         <view class="user">
+                            <!--                            <image :src="item.avatar"></image>-->
                             <text class="name">{{ item.author }}</text>
                             <text class="time">
                                 {{ item.reply_time }}
@@ -84,7 +85,9 @@
                     </view>
                     <mp-html :content="item.content" markdown selectable />
                 </view>
+                <!-- #ifdef MP-WEIXIN -->
                 <ad unit-id="adunit-6996f541fca34984"></ad>
+                <!-- #endif -->
                 <view v-if="noMore" class="noMore">
                     没有更多了，看看别的帖子吧～
                 </view>
@@ -104,7 +107,6 @@ dayjs.locale('zh-cn'); // 使用本地化语言
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import Skeleton from '@/components/Skeleton.vue';
-import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation } from 'vuex-class';
 @Component({
     name: 'Detail',
@@ -138,12 +140,6 @@ export default class Detail extends Vue {
         time === 0 && (this.loadFailedTime = 0);
         uni.hideLoading();
     }
-    private showName(name: string) {
-        uni.showToast({
-            title: name,
-            icon: 'none'
-        });
-    }
     // 加载数据
     private async loadData(reget?: boolean) {
         if (this.loadFailedTime <= 0 || reget) {
@@ -155,7 +151,10 @@ export default class Detail extends Vue {
         this.loading = true;
         const replyList = this.topicsDetail.reply_list || [];
         const params = this.params;
-        const res = await $getTopicDetail({ id: params.id, p: this.pageNum });
+        const res = await $getTopicDetail({
+            id: params.id,
+            p: this.pageNum
+        });
         if (res) {
             let { reply_list, page } = res;
             if (this.pageNum === 1) {
@@ -188,7 +187,7 @@ export default class Detail extends Vue {
         } else {
             this.loadFailedTime += 1;
             if (this.loadFailedTime <= 10) {
-                this.loadData();
+                this.loadData(true);
             } else {
                 this.resetLoading();
             }
@@ -264,6 +263,16 @@ text {
         align-items: center;
         height: 40rpx;
         margin-bottom: 20rpx;
+        .user {
+            display: flex;
+            align-items: center;
+        }
+        image {
+            width: 40rpx;
+            height: 40rpx;
+            margin-right: 10rpx;
+            border-radius: 10rpx;
+        }
         .name {
             font-size: 28rpx;
             color: #666;

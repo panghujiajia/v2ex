@@ -146,7 +146,9 @@ export default class Login extends Vue {
             });
             this.saveCookie(cookie + ';' + data);
             this.saveUserInfo({ username });
-            uni.navigateBack();
+            uni.navigateBack({
+                delta: 1
+            });
         } else {
             uni.showToast({
                 title: '登录失败，请重试',

@@ -67,9 +67,11 @@
                                 >
                                     <Topic :item="item"></Topic>
                                 </view>
+								<!-- #ifdef MP-WEIXIN -->
                                 <view class="item">
                                     <ad unit-id="adunit-1f991a273d575025"></ad>
                                 </view>
+								<!-- #endif -->
                                 <view class="noMore">
                                     没有更多了，看看别的节点吧～
                                 </view>
@@ -132,6 +134,10 @@ export default class Hot extends Vue {
 
     private onShow() {
         this.updateAdSwitch();
+        // #ifdef APP-PLUS
+        // 监听设备网络状态变化事件
+        console.log((plus as any).networkinfo.isSetProxy());
+        // #endif
     }
     private onLoad() {
         this.getTopTagConfig();

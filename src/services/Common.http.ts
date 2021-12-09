@@ -21,7 +21,10 @@ export const $getAllTopics = async (params: { tab: string; p: number }) => {
     }
 };
 
-export const $getTopicDetail = async (params: { id: string; p: string }) => {
+export const $getTopicDetail = async (params: {
+    id: string;
+    p: string | number;
+}) => {
     try {
         const res = await http.get(`/topics/detail/${params.id}/${params.p}`);
         return res.data.data;
