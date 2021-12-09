@@ -33,7 +33,6 @@ export const $getTopicDetail = async (params: { id: string; p: string }) => {
 export const $getLoginParams = async () => {
     try {
         const res = await http.get('/login/params');
-        console.log(res.data.data);
         return res.data.data;
     } catch (error) {
         return false;
@@ -43,7 +42,6 @@ export const $getLoginParams = async () => {
 export const $login = async (params: any) => {
     try {
         const res = await http.post('/login', params);
-        console.log(res);
         return res.data.data;
     } catch (error) {
         return false;
@@ -66,7 +64,6 @@ export const $getUserInfo = async (username: string) => {
                 auth: true
             }
         });
-        console.log(res);
         return res.data.data;
     } catch (error) {
         return false;

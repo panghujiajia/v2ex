@@ -1,6 +1,6 @@
 <template>
     <view class="container">
-        <template v-if="loading">
+        <template v-if="loading && loadType === 'refresh'">
             <Skeleton type="list"></Skeleton>
         </template>
         <template v-else>
@@ -63,7 +63,7 @@
                         </view>
                     </view>
                 </view>
-                <view class="reply-num">
+                <view class="reply-num" v-if="topicsDetail.reply_num">
                     {{ topicsDetail.reply_num }}条回复
                 </view>
                 <view
@@ -85,6 +85,9 @@
                     <mp-html :content="item.content" markdown selectable />
                 </view>
                 <ad unit-id="adunit-6996f541fca34984"></ad>
+                <view v-if="noMore" class="noMore">
+                    没有更多了，看看别的帖子吧～
+                </view>
             </template>
         </template>
     </view>
@@ -115,6 +118,10 @@ export default class Detail extends Vue {
     private topicsDetail: any = {}; // 主题详情
     private params: any = {};
     private loading = true;
+    private noMore = false; // 没有更多了
+    private pageNum = 1; // 页码
+    private page = 1; // 总页码
+    private loadType = 'refresh'; // 加载类型
     private loadFailedTime = 0; // 失败次数
     private onLoad(options: any) {
         this.params = options;
@@ -146,10 +153,16 @@ export default class Detail extends Vue {
             });
         }
         this.loading = true;
+        const replyList = this.topicsDetail.reply_list || [];
         const params = this.params;
-        const res = await $getTopicDetail({ id: params.id, p: '1' });
+        const res = await $getTopicDetail({ id: params.id, p: this.pageNum });
         if (res) {
-            let { reply_list } = res;
+            let { reply_list, page } = res;
+            if (this.pageNum === 1) {
+                this.topicsDetail = res;
+                this.page = page || 1;
+                this.saveHistoryTopics(res);
+            }
             reply_list = reply_list.map((item: any) => {
                 return {
                     ...item,
@@ -159,8 +172,18 @@ export default class Detail extends Vue {
                     )
                 };
             });
-            this.topicsDetail = { ...res, reply_list };
-            this.saveHistoryTopics(res);
+            if (this.loadType === 'refresh') {
+                this.topicsDetail.reply_list = reply_list;
+                uni.stopPullDownRefresh();
+            } else {
+                if (!this.noMore) {
+                    this.topicsDetail.reply_list = [
+                        ...replyList,
+                        ...reply_list
+                    ];
+                }
+            }
+            this.isLastPage();
             this.resetLoading(0);
         } else {
             this.loadFailedTime += 1;
@@ -170,6 +193,25 @@ export default class Detail extends Vue {
                 this.resetLoading();
             }
         }
+    }
+    // 判断是否最后一页
+    private isLastPage() {
+        if (this.pageNum >= this.page) {
+            this.noMore = true;
+        }
+    }
+    private onPullDownRefresh() {
+        this.pageNum = 1;
+        this.loadType = 'refresh';
+        this.loadData();
+    }
+    private onReachBottom() {
+        if (this.pageNum === this.page) {
+            return;
+        }
+        this.pageNum = ++this.pageNum;
+        this.loadType = 'loadMore';
+        this.loadData();
     }
     // #ifdef MP-WEIXIN
     private onShareAppMessage(e: any) {

@@ -1,38 +1,61 @@
 <template>
     <view class="container">
-        <!--        <input-->
-        <!--            :value="username"-->
-        <!--            @change="getUsername"-->
-        <!--            placeholder="请输入用户名"-->
-        <!--        />-->
-        <!--        <input-->
-        <!--            :value="password"-->
-        <!--            @change="getPassword"-->
-        <!--            placeholder="请输入密码"-->
-        <!--            type="password"-->
-        <!--        />-->
-        <image class="code" :src="captchaBase64" />
-        <input :value="code" @change="getCode" placeholder="请输入验证码" />
-        <view class="btn-default" @click="login()">登录</view>
+        <view class="top">
+            <view class="title">
+                <view>Hello!</view>
+                <view>欢迎使用V2EX mini</view>
+            </view>
+        </view>
+        <view class="cell-group">
+            <view class="cell">
+                <view class="label">用户名</view>
+                <input
+                    class="form-item"
+                    :value="username"
+                    @input="getUsername"
+                    placeholder="请输入用户名"
+                />
+            </view>
+            <view class="cell">
+                <view class="label">密码</view>
+                <input
+                    class="form-item"
+                    :value="password"
+                    @input="getPassword"
+                    placeholder="请输入密码"
+                    type="password"
+                />
+            </view>
+            <view class="cell">
+                <view class="label">验证码</view>
+                <input
+                    class="form-item"
+                    :value="code"
+                    @input="getCode"
+                    placeholder="请输入验证码"
+                />
+            </view>
+            <view @click="getLoginParams()">
+                <image class="code" :src="captchaBase64" />
+            </view>
+            <view class="btn-default" @click="login()">登录</view>
+        </view>
     </view>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { $getLoginParams, $getUserInfo, $login } from '@/services/Common.http';
+import { $getLoginParams, $login } from '@/services/Common.http';
 import { Mutation, State } from 'vuex-class';
-import { TagTime } from '@/types/index.type';
 @Component({
     name: 'Login'
 })
 export default class Login extends Vue {
-    @State('username')
-    private username!: string;
     @State('cookie')
     private cookie!: string;
     @Mutation('saveCookie')
     private saveCookie!: (cookie: string) => void;
     @Mutation('saveUserInfo')
-    private saveUserInfo!: (username: string) => void;
+    private saveUserInfo!: (userInfo: any) => void;
     // 登录页面拿的参数
     private signinData = {
         username_key: '',
@@ -44,49 +67,72 @@ export default class Login extends Vue {
     // 验证码的base64
     private captchaBase64 = '';
     private code = '';
-    // private username = '';
-    // private password = '';
+    private username = '';
+    private password = '';
     private created() {
         this.getLoginParams();
-        this.getUserInfo();
-    }
-    private async getUserInfo() {
-        const data = await $getUserInfo(this.username);
-        console.log(data);
     }
     private async getLoginParams() {
+        uni.showLoading({
+            title: '加载验证码...',
+            mask: true
+        });
         const data = await $getLoginParams();
         if (data) {
-            console.log(data);
             const { codeUrl } = data;
             this.signinData = data;
             this.captchaBase64 =
                 'data:image/png;base64,' +
                 uni.arrayBufferToBase64(codeUrl.data);
+        } else {
+            uni.showToast({
+                title: '验证码获取失败，请重试',
+                icon: 'none'
+            });
         }
+        uni.hideLoading();
     }
     // 获取输入的验证码
     private getCode(e: any) {
         this.code = e.detail.value;
     }
     // 获取输入的账号
-    // private getUsername(e: any) {
-    //     this.username = e.detail.value;
-    // }
+    private getUsername(e: any) {
+        this.username = e.detail.value;
+    }
     // // 获取输入的密码
-    // private getPassword(e: any) {
-    //     this.password = e.detail.value;
-    // }
+    private getPassword(e: any) {
+        this.password = e.detail.value;
+    }
     // 登录请求
     private async login() {
         const { username_key, password_key, code_key, once, cookie } =
             this.signinData;
-        const code = this.code;
-        // const username = this.username;
-        // const password = this.password;
+        const { username, password, code } = this;
+        if (!username) {
+            uni.showToast({
+                title: '请输入用户名',
+                icon: 'none'
+            });
+            return;
+        }
+        if (!password) {
+            uni.showToast({
+                title: '请输入密码',
+                icon: 'none'
+            });
+            return;
+        }
+        if (!code) {
+            uni.showToast({
+                title: '请输入验证码',
+                icon: 'none'
+            });
+            return;
+        }
         const params = {
-            [username_key]: 'timedivision',
-            [password_key]: '123456MM..',
+            [username_key]: username,
+            [password_key]: password,
             [code_key]: code,
             cookie,
             once,
@@ -94,8 +140,13 @@ export default class Login extends Vue {
         };
         const data = await $login(params);
         if (data) {
+            uni.showToast({
+                title: '登录成功',
+                icon: 'none'
+            });
             this.saveCookie(cookie + ';' + data);
-            this.saveUserInfo('timedivision');
+            this.saveUserInfo({ username });
+            uni.navigateBack();
         } else {
             uni.showToast({
                 title: '登录失败，请重试',
@@ -107,13 +158,61 @@ export default class Login extends Vue {
 }
 </script>
 <style lang="less" scoped>
-.input {
-    height: 80rpx;
-    width: 100%;
-    border: 2rpx solid #ccc;
+.container {
+    min-height: 100vh;
+    background: #efefef;
+    box-sizing: border-box;
+    .top {
+        height: 661rpx;
+        background: url(https://cdn.todayhub.cn/lib/image/bg-user-center.png)
+            50% no-repeat;
+        background-size: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .title {
+            width: 690rpx;
+            height: 300rpx;
+            line-height: 70rpx;
+            color: #fff;
+            font-size: 48rpx;
+            font-weight: bold;
+        }
+    }
 }
-.code {
-    width: 100vw;
-    height: 240rpx;
+.cell-group {
+    width: 690rpx;
+    margin: 0 auto;
+    margin-top: -200rpx;
+    border-radius: 16rpx 16rpx 0 0;
+    position: relative;
+    box-sizing: border-box;
+    z-index: 2;
+    min-height: calc(100vh - 461rpx);
+    .cell {
+        display: flex;
+        align-items: center;
+        .label {
+            width: 100rpx;
+            padding-right: 36rpx;
+            text-align: right;
+            color: #33374d;
+            font-size: 32rpx;
+        }
+        .form-item {
+            flex: 1;
+            font-size: 32rpx;
+        }
+    }
+    .code {
+        width: 100%;
+        height: 120rpx;
+    }
+}
+.btn-default {
+    width: 660rpx;
+    border-radius: 10rpx;
 }
 </style>

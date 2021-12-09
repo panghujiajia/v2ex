@@ -115,7 +115,6 @@ export default class Tag extends Vue {
             });
             // 如果是加载更多
             if (this.loadType === 'loadMore') {
-                this.isLastPage(tagArr);
                 if (!this.noMore) {
                     this.tagList = [...tagList, ...tagArr];
                 }
@@ -123,6 +122,7 @@ export default class Tag extends Vue {
                 this.tagList = tagArr;
                 uni.stopPullDownRefresh();
             }
+            this.isLastPage();
             this.resetLoading(0);
         } else {
             this.loadFailedTime += 1;
@@ -134,14 +134,12 @@ export default class Tag extends Vue {
         }
     }
     // 判断是否最后一页
-    private isLastPage(data: any) {
-        const dataLen = data.length;
+    private isLastPage() {
+        const { topic_count } = this.nodeInfo;
         const tagList = this.tagList;
         const tagListLen = tagList.length;
-        if (tagListLen > dataLen) {
-            if (data[dataLen - 1].id === tagList[tagListLen - 1].id) {
-                this.noMore = true;
-            }
+        if (tagListLen >= topic_count) {
+            this.noMore = true;
         }
     }
     // 跳转主题详情
@@ -169,6 +167,9 @@ export default class Tag extends Vue {
         this.getAllTopics();
     }
     private onReachBottom() {
+        if (this.noMore) {
+            return;
+        }
         this.pageNum = ++this.pageNum;
         this.loadType = 'loadMore';
         this.getAllTopics();
@@ -191,8 +192,8 @@ export default class Tag extends Vue {
 }
 .topic-header {
     min-height: 200rpx;
-    background: url(https://ibao-private.oss-cn-shanghai.aliyuncs.com/yunibaoadmin/bg-topic.jpg)
-        50% no-repeat;
+    background: url(https://cdn.todayhub.cn/lib/image/bg-topic.jpg) 50%
+        no-repeat;
     background-size: cover;
     padding: 30rpx;
     box-sizing: border-box;

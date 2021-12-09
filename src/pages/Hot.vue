@@ -37,7 +37,7 @@
                 >
                     <Skeleton type="list"></Skeleton>
                 </view>
-                <view v-else>
+                <template v-else>
                     <view class="load-failed" v-if="loadFailedTime > 0">
                         <view class="reload">
                             <image
@@ -52,22 +52,31 @@
                         </view>
                     </view>
                     <template v-else>
-                        <view class="list-wrap">
-                            <view
-                                class="item"
-                                v-for="(item, index) in tagList"
-                                :key="index"
-                                @click.stop="getTopicsDetail(item.id)"
-                            >
-                                <Topic :item="item"></Topic>
+                        <scroll-view
+                            class="list-wrap"
+                            scroll-y="true"
+                            scroll-with-animation
+                            style="height: 100%"
+                        >
+                            <view class="scroll-wrap">
+                                <view
+                                    class="item"
+                                    v-for="(item, index) in tagList"
+                                    :key="index"
+                                    @click.stop="getTopicsDetail(item.id)"
+                                >
+                                    <Topic :item="item"></Topic>
+                                </view>
+                                <view class="item">
+                                    <ad unit-id="adunit-1f991a273d575025"></ad>
+                                </view>
+                                <view class="noMore">
+                                    没有更多了，看看别的节点吧～
+                                </view>
                             </view>
-                            <view class="item">
-                                <ad unit-id="adunit-1f991a273d575025"></ad>
-                            </view>
-                        </view>
-                        <view class="noMore">没有更多了，看看别的节点吧～</view>
+                        </scroll-view>
                     </template>
-                </view>
+                </template>
             </swiper-item>
         </swiper>
     </view>
@@ -267,6 +276,7 @@ export default class Hot extends Vue {
 
 <style lang="less" scoped>
 .container {
+    height: 100%;
     ::-webkit-scrollbar {
         display: none;
     }
@@ -275,7 +285,7 @@ export default class Hot extends Vue {
         top: 0;
         left: 0;
         z-index: 999;
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid #f5f5f5;
         background: #fff;
         height: 40px;
         .scroll-wrap {
@@ -321,10 +331,12 @@ export default class Hot extends Vue {
     .list-wrap {
         background: #f5f5f5;
         border-bottom: 1rpx solid #f5f5f5;
-        margin-bottom: 20rpx;
-        border-top: 20rpx solid #f5f5f5;
-        overflow-y: scroll;
+        height: 100%;
+        .scroll-wrap {
+            white-space: nowrap;
+        }
         .item {
+            white-space: normal;
             &:last-child {
                 /deep/.topic-wrap {
                     margin-bottom: 0;

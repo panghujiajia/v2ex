@@ -5,11 +5,16 @@
             <view class="header" @click="showTip()">
                 <view class="avatar">
                     <image
-                        src="https://cdn.todayhub.cn/lib/image/img-user-avatar.png"
+                        :src="
+                            (cookie && userInfo.avatar) ||
+                            'https://cdn.todayhub.cn/lib/image/img-user-avatar.png'
+                        "
                     />
                 </view>
                 <view class="nick-name">
-                    <view> {{ (cookie && username) || '点击登录' }} </view>
+                    <view>
+                        {{ (cookie && userInfo.username) || '点击登录' }}
+                    </view>
                 </view>
             </view>
         </view>
@@ -44,6 +49,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
+import { $getUserInfo } from '@/services/Common.http';
 
 @Component({
     name: 'Set'
@@ -51,8 +57,8 @@ import { Mutation, State } from 'vuex-class';
 export default class Set extends Vue {
     @State('adSwitch')
     private adSwitch!: boolean;
-    @State('username')
-    private username!: string;
+    @State('userInfo')
+    private userInfo!: any;
     @State('cookie')
     private cookie!: string;
     @Mutation('saveAdCloseTime')
@@ -61,7 +67,16 @@ export default class Set extends Vue {
     private clearHistory!: () => void;
     @Mutation('toggleAdSwitch')
     private toggleAdSwitch!: (data: boolean) => void;
-    private onLoad() {}
+    @Mutation('saveUserInfo')
+    private saveUserInfo!: (userInfo: any) => void;
+    private onLoad() {
+        this.getUserInfo();
+    }
+    private async getUserInfo() {
+        const data = await $getUserInfo(this.userInfo.username);
+        console.log(data);
+        this.saveUserInfo(data);
+    }
     private onSwitchChange({ detail }: any) {
         this.toggleAdSwitch(detail);
         if (!detail) {
@@ -134,7 +149,9 @@ export default class Set extends Vue {
     }
     // 点击头像
     private showTip() {
-        uni.navigateTo({ url: '/pages/Login' });
+        if (!this.cookie) {
+            uni.navigateTo({ url: '/pages/Login' });
+        }
         // uni.showToast({
         //     title: '没有获取你任何信息哦',
         //     icon: 'none'
@@ -157,7 +174,7 @@ export default class Set extends Vue {
     box-sizing: border-box;
     .top {
         height: 661rpx;
-        background: url(https://ibao-private.oss-cn-shanghai.aliyuncs.com/yunibaoadmin/bg-user-center.png)
+        background: url(https://cdn.todayhub.cn/lib/image/bg-user-center.png)
             50% no-repeat;
         background-size: 100%;
         position: relative;

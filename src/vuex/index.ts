@@ -16,7 +16,9 @@ const RootProjectPersisted = createPersistedState({
 export default new Vuex.Store({
     state: {
         cookie: '',
-        username: '',
+        userInfo: {
+            username: ''
+        },
         historyTopic: [],
         adSwitch: true, // 广告
         adCloseTime: '',
@@ -110,7 +112,7 @@ export default new Vuex.Store({
             state.cookie = data;
         },
         saveUserInfo(state, data) {
-            state.username = data;
+            state.userInfo = { ...state.userInfo, ...data };
         }
     },
     actions: {},
