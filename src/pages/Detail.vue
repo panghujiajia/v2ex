@@ -131,6 +131,12 @@ export default class Detail extends Vue {
         time === 0 && (this.loadFailedTime = 0);
         uni.hideLoading();
     }
+    private showName(name: string) {
+        uni.showToast({
+            title: name,
+            icon: 'none'
+        });
+    }
     // 加载数据
     private async loadData(reget?: boolean) {
         if (this.loadFailedTime <= 0 || reget) {
@@ -143,7 +149,17 @@ export default class Detail extends Vue {
         const params = this.params;
         const res = await $getTopicDetail({ id: params.id, p: '1' });
         if (res) {
-            this.topicsDetail = res;
+            let { reply_list } = res;
+            reply_list = reply_list.map((item: any) => {
+                return {
+                    ...item,
+                    content: item.content.replace(
+                        /(@.*?>)(.*?)(<\/a>)/g,
+                        '<text class="user-name">@$2</text>'
+                    )
+                };
+            });
+            this.topicsDetail = { ...res, reply_list };
             this.saveHistoryTopics(res);
             this.resetLoading(0);
         } else {
@@ -183,13 +199,15 @@ text {
     }
 }
 .subtle-wrap {
-    padding: 0 30rpx;
     background: #fffff9;
-    border-top: 2rpx solid #f5f5f5;
     color: #666;
     .title {
         font-size: 24rpx;
-        padding-top: 25rpx;
+        padding: 25rpx 30rpx 0;
+        border-top: 2rpx solid #f5f5f5;
+    }
+    .content {
+        padding: 0 30rpx;
     }
 }
 .topic-wrap {
