@@ -16,6 +16,11 @@
                         {{ (cookie && userInfo.username) || '点击登录' }}
                     </view>
                 </view>
+                <view class="nick-name rank">
+                    <view>
+                        {{ (cookie && userInfo.info.split('，')[0]) || '' }}
+                    </view>
+                </view>
             </view>
         </view>
         <view class="cell-group">
@@ -69,8 +74,10 @@ export default class Set extends Vue {
     private toggleAdSwitch!: (data: boolean) => void;
     @Mutation('saveUserInfo')
     private saveUserInfo!: (userInfo: any) => void;
+    @Mutation('clearAllStorage')
+    private clearAllStorage!: () => void;
     private onLoad() {
-        this.getUserInfo();
+        this.cookie && this.getUserInfo();
     }
     private async getUserInfo() {
         const data = await $getUserInfo(this.userInfo.username);
@@ -130,9 +137,9 @@ export default class Set extends Vue {
                         });
                         break;
                     case 1:
-                        this.clearHistory();
-                        this.toggleAdSwitch(true);
+                        this.clearAllStorage();
                         uni.clearStorageSync();
+                        this.toggleAdSwitch(true);
                         uni.showToast({
                             title: `清理成功！共为您腾出${size}kb空间！`,
                             icon: 'none'
@@ -207,6 +214,10 @@ export default class Set extends Vue {
     .nick-name {
         margin-top: 20rpx;
         color: #fff;
+        font-size: 36rpx;
+    }
+    .rank {
+        font-size: 24rpx;
     }
 }
 .cell-group {

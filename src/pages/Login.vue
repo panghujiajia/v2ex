@@ -138,7 +138,12 @@ export default class Login extends Vue {
             once,
             next: '/'
         };
+        uni.showLoading({
+            title: '登录中...',
+            mask: true
+        });
         const data = await $login(params);
+        uni.hideLoading();
         if (data) {
             uni.showToast({
                 title: '登录成功',
