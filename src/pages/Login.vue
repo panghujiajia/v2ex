@@ -74,8 +74,7 @@ export default class Login extends Vue {
     }
     private async getLoginParams() {
         uni.showLoading({
-            title: '加载验证码...',
-            mask: true
+            title: '加载验证码...'
         });
         const data = await $getLoginParams();
         if (data) {
@@ -84,11 +83,13 @@ export default class Login extends Vue {
             this.captchaBase64 =
                 'data:image/png;base64,' +
                 uni.arrayBufferToBase64(codeUrl.data);
+            console.log(this.captchaBase64);
         } else {
             uni.showToast({
                 title: '验证码获取失败，请重试',
                 icon: 'none'
             });
+            uni.hideLoading();
         }
         uni.hideLoading();
     }

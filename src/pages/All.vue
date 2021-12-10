@@ -132,9 +132,6 @@ export default class All extends Vue {
 </script>
 
 <style lang="less" scoped>
-.my-tags {
-    border-top: 20rpx solid #f5f5f5;
-}
 .my-tags,
 .tag-wrap {
     padding: 20rpx;

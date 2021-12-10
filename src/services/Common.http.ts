@@ -53,7 +53,7 @@ export const $login = async (params: any) => {
 
 export const $getTopTagConfig = async () => {
     try {
-        const res = await http.get('/top/tag/config');
+        const res = await http.get('/config/tag/top');
         return res.data.data;
     } catch (error) {
         return false;
@@ -63,6 +63,19 @@ export const $getTopTagConfig = async () => {
 export const $getUserInfo = async (username: string) => {
     try {
         const res = await http.get(`/member/${username}`, {
+            custom: {
+                auth: true
+            }
+        });
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const $getUserTopics = async (username: string) => {
+    try {
+        const res = await http.get(`/member/${username}/topics`, {
             custom: {
                 auth: true
             }

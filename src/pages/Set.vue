@@ -54,7 +54,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
-import { $getUserInfo } from '@/services/Common.http';
+import { $getUserInfo, $getUserTopics } from '@/services/Common.http';
 
 @Component({
     name: 'Set'
@@ -77,7 +77,14 @@ export default class Set extends Vue {
     @Mutation('clearAllStorage')
     private clearAllStorage!: () => void;
     private onLoad() {
-        this.cookie && this.getUserInfo();
+        if (this.cookie) {
+            this.getUserInfo();
+            this.getUserTopics();
+        }
+    }
+    private async getUserTopics() {
+        const data = await $getUserTopics(this.userInfo.username);
+        console.log(data);
     }
     private async getUserInfo() {
         const data = await $getUserInfo(this.userInfo.username);
