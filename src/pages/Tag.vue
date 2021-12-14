@@ -4,7 +4,7 @@
             <Skeleton type="list"></Skeleton>
         </template>
         <template v-else>
-            <view class="load-failed" v-if="loadFailedTime > 0">
+            <view class="load-failed" v-if="!tagList.length">
                 <view class="reload">
                     <image
                         class="empty-img"
@@ -76,7 +76,6 @@ export default class Tag extends Vue {
     private loading = true;
     private noMore = false; // 没有更多了
     private loadType = 'refresh'; // 加载类型
-    private loadFailedTime = 0; // 失败次数
 
     private onLoad(options: any) {
         const { value, title } = options;
@@ -85,19 +84,11 @@ export default class Tag extends Vue {
         this.title = title;
         this.getAllTopics();
     }
-    private resetLoading(time?: number) {
+    private resetLoading() {
         this.loading = false;
-        time === 0 && (this.loadFailedTime = 0);
-        uni.hideLoading();
     }
     // 根据tag获取内容
-    private async getAllTopics(reget?: boolean) {
-        if (this.loadFailedTime <= 0 || reget) {
-            uni.showLoading({
-                title: '加载中...',
-                mask: true
-            });
-        }
+    private async getAllTopics() {
         this.loading = true;
         const tagList = this.tagList;
         const tab = this.value;
@@ -123,15 +114,8 @@ export default class Tag extends Vue {
                 uni.stopPullDownRefresh();
             }
             this.isLastPage();
-            this.resetLoading(0);
-        } else {
-            this.loadFailedTime += 1;
-            if (this.loadFailedTime <= 10) {
-                this.getAllTopics();
-            } else {
-                this.resetLoading();
-            }
         }
+        this.resetLoading();
     }
     // 判断是否最后一页
     private isLastPage() {

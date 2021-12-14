@@ -60,6 +60,15 @@ export const $getTopTagConfig = async () => {
     }
 };
 
+export const $getAllTagConfig = async () => {
+    try {
+        const res = await http.get('/config/tag/all');
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
 export const $getUserInfo = async (username: string) => {
     try {
         const res = await http.get(`/member/${username}`, {
@@ -76,6 +85,32 @@ export const $getUserInfo = async (username: string) => {
 export const $getUserTopics = async (username: string) => {
     try {
         const res = await http.get(`/member/${username}/topics`, {
+            custom: {
+                auth: true
+            }
+        });
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const $getLoginRewardInfo = async () => {
+    try {
+        const res = await http.get('/mission/daily', {
+            custom: {
+                auth: true
+            }
+        });
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const $getLoginReward = async () => {
+    try {
+        const res = await http.post('/mission/daily', null, {
             custom: {
                 auth: true
             }

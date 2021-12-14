@@ -13,12 +13,12 @@
                 </view>
                 <view class="nick-name">
                     <view>
-                        {{ (cookie && userInfo.username) || '点击登录' }}
+                        {{ userInfo.username || '点击登录' }}
                     </view>
                 </view>
-                <view class="nick-name rank">
+                <view class="nick-name rank" v-if="userInfo.info">
                     <view>
-                        {{ (cookie && userInfo.info.split('，')[0]) || '' }}
+                        {{ userInfo.info.split('，')[0] || '' }}
                     </view>
                 </view>
             </view>
@@ -54,7 +54,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
-import { $getUserInfo, $getUserTopics } from '@/services/Common.http';
+import {
+    $getLoginReward,
+    $getLoginRewardInfo,
+    $getUserInfo,
+    $getUserTopics
+} from '@/services/Common.http';
 
 @Component({
     name: 'Set'
@@ -76,11 +81,18 @@ export default class Set extends Vue {
     private saveUserInfo!: (userInfo: any) => void;
     @Mutation('clearAllStorage')
     private clearAllStorage!: () => void;
-    private onLoad() {
-        if (this.cookie) {
+    private onShow() {
+        this.getLoginReward();
+        // this.getLoginRewardInfo();
+        if (!this.userInfo.info) {
             this.getUserInfo();
-            this.getUserTopics();
         }
+    }
+    private async getLoginRewardInfo() {
+        const data = await $getLoginRewardInfo();
+    }
+    private async getLoginReward() {
+        const data = await $getLoginReward();
     }
     private async getUserTopics() {
         const data = await $getUserTopics(this.userInfo.username);

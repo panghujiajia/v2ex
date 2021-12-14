@@ -46,6 +46,7 @@ import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import { Mutation, State } from 'vuex-class';
 import tagNavs from '@/config/tagNav.config';
+import { $getAllTagConfig } from '@/services/Common.http';
 @Component({
     name: 'All'
 })
@@ -57,7 +58,14 @@ export default class All extends Vue {
     private tagNavs = tagNavs; // 全部tag
     private isEdit = false; // 编辑状态
     private onLoad() {
+        this.getAllTagConfig();
         this.getActive();
+    }
+    private async getAllTagConfig() {
+        const data = await $getAllTagConfig();
+        if (data) {
+            this.tagNavs = data;
+        }
     }
     // 设置编辑状态下高量选中的
     private getActive() {

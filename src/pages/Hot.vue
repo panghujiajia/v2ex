@@ -38,7 +38,7 @@
                     <Skeleton type="list"></Skeleton>
                 </view>
                 <template v-else>
-                    <view class="load-failed" v-if="loadFailedTime > 0">
+                    <view class="load-failed" v-if="!tagList.length">
                         <view class="reload">
                             <image
                                 class="empty-img"
@@ -67,11 +67,11 @@
                                 >
                                     <Topic :item="item"></Topic>
                                 </view>
-								<!-- #ifdef MP-WEIXIN -->
+                                <!-- #ifdef MP-WEIXIN -->
                                 <view class="item">
                                     <ad unit-id="adunit-1f991a273d575025"></ad>
                                 </view>
-								<!-- #endif -->
+                                <!-- #endif -->
                                 <view class="noMore">
                                     没有更多了，看看别的节点吧～
                                 </view>
@@ -130,7 +130,6 @@ export default class Hot extends Vue {
     private tagList: any = []; // 主题内容
     private loading = true;
     private activeTab = 0;
-    private loadFailedTime = 0; // 失败次数
 
     private onShow() {
         this.updateAdSwitch();
@@ -152,13 +151,7 @@ export default class Hot extends Vue {
         }
     }
     // 获取数据
-    private getData(reget?: boolean) {
-        if (this.loadFailedTime <= 0 || reget) {
-            uni.showLoading({
-                title: '加载中...',
-                mask: true
-            });
-        }
+    private getData() {
         this.loading = true;
         const title = this.curTag;
         // 如果没拿到数据就调接口
@@ -166,10 +159,8 @@ export default class Hot extends Vue {
             this.getTabTopics(title);
         }
     }
-    private resetLoading(time?: number) {
+    private resetLoading() {
         this.loading = false;
-        time === 0 && (this.loadFailedTime = 0);
-        uni.hideLoading();
     }
     // 点击tab
     private onClick(index: number) {
@@ -210,7 +201,7 @@ export default class Hot extends Vue {
                 }
             });
             this.tagList = tagList;
-            this.resetLoading(0);
+            this.resetLoading();
             return false;
         }
     }
@@ -227,14 +218,8 @@ export default class Hot extends Vue {
                 return { ...item, beVisited };
             });
             this.commonUpdate(title, tagArr);
-        } else {
-            this.loadFailedTime += 1;
-            if (this.loadFailedTime <= 10) {
-                this.getData();
-            } else {
-                this.resetLoading();
-            }
         }
+        this.resetLoading();
     }
     // 更新缓存
     private commonUpdate(title: string, tagArr: any) {
@@ -250,7 +235,6 @@ export default class Hot extends Vue {
             value: dayjs()
         });
         this.tagList = tagArr;
-        this.resetLoading(0);
     }
     // 跳转主题详情
     private getTopicsDetail(id: string) {

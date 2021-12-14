@@ -4,7 +4,7 @@
             <Skeleton type="list"></Skeleton>
         </template>
         <template v-else>
-            <view class="load-failed" v-if="loadFailedTime > 0">
+            <view class="load-failed" v-if="!topicsDetail.title">
                 <view class="reload">
                     <view class="reload">
                         <image
@@ -124,7 +124,6 @@ export default class Detail extends Vue {
     private pageNum = 1; // 页码
     private page = 1; // 总页码
     private loadType = 'refresh'; // 加载类型
-    private loadFailedTime = 0; // 失败次数
     private onLoad(options: any) {
         this.params = options;
         this.loadData();
@@ -135,19 +134,11 @@ export default class Detail extends Vue {
             url: `/pages/Tag?value=${tag.tag_link}&title=${tag.tag_name}`
         });
     }
-    private resetLoading(time?: number) {
+    private resetLoading() {
         this.loading = false;
-        time === 0 && (this.loadFailedTime = 0);
-        uni.hideLoading();
     }
     // 加载数据
-    private async loadData(reget?: boolean) {
-        if (this.loadFailedTime <= 0 || reget) {
-            uni.showLoading({
-                title: '加载中...',
-                mask: true
-            });
-        }
+    private async loadData() {
         this.loading = true;
         const replyList = this.topicsDetail.reply_list || [];
         const params = this.params;
@@ -183,15 +174,8 @@ export default class Detail extends Vue {
                 }
             }
             this.isLastPage();
-            this.resetLoading(0);
-        } else {
-            this.loadFailedTime += 1;
-            if (this.loadFailedTime <= 10) {
-                this.loadData(true);
-            } else {
-                this.resetLoading();
-            }
         }
+        this.resetLoading();
     }
     // 判断是否最后一页
     private isLastPage() {
