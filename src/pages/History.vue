@@ -51,7 +51,6 @@ export default class History extends Vue {
     background: #f5f5f5;
     border-bottom: 1rpx solid #f5f5f5;
     margin-bottom: 20rpx;
-    border-top: 20rpx solid #f5f5f5;
     .item {
         &:last-child {
             /deep/.topic-wrap {

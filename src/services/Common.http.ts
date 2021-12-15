@@ -82,13 +82,16 @@ export const $getUserInfo = async (username: string) => {
     }
 };
 
-export const $getUserTopics = async (username: string) => {
+export const $getUserTopics = async (params: any) => {
     try {
-        const res = await http.get(`/member/${username}/topics`, {
-            custom: {
-                auth: true
+        const res = await http.get(
+            `/member/${params.username}/topics/${params.p}`,
+            {
+                custom: {
+                    auth: true
+                }
             }
-        });
+        );
         return res.data.data;
     } catch (error) {
         return false;

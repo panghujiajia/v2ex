@@ -23,7 +23,12 @@
                 <view class="topic-wrap topic-header">
                     <view class="user-info">
                         <view class="user">
-                            <text class="name">{{ topicsDetail.author }}</text>
+                            <text
+                                class="name"
+                                @click="getUserInfo(topicsDetail.author)"
+                            >
+                                {{ topicsDetail.author }}
+                            </text>
                             <text class="time">
                                 {{ topicsDetail.publish_time }}
                             </text>
@@ -67,14 +72,27 @@
                     {{ topicsDetail.reply_num }}条回复
                 </view>
                 <view
+                    v-if="lastScrollTop"
+                    class="back-top-last-scroll"
+                    @click="backToLastScroll()"
+                >
+                    回到现在
+                </view>
+                <view
                     class="topic-wrap topic-reply"
+                    :class="item.author"
                     v-for="(item, index) in topicsDetail.reply_list"
                     :key="index"
                 >
                     <view class="user-info">
                         <view class="user">
                             <!--                            <image :src="item.avatar"></image>-->
-                            <text class="name">{{ item.author }}</text>
+                            <text
+                                class="name"
+                                @click="getUserInfo(item.author)"
+                            >
+                                {{ item.author }}
+                            </text>
                             <text class="op" v-if="item.is_master">OP</text>
                             <text class="time">
                                 {{ item.reply_time }}
@@ -93,13 +111,18 @@
                             {{ `${index + 1}楼` }}
                         </view>
                     </view>
-                    <mp-html :content="item.content" markdown selectable />
+                    <mp-html
+                        :content="item.content"
+                        markdown
+                        selectable
+                        @linktap="linktap"
+                    />
                 </view>
                 <!-- #ifdef MP-WEIXIN -->
                 <ad unit-id="adunit-6996f541fca34984"></ad>
                 <!-- #endif -->
                 <view v-if="noMore" class="noMore">
-                    没有更多了，看看别的帖子吧～
+                    没有更多了，看看别的主题吧～
                 </view>
             </template>
         </template>
@@ -134,9 +157,36 @@ export default class Detail extends Vue {
     private pageNum = 1; // 页码
     private page = 1; // 总页码
     private loadType = 'refresh'; // 加载类型
+    private scrollTop = 0;
+    private lastScrollTop = 0;
     private onLoad(options: any) {
         this.params = options;
         this.loadData();
+    }
+    private getUserInfo(username: string) {
+        uni.navigateTo({
+            url: `/pages/UserTopic?username=${username}`
+        });
+    }
+    //回到上次浏览位置
+    private backToLastScroll() {
+        uni.pageScrollTo({
+            scrollTop: this.lastScrollTop,
+            success: () => {
+                this.lastScrollTop = 0;
+            }
+        });
+    }
+    //点击 @用户 跳转对应楼层
+    private linktap(e: any) {
+        console.log(e);
+        const { href, innerText } = e;
+        if (href.indexOf('/member/') > -1) {
+            this.lastScrollTop = this.scrollTop;
+            uni.pageScrollTo({
+                selector: `.${innerText}`
+            });
+        }
     }
     // 跳转tag
     private getTags(tag: any) {
@@ -168,7 +218,7 @@ export default class Detail extends Vue {
                     ...item,
                     content: item.content.replace(
                         /(@.*?>)(.*?)(<\/a>)/g,
-                        '<text class="user-name">@$2</text>'
+                        '<text class="user-name">$1$2$3</text>'
                     )
                 };
             });
@@ -192,6 +242,9 @@ export default class Detail extends Vue {
         if (this.pageNum >= this.page) {
             this.noMore = true;
         }
+    }
+    private onPageScroll(e: any) {
+        this.scrollTop = e.scrollTop;
     }
     private onPullDownRefresh() {
         this.pageNum = 1;
@@ -250,6 +303,12 @@ text {
     background: #fff;
     /deep/.user-name {
         color: #4474ff;
+        view {
+            color: #4474ff;
+        }
+        ._hover {
+            text-decoration: none;
+        }
     }
     .user-info {
         display: flex;
@@ -301,6 +360,17 @@ text {
         font-weight: 500;
         margin-bottom: 20rpx;
     }
+}
+.back-top-last-scroll {
+    position: fixed;
+    z-index: 99;
+    right: 50rpx;
+    bottom: 280rpx;
+    border-radius: 8rpx;
+    padding: 10rpx 14rpx;
+    box-shadow: 0 0 10rpx #ccc;
+    font-size: 26rpx;
+    background: #fff;
 }
 .tag-info {
     display: flex;

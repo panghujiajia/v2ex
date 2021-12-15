@@ -157,8 +157,8 @@ export default class Set extends Vue {
         }
         const urlList: any = {
             history: '/pages/History',
-            topic: '/pages/MyTopic',
-            reply: '/pages/MyReply',
+            topic: '/pages/UserTopic',
+            reply: '/pages/UserReply',
             collect: '/pages/MyCollect',
             about: '/pages/About'
         };
@@ -170,6 +170,12 @@ export default class Set extends Vue {
             return;
         }
         const url = urlList[key];
+        if (['reply', 'topic'].includes(key)) {
+            uni.navigateTo({
+                url: `${url}?username=${this.userInfo.username}`
+            });
+            return;
+        }
         uni.navigateTo({ url });
     }
     // 清理缓存

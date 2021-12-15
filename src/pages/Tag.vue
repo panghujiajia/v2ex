@@ -121,8 +121,8 @@ export default class Tag extends Vue {
     private isLastPage() {
         const { topic_count } = this.nodeInfo;
         const tagList = this.tagList;
-        const tagListLen = tagList.length;
-        if (tagListLen >= topic_count) {
+        const len = tagList.length;
+        if (len >= topic_count) {
             this.noMore = true;
         }
     }

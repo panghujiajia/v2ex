@@ -75,13 +75,4 @@ export const http = new Request({
         loading: true // 是否需要loading
     }
 });
-
-// export const api = new Request({
-// 	baseURL: environments.api,
-// 	timeout: 10000,
-// 	custom: {
-// 		loading: true, // 是否需要loading
-// 	},
-// });
 createInterceptor(http);
-// createInterceptor(api);
