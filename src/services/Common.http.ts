@@ -99,7 +99,8 @@ export const $getLoginRewardInfo = async () => {
     try {
         const res = await http.get('/mission/daily', {
             custom: {
-                auth: true
+                auth: true,
+                loading: false
             }
         });
         return res.data.data;
@@ -110,11 +111,15 @@ export const $getLoginRewardInfo = async () => {
 
 export const $getLoginReward = async () => {
     try {
-        const res = await http.post('/mission/daily', null, {
-            custom: {
-                auth: true
+        const res = await http.post(
+            '/mission/daily',
+            {},
+            {
+                custom: {
+                    auth: true
+                }
             }
-        });
+        );
         return res.data.data;
     } catch (error) {
         return false;

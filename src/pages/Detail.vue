@@ -75,12 +75,22 @@
                         <view class="user">
                             <!--                            <image :src="item.avatar"></image>-->
                             <text class="name">{{ item.author }}</text>
+                            <text class="op" v-if="item.is_master">OP</text>
                             <text class="time">
                                 {{ item.reply_time }}
                             </text>
+                            <template v-if="item.like_num">
+                                <image
+                                    class="like-icon"
+                                    src="https://cdn.todayhub.cn/lib/image/like_num.png"
+                                ></image>
+                                <text class="like-num">
+                                    {{ item.like_num }}
+                                </text>
+                            </template>
                         </view>
                         <view class="floor">
-                            {{ item.is_master ? '楼主' : `${index + 1}楼` }}
+                            {{ `${index + 1}楼` }}
                         </view>
                     </view>
                     <mp-html :content="item.content" markdown selectable />
@@ -251,11 +261,26 @@ text {
             display: flex;
             align-items: center;
         }
-        image {
-            width: 40rpx;
-            height: 40rpx;
-            margin-right: 10rpx;
-            border-radius: 10rpx;
+        .like-icon {
+            width: 20rpx;
+            height: 20rpx;
+            margin-left: 10rpx;
+            margin-right: 5rpx;
+        }
+        .like-num {
+            font-size: 22rpx;
+            color: #999;
+            font-weight: 400;
+        }
+        .op {
+            border: 2rpx solid #1484cd;
+            color: #1484cd;
+            font-size: 20rpx;
+            border-radius: 7rpx;
+            font-weight: 500;
+            padding: 5rpx;
+            line-height: 16rpx;
+            margin-left: 10rpx;
         }
         .name {
             font-size: 28rpx;

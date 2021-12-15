@@ -26,18 +26,25 @@
                     type="password"
                 />
             </view>
-            <view class="cell">
+            <view class="cell code-cell">
                 <view class="label">验证码</view>
-                <input
-                    class="form-item"
-                    :value="code"
-                    @input="getCode"
-                    placeholder="请输入验证码"
-                />
+                <view class="form-item">
+                    <input
+                        class="form-item"
+                        :value="code"
+                        @input="getCode"
+                        placeholder="请输入验证码"
+                    />
+                    <image
+                        @click="getLoginParams()"
+                        class="code"
+                        :src="captchaBase64"
+                    />
+                </view>
             </view>
-            <view @click="getLoginParams()">
-                <image class="code" :src="captchaBase64" />
-            </view>
+            <!--            <view @click="getLoginParams()">-->
+            <!--                <image class="code" :src="captchaBase64" />-->
+            <!--            </view>-->
             <view class="btn-default" @click="login()">登录</view>
         </view>
     </view>
@@ -202,6 +209,9 @@ export default class Login extends Vue {
     .cell {
         display: flex;
         align-items: center;
+        &.code-cell {
+            padding-right: 0;
+        }
         .label {
             width: 100rpx;
             padding-right: 36rpx;
@@ -212,12 +222,21 @@ export default class Login extends Vue {
         .form-item {
             flex: 1;
             font-size: 32rpx;
+            display: flex;
+            align-items: center;
+            input {
+                flex: 1;
+            }
+            .code {
+                width: 280rpx;
+                height: 100rpx;
+            }
         }
     }
-    .code {
-        width: 100%;
-        height: 120rpx;
-    }
+    //.code {
+    //    width: 100%;
+    //    height: 120rpx;
+    //}
 }
 .btn-default {
     width: 660rpx;

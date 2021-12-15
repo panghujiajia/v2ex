@@ -31,6 +31,27 @@
                 <view>访问记录</view>
                 <view class="icon-arrow"></view>
             </view>
+            <view
+                class="cell van-hairline--bottom"
+                @click="navigateTo('topic', true)"
+            >
+                <view>我的主题</view>
+                <view class="icon-arrow"></view>
+            </view>
+            <view
+                class="cell van-hairline--bottom"
+                @click="navigateTo('reply', true)"
+            >
+                <view>我的回复</view>
+                <view class="icon-arrow"></view>
+            </view>
+            <view
+                class="cell van-hairline--bottom"
+                @click="navigateTo('collect', true)"
+            >
+                <view>我的收藏</view>
+                <view class="icon-arrow"></view>
+            </view>
             <!-- <view class="cell van-hairline--bottom">
 				<view>广告开关</view>
 				<van-switch
@@ -43,7 +64,10 @@
                 <view>清空缓存</view>
                 <view class="icon-arrow"></view>
             </view>
-            <view class="cell van-hairline--bottom" @click="navigateTo()">
+            <view
+                class="cell van-hairline--bottom"
+                @click="navigateTo('about')"
+            >
                 <view>关于</view>
                 <view class="icon-arrow"></view>
             </view>
@@ -82,14 +106,19 @@ export default class Set extends Vue {
     @Mutation('clearAllStorage')
     private clearAllStorage!: () => void;
     private onShow() {
-        this.getLoginReward();
-        // this.getLoginRewardInfo();
-        if (!this.userInfo.info) {
-            this.getUserInfo();
+        // this.getLoginReward();
+        if (this.cookie) {
+            this.getLoginRewardInfo();
+            if (!this.userInfo.info) {
+                this.getUserInfo();
+            }
         }
     }
     private async getLoginRewardInfo() {
         const data = await $getLoginRewardInfo();
+        if (data) {
+            const { is_sign_in, sign_in_day } = data;
+        }
     }
     private async getLoginReward() {
         const data = await $getLoginReward();
@@ -118,9 +147,20 @@ export default class Set extends Vue {
             icon: 'none'
         });
     }
-    private navigateTo(key: string) {
+    private navigateTo(key: string, auth: boolean = false) {
+        if (auth && !this.cookie) {
+            uni.showToast({
+                title: '请先登录',
+                icon: 'none'
+            });
+            return;
+        }
         const urlList: any = {
-            history: '/pages/History'
+            history: '/pages/History',
+            topic: '/pages/MyTopic',
+            reply: '/pages/MyReply',
+            collect: '/pages/MyCollect',
+            about: '/pages/About'
         };
         if (!key) {
             uni.showToast({
