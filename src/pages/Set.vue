@@ -29,7 +29,9 @@
                     <view class="btn-sign" v-if="userInfo.is_sign_in">
                         已签到
                     </view>
-                    <view class="btn-sign" v-else>签到</view>
+                    <view class="btn-sign" v-else @click="getLoginReward()">
+                        签到
+                    </view>
                 </view>
             </view>
         </div>

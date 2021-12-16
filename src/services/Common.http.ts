@@ -1,6 +1,7 @@
 import { http } from './index';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+
 dayjs.extend(relativeTime);
 
 export const $getTabTopics = async (tab: string) => {
@@ -53,7 +54,11 @@ export const $login = async (params: any) => {
 
 export const $getTopTagConfig = async () => {
     try {
-        const res = await http.get('/config/tag/top');
+        const res = await http.get('/config/tag/top', {
+            custom: {
+                loading: false
+            }
+        });
         return res.data.data;
     } catch (error) {
         return false;
