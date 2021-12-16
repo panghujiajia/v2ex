@@ -93,7 +93,6 @@ import topTags from '@/config/topTag.config';
 import { Getter, Mutation, State } from 'vuex-class';
 import { Component, Vue } from 'vue-property-decorator';
 import { $getTabTopics, $getTopTagConfig } from '@/services/Common.http';
-import { TagData, TagDataKey, TagTime, TagTimeKey } from '@/types/index.type';
 
 dayjs.extend(relativeTime);
 
@@ -113,16 +112,16 @@ export default class Hot extends Vue {
     private visited!: string[]; // 访问过的
     // 获取tag数据
     @Getter('getTagData')
-    private getTagData!: (key: TagDataKey) => any;
+    private getTagData!: (key: string) => any;
     // 获取tag时间
     @Getter('getTagTime')
-    private getTagTime!: (key: TagTimeKey) => string;
+    private getTagTime!: (key: string) => string;
     @Mutation('updateAdSwitch')
     private updateAdSwitch!: () => void;
     @Mutation('updateTagTime')
-    private updateTagTime!: (tagTime: TagTime) => void;
+    private updateTagTime!: (tagTime: any) => void;
     @Mutation('updateTagData')
-    private updateTagData!: (tagData: TagData) => void;
+    private updateTagData!: (tagData: any) => void;
     @Mutation('updateVisited')
     private updateVisited!: (visited: string[]) => void;
     private topTags = []; // tag列表
@@ -176,7 +175,7 @@ export default class Hot extends Vue {
     }
     // 判定缓存数据是否过期
     private isExpired(title: string) {
-        const time = this.getTagTime((TagTimeKey as any)[title]);
+        const time = this.getTagTime(title + '_time');
         if (!time) {
             return true;
         } else {
@@ -192,7 +191,7 @@ export default class Hot extends Vue {
     }
     // 从缓存取数据
     private getStorageData(title: string) {
-        const tagList = this.getTagData((TagDataKey as any)[title]);
+        const tagList = this.getTagData(title);
         if (tagList.length) {
             const visited: any = this.visited;
             tagList.forEach((item: any) => {
@@ -227,11 +226,11 @@ export default class Hot extends Vue {
             scrollTop: 0
         });
         this.updateTagData({
-            key: (TagDataKey as any)[title],
+            key: title,
             value: tagArr
         });
         this.updateTagTime({
-            key: (TagTimeKey as any)[title],
+            key: title + '_time',
             value: dayjs()
         });
         this.tagList = tagArr;

@@ -179,9 +179,8 @@ export default class Detail extends Vue {
     }
     //点击 @用户 跳转对应楼层
     private linktap(e: any) {
-        console.log(e);
         const { href, innerText } = e;
-        if (href.indexOf('/member/') > -1) {
+        if (href.indexOf('/member/') > -1 && href.split('/').length === 3) {
             this.lastScrollTop = this.scrollTop;
             uni.pageScrollTo({
                 selector: `.${innerText}`

@@ -1,28 +1,38 @@
 <template>
     <view class="container">
-        <nav-bar :title="'有返回和home'"></nav-bar>
-        <view class="top">
-            <view class="header" @click="showTip()">
-                <view class="avatar">
-                    <image
-                        :src="
-                            (cookie && userInfo.avatar) ||
-                            'https://cdn.todayhub.cn/lib/image/img-user-avatar.png'
-                        "
-                    />
-                </view>
-                <view class="nick-name">
-                    <view>
-                        {{ userInfo.username || '点击登录' }}
+        <div class="top-bg">
+            <view class="top">
+                <view class="header" @click="showTip()">
+                    <view class="avatar">
+                        <image
+                            :src="
+                                (cookie && userInfo.avatar) ||
+                                'https://cdn.todayhub.cn/lib/image/img-user-avatar.png'
+                            "
+                        />
                     </view>
-                </view>
-                <view class="nick-name rank" v-if="userInfo.info">
-                    <view>
-                        {{ userInfo.info.split('，')[0] || '' }}
+                    <view class="nick-name">
+                        <view>
+                            {{ userInfo.username || '点击登录' }}
+                        </view>
                     </view>
+                    <view class="nick-name rank" v-if="userInfo.info">
+                        <view>
+                            {{ userInfo.info.split('，')[0] || '' }}
+                        </view>
+                    </view>
+                    <view class="nick-name rank" v-if="userInfo.sign_in_day">
+                        <view>
+                            {{ userInfo.sign_in_day || '' }}
+                        </view>
+                    </view>
+                    <view class="btn-sign" v-if="userInfo.is_sign_in">
+                        已签到
+                    </view>
+                    <view class="btn-sign" v-else>签到</view>
                 </view>
             </view>
-        </view>
+        </div>
         <view class="cell-group">
             <view
                 class="cell van-hairline--bottom"
@@ -76,13 +86,11 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import mpHtml from '@/components/mp-html/mp-html.vue';
 import { Mutation, State } from 'vuex-class';
 import {
     $getLoginReward,
     $getLoginRewardInfo,
-    $getUserInfo,
-    $getUserTopics
+    $getUserInfo
 } from '@/services/Common.http';
 
 @Component({
@@ -106,7 +114,6 @@ export default class Set extends Vue {
     @Mutation('clearAllStorage')
     private clearAllStorage!: () => void;
     private onShow() {
-        // this.getLoginReward();
         if (this.cookie) {
             this.getLoginRewardInfo();
             if (!this.userInfo.info) {
@@ -117,20 +124,30 @@ export default class Set extends Vue {
     private async getLoginRewardInfo() {
         const data = await $getLoginRewardInfo();
         if (data) {
-            const { is_sign_in, sign_in_day } = data;
+            const { is_sign_in } = data;
+            if (!is_sign_in) {
+                await this.getLoginReward();
+                return;
+            }
+            this.saveUserInfo(data);
         }
     }
     private async getLoginReward() {
         const data = await $getLoginReward();
-    }
-    private async getUserTopics() {
-        const data = await $getUserTopics(this.userInfo.username);
-        console.log(data);
+        if (data) {
+            const { sign_in_day } = data;
+            uni.showToast({
+                title: `签到成功，${sign_in_day}`,
+                icon: 'none'
+            });
+            this.saveUserInfo(data);
+        }
     }
     private async getUserInfo() {
         const data = await $getUserInfo(this.userInfo.username);
-        console.log(data);
-        this.saveUserInfo(data);
+        if (data) {
+            this.saveUserInfo(data);
+        }
     }
     private onSwitchChange({ detail }: any) {
         this.toggleAdSwitch(detail);
@@ -223,11 +240,12 @@ export default class Set extends Vue {
     private showTip() {
         if (!this.cookie) {
             uni.navigateTo({ url: '/pages/Login' });
+            return;
         }
-        // uni.showToast({
-        //     title: '没有获取你任何信息哦',
-        //     icon: 'none'
-        // });
+        uni.showToast({
+            title: ' 我宁可呼吸到她散发在空气中的发香，轻吻她的双唇，抚摸她的双手，而放弃永生。——《天使之城》',
+            icon: 'none'
+        });
     }
     // #ifdef MP-WEIXIN
     private onShareAppMessage(e: any) {
@@ -244,14 +262,17 @@ export default class Set extends Vue {
     min-height: 100vh;
     background: #efefef;
     box-sizing: border-box;
-    .top {
+    .top-bg {
         height: 661rpx;
         background: url(https://cdn.todayhub.cn/lib/image/bg-user-center.png)
             50% no-repeat;
         background-size: 100%;
-        position: relative;
-        display: flex;
-        justify-content: center;
+        .top {
+            height: 461rpx;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         .title {
             height: 80rpx;
             line-height: 80rpx;
@@ -264,8 +285,6 @@ export default class Set extends Vue {
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: absolute;
-    bottom: 300rpx;
     .avatar {
         width: 200rpx;
         height: 200rpx;
@@ -282,6 +301,13 @@ export default class Set extends Vue {
         font-size: 36rpx;
     }
     .rank {
+        font-size: 24rpx;
+    }
+    .btn-sign {
+        padding: 10rpx 15rpx;
+        background: #999999;
+        color: #fff;
+        border-radius: 10rpx;
         font-size: 24rpx;
     }
 }

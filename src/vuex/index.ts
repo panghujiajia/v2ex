@@ -1,8 +1,8 @@
-import { TagData, TagDataKey, TagTime, TagTimeKey } from '@/types/index.type';
 import dayjs from 'dayjs';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
+
 Vue.use(Vuex);
 
 const RootProjectPersisted = createPersistedState({
@@ -22,34 +22,16 @@ export default new Vuex.Store({
         adCloseTime: '',
         stroageTime: 15, // 缓存时长 分钟
         visited: [], // 访问过的
-        myTags: [], // 我的tag
-        top_time: '',
-        top: [],
-        all_time: '',
-        all: [],
-        tech_time: '',
-        tech: [],
-        creative_time: '',
-        creative: [],
-        play_time: '',
-        play: [],
-        apple_time: '',
-        apple: [],
-        qna_time: '',
-        qna: [],
-        hot_time: '',
-        hot: [],
-        r2_time: '',
-        r2: []
+        myTags: [] // 我的tag
     },
     getters: {
         // 获取tag时间
-        getTagTime(state) {
-            return (key: TagTimeKey) => state[key];
+        getTagTime(state: any) {
+            return (key: string) => state[key];
         },
         // 获取tag数据
-        getTagData(state) {
-            return (key: TagDataKey) => state[key];
+        getTagData(state: any) {
+            return (key: string) => state[key];
         }
     },
     mutations: {
@@ -70,11 +52,11 @@ export default new Vuex.Store({
             state.visited = visited;
         },
         // 更新tag数据
-        updateTagData(state, tagData: TagData) {
+        updateTagData(state: any, tagData: any) {
             state[tagData.key] = tagData.value;
         },
         // 更新tag时间
-        updateTagTime(state, tagTime: TagTime) {
+        updateTagTime(state: any, tagTime: any) {
             state[tagTime.key] = tagTime.value;
         },
         saveHistoryTopics(state, data: any) {
