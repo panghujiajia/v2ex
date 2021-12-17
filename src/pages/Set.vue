@@ -1,40 +1,49 @@
 <template>
     <view class="container">
-        <div class="top-bg">
-            <view class="top">
-                <view class="header" @click="showTip()">
-                    <view class="avatar">
+        <view class="toast" v-if="toastTitle">{{ toastTitle }}</view>
+        <view class="top-wrap">
+            <view class="header">
+                <view class="header-info">
+                    <view class="avatar" @click="showTip()">
                         <image
                             :src="
-                                (cookie && userInfo.avatar) ||
+                                userInfo.avatar ||
                                 'https://cdn.todayhub.cn/lib/image/img-user-avatar.png'
                             "
                         />
                     </view>
-                    <view class="nick-name">
+                    <view class="info">
                         <view>
-                            {{ userInfo.username || '点击登录' }}
+                            <view class="nick-name" @click="showTip()">
+                                {{ userInfo.username || '点击登录' }}
+                            </view>
+                            <view class="rank" v-if="cookie">
+                                {{ userInfo.info || '' }}
+                            </view>
+                            <view class="rank" v-if="cookie">
+                                {{ userInfo.sign_in_day || '' }}
+                            </view>
                         </view>
-                    </view>
-                    <view class="nick-name rank" v-if="userInfo.info">
-                        <view>
-                            {{ userInfo.info.split('，')[0] || '' }}
+                        <view class="money" v-if="cookie">
+                            <template v-if="userInfo.balance">
+                                <view v-for="(item, index) in userInfo.balance">
+                                    <image
+                                        :src="`https://cdn.todayhub.cn/lib/image/icon-balance${
+                                            userInfo.balance.length - index
+                                        }.png`"
+                                    ></image>
+                                    <text>{{ item }}</text>
+                                </view>
+                            </template>
                         </view>
-                    </view>
-                    <view class="nick-name rank" v-if="userInfo.sign_in_day">
-                        <view>
-                            {{ userInfo.sign_in_day || '' }}
-                        </view>
-                    </view>
-                    <view class="btn-sign" v-if="userInfo.is_sign_in">
-                        已签到
-                    </view>
-                    <view class="btn-sign" v-else @click="getLoginReward()">
-                        签到
                     </view>
                 </view>
+                <view class="btn-sign disabled" v-if="userInfo.is_sign_in">
+                    已签到
+                </view>
+                <view class="btn-sign" v-else @click="getSignIn()"> 签到 </view>
             </view>
-        </div>
+        </view>
         <view class="cell-group">
             <view
                 class="cell van-hairline--bottom"
@@ -64,14 +73,15 @@
                 <view>我的收藏</view>
                 <view class="icon-arrow"></view>
             </view>
-            <!-- <view class="cell van-hairline--bottom">
-				<view>广告开关</view>
-				<van-switch
-					size="40rpx"
-					:checked="adSwitch"
-					@change="onSwitchChange"
-				/>
-			</view> -->
+            <view class="cell van-hairline--bottom">
+                <view>自动签到</view>
+                <switch
+                    :checked="autoSign"
+                    @change="onAutoSignChange"
+                    style="transform: scale(0.7); margin-right: -30rpx"
+                    color="#ffc413"
+                />
+            </view>
             <view class="cell van-hairline--bottom" @click="clearStorage()">
                 <view>清空缓存</view>
                 <view class="icon-arrow"></view>
@@ -88,88 +98,64 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Mutation, State } from 'vuex-class';
-import {
-    $getLoginReward,
-    $getLoginRewardInfo,
-    $getUserInfo
-} from '@/services/Common.http';
+import { Action, Mutation, State } from 'vuex-class';
 
 @Component({
     name: 'Set'
 })
 export default class Set extends Vue {
-    @State('adSwitch')
-    private adSwitch!: boolean;
+    @State('autoSign')
+    private autoSign!: boolean;
     @State('userInfo')
     private userInfo!: any;
     @State('cookie')
     private cookie!: string;
-    @Mutation('saveAdCloseTime')
-    private saveAdCloseTime!: () => void;
     @Mutation('clearHistory')
     private clearHistory!: () => void;
-    @Mutation('toggleAdSwitch')
-    private toggleAdSwitch!: (data: boolean) => void;
-    @Mutation('saveUserInfo')
-    private saveUserInfo!: (userInfo: any) => void;
+    @Mutation('toggleAutoSign')
+    private toggleAutoSign!: (data: boolean) => void;
     @Mutation('clearAllStorage')
     private clearAllStorage!: () => void;
+    @Action('getUserBalance')
+    private getUserBalance!: () => void;
+    @Action('getUserInfo')
+    private getUserInfo!: () => void;
+    @Action('getLoginReward')
+    private getLoginReward!: () => void;
+    private toastTitle = '';
     private onShow() {
+        console.log(this.toasts);
         if (this.cookie) {
-            this.getLoginRewardInfo();
+            this.getUserBalance();
             if (!this.userInfo.info) {
                 this.getUserInfo();
             }
         }
     }
-    private async getLoginRewardInfo() {
-        const data = await $getLoginRewardInfo();
-        if (data) {
-            const { is_sign_in } = data;
-            if (!is_sign_in) {
-                await this.getLoginReward();
-                return;
-            }
-            this.saveUserInfo(data);
-        }
-    }
-    private async getLoginReward() {
-        const data = await $getLoginReward();
-        if (data) {
-            const { sign_in_day } = data;
+    private onAutoSignChange({ detail }: any) {
+        const { value } = detail;
+        if (!this.cookie && value) {
             uni.showToast({
-                title: `签到成功，${sign_in_day}`,
+                title: '登录后才能为您自动签到哦！',
                 icon: 'none'
             });
-            this.saveUserInfo(data);
         }
+        this.toggleAutoSign(value);
     }
-    private async getUserInfo() {
-        const data = await $getUserInfo(this.userInfo.username);
-        if (data) {
-            this.saveUserInfo(data);
-        }
-    }
-    private onSwitchChange({ detail }: any) {
-        this.toggleAdSwitch(detail);
-        if (!detail) {
-            this.saveAdCloseTime();
+    private getSignIn() {
+        if (!this.cookie) {
             uni.showToast({
-                title: '关闭成功，本周将不会显示广告',
+                title: '您需要登录才能进行签到哦！',
                 icon: 'none'
             });
             return;
         }
-        uni.showToast({
-            title: '开启成功，感谢您愿意打开广告',
-            icon: 'none'
-        });
+        this.getLoginReward();
     }
     private navigateTo(key: string, auth: boolean = false) {
         if (auth && !this.cookie) {
             uni.showToast({
-                title: '请先登录',
+                title: '您需要登录才能访问哦！',
                 icon: 'none'
             });
             return;
@@ -223,7 +209,6 @@ export default class Set extends Vue {
                     case 1:
                         this.clearAllStorage();
                         uni.clearStorageSync();
-                        this.toggleAdSwitch(true);
                         uni.showToast({
                             title: `清理成功！共为您腾出${size}kb空间！`,
                             icon: 'none'
@@ -244,10 +229,11 @@ export default class Set extends Vue {
             uni.navigateTo({ url: '/pages/Login' });
             return;
         }
-        uni.showToast({
-            title: ' 我宁可呼吸到她散发在空气中的发香，轻吻她的双唇，抚摸她的双手，而放弃永生。——《天使之城》',
-            icon: 'none'
-        });
+        this.toastTitle =
+            '我宁可呼吸到她散发在空气中的发香，轻吻她的双唇，抚摸她的双手，而放弃永生。——《天使之城》';
+        setTimeout(() => {
+            this.toastTitle = '';
+        }, 3000);
     }
     // #ifdef MP-WEIXIN
     private onShareAppMessage(e: any) {
@@ -264,63 +250,115 @@ export default class Set extends Vue {
     min-height: 100vh;
     background: #efefef;
     box-sizing: border-box;
-    .top-bg {
-        height: 661rpx;
+    position: relative;
+    .toast {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+        transform: translateX(-310rpx);
+        z-index: 99999;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 20rpx;
+        padding: 20rpx;
+        color: #fff;
+        font-size: 28rpx;
+        width: 620rpx;
+        box-sizing: border-box;
+    }
+    .top-wrap {
+        height: 600rpx;
         background: url(https://cdn.todayhub.cn/lib/image/bg-user-center.png)
             50% no-repeat;
         background-size: 100%;
-        .top {
-            height: 461rpx;
+        .header {
+            height: 400rpx;
+            width: 690rpx;
+            margin: 0 auto;
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
+            .header-info {
+                display: flex;
+            }
+            .avatar {
+                width: 180rpx;
+                height: 180rpx;
+                border-radius: 50%;
+                overflow: hidden;
+                margin-right: 30rpx;
+                image {
+                    width: 180rpx;
+                    height: 180rpx;
+                }
+            }
+            .info {
+                width: 330rpx;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                .nick-name {
+                    font-size: 40rpx;
+                    font-family: PingFangSC-Medium, PingFang SC;
+                    font-weight: 500;
+                    color: #ffffff;
+                    line-height: 56rpx;
+                }
+                .rank {
+                    font-size: 24rpx;
+                    font-family: PingFangSC-Regular, PingFang SC;
+                    font-weight: 400;
+                    color: #ffffff;
+                    line-height: 33rpx;
+                    margin: 10rpx 0;
+                }
+                .money {
+                    height: 40rpx;
+                    display: flex;
+                    align-items: center;
+                    margin-top: 30rpx;
+                    color: #fff;
+                    font-size: 24rpx;
+                    font-family: PingFangSC-Regular, PingFang SC;
+                    font-weight: 400;
+                    view {
+                        display: flex;
+                        align-items: center;
+                        margin-right: 15rpx;
+                    }
+                    image {
+                        width: 34rpx;
+                        height: 34rpx;
+                        margin-right: 5rpx;
+                    }
+                }
+            }
+            .btn-sign {
+                width: 143rpx;
+                height: 51rpx;
+                background: #ffc413;
+                border-radius: 26rpx;
+                font-size: 28rpx;
+                font-family: PingFangSC-Regular, PingFang SC;
+                font-weight: 400;
+                color: #ffffff;
+                line-height: 51rpx;
+                text-align: center;
+                &.disabled {
+                    background: #c3c3c3;
+                }
+            }
         }
-        .title {
-            height: 80rpx;
-            line-height: 80rpx;
-            color: #fff;
-            font-weight: bold;
-        }
-    }
-}
-.header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .avatar {
-        width: 200rpx;
-        height: 200rpx;
-        border-radius: 50%;
-        overflow: hidden;
-        image {
-            width: 200rpx;
-            height: 200rpx;
-        }
-    }
-    .nick-name {
-        margin-top: 20rpx;
-        color: #fff;
-        font-size: 36rpx;
-    }
-    .rank {
-        font-size: 24rpx;
-    }
-    .btn-sign {
-        padding: 10rpx 15rpx;
-        background: #999999;
-        color: #fff;
-        border-radius: 10rpx;
-        font-size: 24rpx;
     }
 }
 .cell-group {
     width: 690rpx;
     margin: 0 auto;
-    margin-top: -200rpx;
+    margin-top: -250rpx;
     border-radius: 16rpx 16rpx 0 0;
     position: relative;
     box-sizing: border-box;
     z-index: 2;
-    min-height: calc(100vh - 461rpx);
+    min-height: calc(100vh - 350rpx);
 }
 </style>

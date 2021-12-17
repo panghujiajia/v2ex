@@ -43,10 +43,10 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { State } from 'vuex-class';
 import Topic from '@/components/Topic.vue';
 import { $getUserTopics } from '@/services/Common.http';
 import Skeleton from '@/components/Skeleton.vue';
+
 @Component({
     name: 'UserTopic',
     components: {
@@ -75,7 +75,8 @@ export default class UserTopic extends Vue {
         const list = this.list;
         const res = await $getUserTopics({
             username: this.username,
-            p: this.pageNum
+            p: this.pageNum,
+            auth: this.cookie
         });
         if (res) {
             const { topicInfo, data } = res;

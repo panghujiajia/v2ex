@@ -2,8 +2,8 @@
     <view class="container">
         <view class="top">
             <view class="title">
-                <view>Hello!</view>
-                <view>欢迎使用V2EX mini</view>
+                <view>V2EX</view>
+                <view>创意工作者们的社区</view>
             </view>
         </view>
         <view class="cell-group">
@@ -38,13 +38,16 @@
                     <image
                         @click="getLoginParams()"
                         class="code"
-                        :src="captchaBase64"
+                        :src="
+                            captchaBase64 ||
+                            'https://cdn.todayhub.cn/lib/image/code-loading.gif'
+                        "
                     />
                 </view>
             </view>
-            <!--            <view @click="getLoginParams()">-->
-            <!--                <image class="code" :src="captchaBase64" />-->
-            <!--            </view>-->
+            <view class="promise">
+                我发誓，没有记录您任何信息，所有内容均存储在本地
+            </view>
             <view class="btn-default" @click="login()">登录</view>
         </view>
     </view>
@@ -52,7 +55,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { $getLoginParams, $login } from '@/services/Common.http';
-import { Mutation, State } from 'vuex-class';
+import { Action, Mutation, State } from 'vuex-class';
+
 @Component({
     name: 'Login'
 })
@@ -63,6 +67,12 @@ export default class Login extends Vue {
     private saveCookie!: (cookie: string) => void;
     @Mutation('saveUserInfo')
     private saveUserInfo!: (userInfo: any) => void;
+    @Action('getLoginRewardInfo')
+    private getLoginRewardInfo!: () => void;
+    @Action('getUserBalance')
+    private getUserBalance!: () => void;
+    @Action('getUserInfo')
+    private getUserInfo!: () => void;
     // 登录页面拿的参数
     private signinData = {
         username_key: '',
@@ -76,13 +86,11 @@ export default class Login extends Vue {
     private code = '';
     private username = '';
     private password = '';
-    private created() {
+    private onShow() {
         this.getLoginParams();
     }
     private async getLoginParams() {
-        uni.showLoading({
-            title: '加载验证码...'
-        });
+        this.captchaBase64 = '';
         const data = await $getLoginParams();
         if (data) {
             const { codeUrl } = data;
@@ -90,15 +98,12 @@ export default class Login extends Vue {
             this.captchaBase64 =
                 'data:image/png;base64,' +
                 uni.arrayBufferToBase64(codeUrl.data);
-            console.log(this.captchaBase64);
         } else {
             uni.showToast({
                 title: '验证码获取失败，请重试',
                 icon: 'none'
             });
-            uni.hideLoading();
         }
-        uni.hideLoading();
     }
     // 获取输入的验证码
     private getCode(e: any) {
@@ -151,14 +156,19 @@ export default class Login extends Vue {
             mask: true
         });
         const data = await $login(params);
-        uni.hideLoading();
         if (data) {
             uni.showToast({
-                title: '登录成功',
-                icon: 'none'
+                title: '登录成功，即将自动跳转',
+                icon: 'none',
+                mask: true,
+                duration: 1000 * 30
             });
             this.saveCookie(cookie + ';' + data);
             this.saveUserInfo({ username });
+            await this.getUserInfo();
+            await this.getUserBalance();
+            await this.getLoginRewardInfo();
+            uni.hideToast();
             uni.navigateBack({
                 delta: 1
             });
@@ -178,7 +188,7 @@ export default class Login extends Vue {
     background: #efefef;
     box-sizing: border-box;
     .top {
-        height: 661rpx;
+        height: 600rpx;
         background: url(https://cdn.todayhub.cn/lib/image/bg-user-center.png)
             50% no-repeat;
         background-size: 100%;
@@ -189,7 +199,7 @@ export default class Login extends Vue {
         align-items: center;
         .title {
             width: 690rpx;
-            height: 300rpx;
+            height: 400rpx;
             line-height: 70rpx;
             color: #fff;
             font-size: 48rpx;
@@ -200,12 +210,12 @@ export default class Login extends Vue {
 .cell-group {
     width: 690rpx;
     margin: 0 auto;
-    margin-top: -200rpx;
+    margin-top: -250rpx;
     border-radius: 16rpx 16rpx 0 0;
     position: relative;
     box-sizing: border-box;
     z-index: 2;
-    min-height: calc(100vh - 461rpx);
+    min-height: calc(100vh - 350rpx);
     .cell {
         display: flex;
         align-items: center;
@@ -233,13 +243,18 @@ export default class Login extends Vue {
             }
         }
     }
-    //.code {
-    //    width: 100%;
-    //    height: 120rpx;
-    //}
+}
+.promise {
+    color: #999;
+    font-size: 22rpx;
+    line-height: 40rpx;
+    width: 660rpx;
+    margin: 0 auto;
+    margin-top: 15rpx;
 }
 .btn-default {
     width: 660rpx;
     border-radius: 10rpx;
+    margin-top: 15rpx;
 }
 </style>

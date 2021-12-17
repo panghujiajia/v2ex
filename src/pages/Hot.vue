@@ -90,7 +90,7 @@ import Topic from '@/components/Topic.vue';
 import Skeleton from '@/components/Skeleton.vue';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import topTags from '@/config/topTag.config';
-import { Getter, Mutation, State } from 'vuex-class';
+import { Action, Getter, Mutation, State } from 'vuex-class';
 import { Component, Vue } from 'vue-property-decorator';
 import { $getTabTopics, $getTopTagConfig } from '@/services/Common.http';
 
@@ -106,6 +106,8 @@ dayjs.extend(relativeTime);
 export default class Hot extends Vue {
     @State('adSwitch')
     private adSwitch!: boolean;
+    @State('cookie')
+    private cookie!: string;
     @State('stroageTime')
     private stroageTime!: number; // 缓存时长
     @State('visited')
@@ -116,14 +118,14 @@ export default class Hot extends Vue {
     // 获取tag时间
     @Getter('getTagTime')
     private getTagTime!: (key: string) => string;
-    @Mutation('updateAdSwitch')
-    private updateAdSwitch!: () => void;
     @Mutation('updateTagTime')
     private updateTagTime!: (tagTime: any) => void;
     @Mutation('updateTagData')
     private updateTagData!: (tagData: any) => void;
     @Mutation('updateVisited')
     private updateVisited!: (visited: string[]) => void;
+    @Action('getLoginRewardInfo')
+    private getLoginRewardInfo!: () => void;
     private topTags = []; // tag列表
     private curTag = 'top';
     private tagList: any = []; // 主题内容
@@ -131,7 +133,7 @@ export default class Hot extends Vue {
     private activeTab = 0;
 
     private onShow() {
-        this.updateAdSwitch();
+        this.cookie && this.getLoginRewardInfo();
         // #ifdef APP-PLUS
         // 监听设备网络状态变化事件
         console.log((plus as any).networkinfo.isSetProxy());

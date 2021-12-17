@@ -2,6 +2,12 @@ import dayjs from 'dayjs';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
+import {
+    $getLoginReward,
+    $getLoginRewardInfo,
+    $getUserBalance,
+    $getUserInfo
+} from '@/services/Common.http';
 
 Vue.use(Vuex);
 
@@ -17,8 +23,8 @@ export default new Vuex.Store({
     state: {
         cookie: '',
         userInfo: {},
+        autoSign: false,
         historyTopic: [],
-        adSwitch: true, // 广告
         adCloseTime: '',
         stroageTime: 15, // 缓存时长 分钟
         visited: [], // 访问过的
@@ -32,6 +38,9 @@ export default new Vuex.Store({
         // 获取tag数据
         getTagData(state: any) {
             return (key: string) => state[key];
+        },
+        getToday() {
+            return dayjs().format('YYYY-MM-DD');
         }
     },
     mutations: {
@@ -42,10 +51,6 @@ export default new Vuex.Store({
         // 更新我喜欢的tag
         updateMyTags(state, data) {
             state.myTags = data;
-        },
-        // 切换模式
-        toggleAdSwitch(state, data) {
-            state.adSwitch = data;
         },
         // 保存访问过的
         updateVisited(state, visited) {
@@ -71,28 +76,14 @@ export default new Vuex.Store({
             state.historyTopic = [];
             state.visited = [];
         },
-        saveAdCloseTime(state) {
-            state.adCloseTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
-        },
-        updateAdSwitch(state) {
-            const adCloseTime = state.adCloseTime;
-            if (!adCloseTime) {
-                state.adSwitch = true;
-                return;
-            }
-            // 如果今天是周一
-            if (dayjs().day() === 1) {
-                // 不是当天关闭广告的
-                if (dayjs().isAfter(adCloseTime, 'day')) {
-                    state.adSwitch = true;
-                }
-            }
-        },
         saveCookie(state, data) {
             state.cookie = data;
         },
         saveUserInfo(state, data) {
             state.userInfo = { ...state.userInfo, ...data };
+        },
+        toggleAutoSign(state, data) {
+            state.autoSign = data;
         },
         clearAllStorage(state) {
             state.cookie = '';
@@ -102,7 +93,54 @@ export default new Vuex.Store({
             state.myTags = [];
         }
     },
-    actions: {},
+    actions: {
+        async getUserBalance({ commit, state, getters }) {
+            const { today } = state.userInfo;
+            if (today && today === getters.getToday) {
+                return;
+            }
+            const data = await $getUserBalance();
+            if (data) {
+                commit('saveUserInfo', { balance: data });
+            }
+        },
+        async getUserInfo({ commit, state }) {
+            const data = await $getUserInfo(state.userInfo.username);
+            if (data) {
+                let { info } = data;
+                info = info.split('，')[0];
+                commit('saveUserInfo', { ...data, info });
+            }
+        },
+        async getLoginRewardInfo({ commit, dispatch, state, getters }) {
+            const { today } = state.userInfo;
+            if (today && today === getters.getToday) {
+                return;
+            }
+            const data = await $getLoginRewardInfo();
+            if (data) {
+                const { is_sign_in } = data;
+                const today = getters.getToday;
+                if (!is_sign_in && state.autoSign) {
+                    await dispatch('getLoginReward');
+                    return;
+                }
+                commit('saveUserInfo', { ...data, today });
+            }
+        },
+        async getLoginReward({ commit, getters }) {
+            const data = await $getLoginReward();
+            if (data) {
+                const { sign_in_day } = data;
+                const today = getters.getToday;
+                uni.showToast({
+                    title: `签到成功，${sign_in_day}`,
+                    icon: 'none'
+                });
+                commit('saveUserInfo', { ...data, today });
+            }
+        }
+    },
     modules: {},
     plugins: [RootProjectPersisted]
 });

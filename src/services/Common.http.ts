@@ -36,7 +36,11 @@ export const $getTopicDetail = async (params: {
 
 export const $getLoginParams = async () => {
     try {
-        const res = await http.get('/login/params');
+        const res = await http.get('/login/params', {
+            custom: {
+                loading: false
+            }
+        });
         return res.data.data;
     } catch (error) {
         return false;
@@ -78,7 +82,8 @@ export const $getUserInfo = async (username: string) => {
     try {
         const res = await http.get(`/member/${username}`, {
             custom: {
-                auth: true
+                auth: true,
+                loading: false
             }
         });
         return res.data.data;
@@ -93,7 +98,7 @@ export const $getUserTopics = async (params: any) => {
             `/member/${params.username}/topics/${params.p}`,
             {
                 custom: {
-                    auth: true
+                    auth: !!params.auth
                 }
             }
         );
@@ -128,6 +133,20 @@ export const $getLoginReward = async () => {
                 }
             }
         );
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const $getUserBalance = async () => {
+    try {
+        const res = await http.get('/balance', {
+            custom: {
+                auth: true,
+                loading: false
+            }
+        });
         return res.data.data;
     } catch (error) {
         return false;
