@@ -69,6 +69,19 @@ export const $getTopTagConfig = async () => {
     }
 };
 
+export const $getV2exConfig = async () => {
+    try {
+        const res = await http.get('/config/v2ex', {
+            custom: {
+                loading: false
+            }
+        });
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
 export const $getAllTagConfig = async () => {
     try {
         const res = await http.get('/config/tag/all');

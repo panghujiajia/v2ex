@@ -5,12 +5,12 @@
                 <view class="title">我喜欢的</view>
                 <template>
                     <view
-                        class="my-tag"
+                        v-for="item in myTags"
+                        :key="item.value"
                         :class="{
                             shake: isEdit
                         }"
-                        v-for="item in myTags"
-                        :key="item.value"
+                        class="my-tag"
                         @click="handleClick(item)"
                     >
                         {{ item.title }}
@@ -22,16 +22,16 @@
             </view>
         </view>
         <view class="tag-wrap">
-            <view v-for="key in Object.keys(tagNavs)" :key="key">
+            <view v-for="key in Object.keys(allTag)" :key="key">
                 <view class="title">{{ key }}</view>
                 <view
-                    class="tag"
+                    v-for="item in allTag[key]"
+                    :key="item.value"
                     :class="{
                         shake: isEdit,
                         cur: isEdit && item.active
                     }"
-                    v-for="item in tagNavs[key]"
-                    :key="item.value"
+                    class="tag"
                     @click="handleClick(item)"
                 >
                     {{ item.title }}
@@ -44,38 +44,36 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
-import { Mutation, State } from 'vuex-class';
-import tagNavs from '@/config/tagNav.config';
-import { $getAllTagConfig } from '@/services/Common.http';
+import { Action, Mutation, State } from 'vuex-class';
+
 @Component({
     name: 'All'
 })
 export default class All extends Vue {
     @State('myTags')
     private myTags!: string[];
+    @State('allTag')
+    private allTag!: any;
     @Mutation('updateMyTags')
     private updateMyTags!: (data: any) => void;
-    private tagNavs = tagNavs; // 全部tag
+    @Mutation('saveAllTag')
+    private saveAllTag!: (data: any) => void;
+    @Action('getAllTagConfig')
+    private getAllTagConfig!: () => void;
     private isEdit = false; // 编辑状态
     private onLoad() {
         this.getAllTagConfig();
         this.getActive();
     }
-    private async getAllTagConfig() {
-        const data = await $getAllTagConfig();
-        if (data) {
-            this.tagNavs = data;
-        }
-    }
     // 设置编辑状态下高量选中的
     private getActive() {
-        const tagNav: any = this.tagNavs;
+        const allTag: any = this.allTag;
         const myTags: any = this.myTags;
-        const keys = Object.keys(tagNavs);
-        const newTagNavs: any = {};
+        const keys = Object.keys(allTag);
+        const newTags: any = {};
         for (const key of keys) {
-            const tags = tagNav[key];
-            const newTags = tags.map((item: any) => {
+            let tags = allTag[key];
+            tags = tags.map((item: any) => {
                 item.active = false;
                 for (const myTag of myTags) {
                     if (item.title === myTag.title) {
@@ -84,9 +82,9 @@ export default class All extends Vue {
                 }
                 return item;
             });
-            newTagNavs[key] = newTags;
+            newTags[key] = tags;
         }
-        this.tagNavs = newTagNavs;
+        this.saveAllTag(newTags);
     }
     // 添加我喜欢
     private setMyTags(tag: any) {

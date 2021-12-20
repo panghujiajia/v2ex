@@ -1,13 +1,16 @@
-import dayjs from 'dayjs';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 import {
+    $getAllTagConfig,
     $getLoginReward,
     $getLoginRewardInfo,
     $getUserBalance,
-    $getUserInfo
+    $getUserInfo,
+    $getV2exConfig
 } from '@/services/Common.http';
+import topTags from '@/config/topTag.config';
+import allTags from '@/config/allTag.config';
 
 Vue.use(Vuex);
 
@@ -22,10 +25,21 @@ const RootProjectPersisted = createPersistedState({
 export default new Vuex.Store({
     state: {
         cookie: '',
-        userInfo: {},
+        userInfo: {
+            avatar: '',
+            balance: [],
+            sign_in_day: '',
+            info: '',
+            is_sign_in: '',
+            username: ''
+        },
         autoSign: false,
+        v2exConfig: {
+            tag: topTags,
+            toast: []
+        },
+        allTag: allTags,
         historyTopic: [],
-        adCloseTime: '',
         stroageTime: 15, // 缓存时长 分钟
         visited: [], // 访问过的
         myTags: [] // 我的tag
@@ -39,8 +53,11 @@ export default new Vuex.Store({
         getTagData(state: any) {
             return (key: string) => state[key];
         },
-        getToday() {
-            return dayjs().format('YYYY-MM-DD');
+        tags(state) {
+            return state.v2exConfig.tag;
+        },
+        toasts(state) {
+            return state.v2exConfig.toast;
         }
     },
     mutations: {
@@ -87,18 +104,40 @@ export default new Vuex.Store({
         },
         clearAllStorage(state) {
             state.cookie = '';
-            state.userInfo = {};
             state.historyTopic = [];
             state.visited = [];
             state.myTags = [];
+            state.userInfo = {
+                avatar: '',
+                balance: [],
+                sign_in_day: '',
+                info: '',
+                is_sign_in: '',
+                username: ''
+            };
+            state.autoSign = false;
+        },
+        saveV2exConfig(state, data) {
+            state.v2exConfig = data;
+        },
+        saveAllTag(state, data) {
+            state.allTag = data;
         }
     },
     actions: {
-        async getUserBalance({ commit, state, getters }) {
-            const { today } = state.userInfo;
-            if (today && today === getters.getToday) {
-                return;
+        async getAllTagConfig({ commit }) {
+            const data = await $getAllTagConfig();
+            if (data) {
+                commit('saveAllTag', data);
             }
+        },
+        async getV2exConfig({ commit }) {
+            const data = await $getV2exConfig();
+            if (data) {
+                commit('saveV2exConfig', data);
+            }
+        },
+        async getUserBalance({ commit }) {
             const data = await $getUserBalance();
             if (data) {
                 commit('saveUserInfo', { balance: data });
@@ -113,31 +152,25 @@ export default new Vuex.Store({
             }
         },
         async getLoginRewardInfo({ commit, dispatch, state, getters }) {
-            const { today } = state.userInfo;
-            if (today && today === getters.getToday) {
-                return;
-            }
             const data = await $getLoginRewardInfo();
             if (data) {
                 const { is_sign_in } = data;
-                const today = getters.getToday;
                 if (!is_sign_in && state.autoSign) {
                     await dispatch('getLoginReward');
                     return;
                 }
-                commit('saveUserInfo', { ...data, today });
+                commit('saveUserInfo', data);
             }
         },
-        async getLoginReward({ commit, getters }) {
+        async getLoginReward({ commit }) {
             const data = await $getLoginReward();
             if (data) {
                 const { sign_in_day } = data;
-                const today = getters.getToday;
                 uni.showToast({
                     title: `签到成功，${sign_in_day}`,
                     icon: 'none'
                 });
-                commit('saveUserInfo', { ...data, today });
+                commit('saveUserInfo', data);
             }
         }
     },

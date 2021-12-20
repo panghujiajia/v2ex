@@ -1,6 +1,6 @@
 <template>
     <view class="container">
-        <view class="toast" v-if="toastTitle">{{ toastTitle }}</view>
+        <view v-if="toastTitle" class="toast">{{ toastTitle }}</view>
         <view class="top-wrap">
             <view class="header">
                 <view class="header-info">
@@ -17,14 +17,14 @@
                             <view class="nick-name" @click="showTip()">
                                 {{ userInfo.username || '点击登录' }}
                             </view>
-                            <view class="rank" v-if="cookie">
+                            <view v-if="cookie" class="rank">
                                 {{ userInfo.info || '' }}
                             </view>
-                            <view class="rank" v-if="cookie">
+                            <view v-if="cookie" class="rank">
                                 {{ userInfo.sign_in_day || '' }}
                             </view>
                         </view>
-                        <view class="money" v-if="cookie">
+                        <view v-if="cookie" class="money">
                             <template v-if="userInfo.balance">
                                 <view v-for="(item, index) in userInfo.balance">
                                     <image
@@ -38,10 +38,10 @@
                         </view>
                     </view>
                 </view>
-                <view class="btn-sign disabled" v-if="userInfo.is_sign_in">
+                <view v-if="userInfo.is_sign_in" class="btn-sign disabled">
                     已签到
                 </view>
-                <view class="btn-sign" v-else @click="getSignIn()"> 签到 </view>
+                <view v-else class="btn-sign" @click="getSignIn()"> 签到 </view>
             </view>
         </view>
         <view class="cell-group">
@@ -59,46 +59,46 @@
                 <view>我的主题</view>
                 <view class="icon-arrow"></view>
             </view>
-            <view
-                class="cell van-hairline--bottom"
-                @click="navigateTo('reply', true)"
-            >
-                <view>我的回复</view>
-                <view class="icon-arrow"></view>
-            </view>
-            <view
-                class="cell van-hairline--bottom"
-                @click="navigateTo('collect', true)"
-            >
-                <view>我的收藏</view>
-                <view class="icon-arrow"></view>
-            </view>
+            <!--            <view-->
+            <!--                class="cell van-hairline&#45;&#45;bottom"-->
+            <!--                @click="navigateTo('reply', true)"-->
+            <!--            >-->
+            <!--                <view>我的回复</view>-->
+            <!--                <view class="icon-arrow"></view>-->
+            <!--            </view>-->
+            <!--            <view-->
+            <!--                class="cell van-hairline&#45;&#45;bottom"-->
+            <!--                @click="navigateTo('collect', true)"-->
+            <!--            >-->
+            <!--                <view>我的收藏</view>-->
+            <!--                <view class="icon-arrow"></view>-->
+            <!--            </view>-->
             <view class="cell van-hairline--bottom">
                 <view>自动签到</view>
                 <switch
                     :checked="autoSign"
-                    @change="onAutoSignChange"
-                    style="transform: scale(0.7); margin-right: -30rpx"
                     color="#ffc413"
+                    style="transform: scale(0.7); margin-right: -30rpx"
+                    @change="onAutoSignChange"
                 />
             </view>
             <view class="cell van-hairline--bottom" @click="clearStorage()">
                 <view>清空缓存</view>
                 <view class="icon-arrow"></view>
             </view>
-            <view
-                class="cell van-hairline--bottom"
-                @click="navigateTo('about')"
-            >
-                <view>关于</view>
-                <view class="icon-arrow"></view>
-            </view>
+            <!--            <view-->
+            <!--                class="cell van-hairline&#45;&#45;bottom"-->
+            <!--                @click="navigateTo('about')"-->
+            <!--            >-->
+            <!--                <view>关于</view>-->
+            <!--                <view class="icon-arrow"></view>-->
+            <!--            </view>-->
         </view>
     </view>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Action, Mutation, State } from 'vuex-class';
+import { Action, Getter, Mutation, State } from 'vuex-class';
 
 @Component({
     name: 'Set'
@@ -110,6 +110,8 @@ export default class Set extends Vue {
     private userInfo!: any;
     @State('cookie')
     private cookie!: string;
+    @Getter('toasts')
+    private toasts!: any;
     @Mutation('clearHistory')
     private clearHistory!: () => void;
     @Mutation('toggleAutoSign')
@@ -124,7 +126,6 @@ export default class Set extends Vue {
     private getLoginReward!: () => void;
     private toastTitle = '';
     private onShow() {
-        console.log(this.toasts);
         if (this.cookie) {
             this.getUserBalance();
             if (!this.userInfo.info) {
@@ -229,11 +230,16 @@ export default class Set extends Vue {
             uni.navigateTo({ url: '/pages/Login' });
             return;
         }
-        this.toastTitle =
-            '我宁可呼吸到她散发在空气中的发香，轻吻她的双唇，抚摸她的双手，而放弃永生。——《天使之城》';
-        setTimeout(() => {
-            this.toastTitle = '';
-        }, 3000);
+        if (this.toastTitle) {
+            return;
+        }
+        if (this.toasts.length) {
+            this.toastTitle =
+                this.toasts[Math.round(Math.random() * this.toasts.length)];
+            setTimeout(() => {
+                this.toastTitle = '';
+            }, 5000);
+        }
     }
     // #ifdef MP-WEIXIN
     private onShareAppMessage(e: any) {

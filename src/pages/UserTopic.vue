@@ -4,8 +4,8 @@
             <Skeleton type="list"></Skeleton>
         </template>
         <template v-else>
-            <view class="load-failed" v-if="!list.length">
-                <view class="reload" v-if="loadFaild">
+            <view v-if="!list.length" class="load-failed">
+                <view v-if="loadFaild" class="reload">
                     <image
                         class="empty-img"
                         src="https://img01.yzcdn.cn/vant/empty-image-error.png"
@@ -16,7 +16,7 @@
                         再试一次
                     </view>
                 </view>
-                <view class="reload" v-else>
+                <view v-else class="reload">
                     <image
                         class="empty-img"
                         src="https://img01.yzcdn.cn/vant/empty-image-default.png"
@@ -28,9 +28,9 @@
             <view v-else>
                 <view class="list-wrap">
                     <view
-                        class="item"
                         v-for="(item, index) in list"
                         :key="index"
+                        class="item"
                         @click.stop="getTopicsDetail(item.id)"
                     >
                         <Topic :item="item"></Topic>
@@ -46,6 +46,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import Topic from '@/components/Topic.vue';
 import { $getUserTopics } from '@/services/Common.http';
 import Skeleton from '@/components/Skeleton.vue';
+import { State } from 'vuex-class';
 
 @Component({
     name: 'UserTopic',
@@ -55,6 +56,8 @@ import Skeleton from '@/components/Skeleton.vue';
     }
 })
 export default class UserTopic extends Vue {
+    @State('cookie')
+    private cookie!: string;
     private loading = true;
     private noMore = false; // 没有更多了
     private loadFaild = false;

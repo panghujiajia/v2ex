@@ -1,18 +1,18 @@
 <template>
     <view class="container">
         <scroll-view
-            class="scroll-view-content"
-            scroll-x="true"
             :scroll-into-view="'tabid_' + (activeTab - 2)"
+            class="scroll-view-content"
             scroll-with-animation
+            scroll-x="true"
         >
             <view class="scroll-wrap">
                 <view
-                    class="item"
-                    :class="activeTab === index ? 'cur' : ''"
+                    v-for="(item, index) in tags"
                     :id="'tabid_' + index"
-                    v-for="(item, index) in topTags"
                     :key="index"
+                    :class="activeTab === index ? 'cur' : ''"
+                    class="item"
                     @click="onClick(index)"
                 >
                     <text>{{ item.title }}</text>
@@ -20,25 +20,25 @@
             </view>
         </scroll-view>
         <swiper
-            class="weui-tabs-swiper"
             :current="activeTab"
+            class="weui-tabs-swiper"
             duration="300"
             @change="onChange"
         >
             <swiper-item
-                class="weui-tabs-swiper-item"
-                v-for="(item, tabIndex) in topTags"
+                v-for="(item, tabIndex) in tags"
                 :key="tabIndex"
                 :data-index="tabIndex"
+                class="weui-tabs-swiper-item"
             >
                 <view
-                    class="tab-skeleton"
                     v-if="loading || activeTab !== tabIndex"
+                    class="tab-skeleton"
                 >
                     <Skeleton type="list"></Skeleton>
                 </view>
                 <template v-else>
-                    <view class="load-failed" v-if="!tagList.length">
+                    <view v-if="!tagList.length" class="load-failed">
                         <view class="reload">
                             <image
                                 class="empty-img"
@@ -54,15 +54,15 @@
                     <template v-else>
                         <scroll-view
                             class="list-wrap"
-                            scroll-y="true"
                             scroll-with-animation
+                            scroll-y="true"
                             style="height: 100%"
                         >
                             <view class="scroll-wrap">
                                 <view
-                                    class="item"
                                     v-for="(item, index) in tagList"
                                     :key="index"
+                                    class="item"
                                     @click.stop="getTopicsDetail(item.id)"
                                 >
                                     <Topic :item="item"></Topic>
@@ -89,10 +89,9 @@ import dayjs from 'dayjs';
 import Topic from '@/components/Topic.vue';
 import Skeleton from '@/components/Skeleton.vue';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import topTags from '@/config/topTag.config';
 import { Action, Getter, Mutation, State } from 'vuex-class';
 import { Component, Vue } from 'vue-property-decorator';
-import { $getTabTopics, $getTopTagConfig } from '@/services/Common.http';
+import { $getTabTopics } from '@/services/Common.http';
 
 dayjs.extend(relativeTime);
 
@@ -110,6 +109,8 @@ export default class Hot extends Vue {
     private cookie!: string;
     @State('stroageTime')
     private stroageTime!: number; // 缓存时长
+    @Getter('tags')
+    private tags!: any;
     @State('visited')
     private visited!: string[]; // 访问过的
     // 获取tag数据
@@ -126,7 +127,8 @@ export default class Hot extends Vue {
     private updateVisited!: (visited: string[]) => void;
     @Action('getLoginRewardInfo')
     private getLoginRewardInfo!: () => void;
-    private topTags = []; // tag列表
+    @Action('getV2exConfig')
+    private getV2exConfig!: () => void;
     private curTag = 'top';
     private tagList: any = []; // 主题内容
     private loading = true;
@@ -139,17 +141,9 @@ export default class Hot extends Vue {
         console.log((plus as any).networkinfo.isSetProxy());
         // #endif
     }
-    private onLoad() {
-        this.getTopTagConfig();
+    private async onLoad() {
+        await this.getV2exConfig();
         this.getData();
-    }
-    private async getTopTagConfig() {
-        const data = await $getTopTagConfig();
-        if (data) {
-            this.topTags = data;
-        } else {
-            this.topTags = topTags as any;
-        }
     }
     // 获取数据
     private getData() {
@@ -170,7 +164,7 @@ export default class Hot extends Vue {
     // 切换tab时
     private onChange(e: any) {
         const index = e.detail.current;
-        const tags: any = this.topTags;
+        const tags = this.tags;
         this.curTag = tags[index].value;
         this.activeTab = index;
         this.getData();
