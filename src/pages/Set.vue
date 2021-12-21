@@ -26,14 +26,18 @@
                         </view>
                         <view v-if="cookie" class="money">
                             <template v-if="userInfo.balance">
-                                <view v-for="(item, index) in userInfo.balance">
-                                    <image
-                                        :src="`https://cdn.todayhub.cn/lib/image/icon-balance${
-                                            userInfo.balance.length - index
-                                        }.png`"
-                                    ></image>
-                                    <text>{{ item }}</text>
-                                </view>
+                                <template
+                                    v-for="(item, index) in userInfo.balance"
+                                >
+                                    <view v-if="item">
+                                        <image
+                                            :src="`https://cdn.todayhub.cn/lib/image/icon-balance${
+                                                userInfo.balance.length - index
+                                            }.png`"
+                                        ></image>
+                                        <text>{{ item }}</text>
+                                    </view>
+                                </template>
                             </template>
                         </view>
                     </view>

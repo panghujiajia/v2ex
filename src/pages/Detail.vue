@@ -40,6 +40,7 @@
                             :content="topicsDetail.content"
                             markdown
                             selectable
+                            @linktap="linktap"
                         />
                     </view>
                 </view>
@@ -56,6 +57,7 @@
                                 :content="item.content"
                                 markdown
                                 selectable
+                                @linktap="linktap"
                             />
                         </view>
                     </template>
@@ -137,7 +139,7 @@ import 'dayjs/locale/zh-cn'; // 导入本地化语言
 import Vue from 'vue';
 import { Component } from 'vue-property-decorator';
 import Skeleton from '@/components/Skeleton.vue';
-import { Mutation } from 'vuex-class';
+import { Mutation, State } from 'vuex-class';
 
 dayjs.extend(isLeapYear); // 使用插件
 dayjs.locale('zh-cn'); // 使用本地化语言
@@ -148,6 +150,8 @@ dayjs.locale('zh-cn'); // 使用本地化语言
     }
 })
 export default class Detail extends Vue {
+    @State('autoNagivate')
+    private autoNagivate!: boolean;
     @Mutation('saveHistoryTopics')
     private saveHistoryTopics!: (data: any) => void;
     private topicsDetail: any = {}; // 主题详情
@@ -188,6 +192,9 @@ export default class Detail extends Vue {
                 uni.pageScrollTo({
                     selector: `.${innerText}`
                 });
+                return;
+            }
+            if (!this.autoNagivate) {
                 return;
             }
             // 链接为主题详情

@@ -1,6 +1,7 @@
 import { http } from './index';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import store from '@/vuex/index';
 
 dayjs.extend(relativeTime);
 
@@ -13,9 +14,16 @@ export const $getTabTopics = async (tab: string) => {
     }
 };
 
-export const $getAllTopics = async (params: { tab: string; p: number }) => {
+export const $getAllTopics = async (params: {
+    tab: string;
+    p: number | string;
+}) => {
     try {
-        const res = await http.get(`/topics/all/${params.tab}/${params.p}`);
+        const res = await http.get(`/topics/all/${params.tab}/${params.p}`, {
+            custom: {
+                auth: !!store.state.cookie
+            }
+        });
         return res.data.data;
     } catch (error) {
         return false;
@@ -105,13 +113,16 @@ export const $getUserInfo = async (username: string) => {
     }
 };
 
-export const $getUserTopics = async (params: any) => {
+export const $getUserTopics = async (params: {
+    username: string;
+    p: string | number;
+}) => {
     try {
         const res = await http.get(
             `/member/${params.username}/topics/${params.p}`,
             {
                 custom: {
-                    auth: !!params.auth
+                    auth: !!store.state.cookie
                 }
             }
         );

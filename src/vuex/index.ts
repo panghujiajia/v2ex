@@ -26,7 +26,7 @@ export default new Vuex.Store({
     state: {
         cookie: '',
         theme: 'deep',
-        autoNavigate: false,
+        autoNavigate: true,
         userInfo: {
             avatar: '',
             balance: [],

@@ -11,7 +11,9 @@
                         src="https://img01.yzcdn.cn/vant/empty-image-error.png"
                     >
                     </image>
-                    <view class="empty-desc">加载失败</view>
+                    <view class="empty-desc">
+                        加载失败，该节点可能需要登录才能访问哦
+                    </view>
                     <view class="empty-button" @click="getAllTopics(true)">
                         再试一次
                     </view>
@@ -96,7 +98,10 @@ export default class Tag extends Vue {
         this.loading = true;
         const tagList = this.tagList;
         const tab = this.value;
-        const res = await $getAllTopics({ tab, p: this.pageNum });
+        const res = await $getAllTopics({
+            tab,
+            p: this.pageNum
+        });
         if (res) {
             const visited: any = this.visited;
             const { data, nodeInfo } = res;
