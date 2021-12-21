@@ -46,7 +46,6 @@ import { Component, Vue } from 'vue-property-decorator';
 import Topic from '@/components/Topic.vue';
 import { $getUserTopics } from '@/services/Common.http';
 import Skeleton from '@/components/Skeleton.vue';
-import { State } from 'vuex-class';
 
 @Component({
     name: 'UserTopic',
@@ -56,8 +55,6 @@ import { State } from 'vuex-class';
     }
 })
 export default class UserTopic extends Vue {
-    @State('cookie')
-    private cookie!: string;
     private loading = true;
     private noMore = false; // 没有更多了
     private loadFaild = false;
@@ -78,8 +75,7 @@ export default class UserTopic extends Vue {
         const list = this.list;
         const res = await $getUserTopics({
             username: this.username,
-            p: this.pageNum,
-            auth: this.cookie
+            p: this.pageNum
         });
         if (res) {
             const { topicInfo, data } = res;
