@@ -82,6 +82,20 @@
                     @change="onAutoSignChange"
                 />
             </view>
+            <view class="cell van-hairline--bottom">
+                <view>
+                    <view>站内链接跳转</view>
+                    <view class="tip">
+                        点击"/t/1024、/go/v2ex"，打开对应帖子、节点
+                    </view>
+                </view>
+                <switch
+                    :checked="autoNagivate"
+                    color="#ffc413"
+                    style="transform: scale(0.7); margin-right: -30rpx"
+                    @change="onAutoNagivateChange"
+                />
+            </view>
             <view class="cell van-hairline--bottom" @click="clearStorage()">
                 <view>清空缓存</view>
                 <view class="icon-arrow"></view>
@@ -106,6 +120,8 @@ import { Action, Getter, Mutation, State } from 'vuex-class';
 export default class Set extends Vue {
     @State('autoSign')
     private autoSign!: boolean;
+    @State('autoNagivate')
+    private autoNagivate!: boolean;
     @State('userInfo')
     private userInfo!: any;
     @State('cookie')
@@ -116,6 +132,8 @@ export default class Set extends Vue {
     private clearHistory!: () => void;
     @Mutation('toggleAutoSign')
     private toggleAutoSign!: (data: boolean) => void;
+    @Mutation('toggleAutoNavigate')
+    private toggleAutoNavigate!: (data: boolean) => void;
     @Mutation('clearAllStorage')
     private clearAllStorage!: () => void;
     @Action('getUserBalance')
@@ -135,6 +153,7 @@ export default class Set extends Vue {
     }
     private onAutoSignChange({ detail }: any) {
         const { value } = detail;
+        uni.vibrateShort({});
         if (!this.cookie && value) {
             uni.showToast({
                 title: '登录后才能为您自动签到哦！',
@@ -142,6 +161,17 @@ export default class Set extends Vue {
             });
         }
         this.toggleAutoSign(value);
+    }
+    private onAutoNagivateChange({ detail }: any) {
+        const { value } = detail;
+        uni.vibrateShort({});
+        if (!this.cookie && value) {
+            uni.showToast({
+                title: '登录后才能为您自动签到哦！',
+                icon: 'none'
+            });
+        }
+        this.toggleAutoNavigate(value);
     }
     private getSignIn() {
         if (!this.cookie) {
@@ -366,5 +396,9 @@ export default class Set extends Vue {
     box-sizing: border-box;
     z-index: 2;
     min-height: calc(100vh - 350rpx);
+    .tip {
+        color: #999;
+        font-size: 22rpx;
+    }
 }
 </style>

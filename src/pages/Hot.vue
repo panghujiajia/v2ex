@@ -330,4 +330,5 @@ export default class Hot extends Vue {
         }
     }
 }
+@import url('@/theme/dark.less');
 </style>

@@ -177,14 +177,34 @@ export default class Detail extends Vue {
             }
         });
     }
-    //点击 @用户 跳转对应楼层
+    // 点击链接
     private linktap(e: any) {
         const { href, innerText } = e;
-        if (href.indexOf('/member/') > -1 && href.split('/').length === 3) {
-            this.lastScrollTop = this.scrollTop;
-            uni.pageScrollTo({
-                selector: `.${innerText}`
-            });
+        const hrefArr = href.split('/');
+        if (hrefArr.length >= 3) {
+            // 点击 @用户 跳转对应楼层
+            if (href.indexOf('/member/') > -1) {
+                this.lastScrollTop = this.scrollTop;
+                uni.pageScrollTo({
+                    selector: `.${innerText}`
+                });
+                return;
+            }
+            // 链接为主题详情
+            if (href.indexOf('/t/') > -1) {
+                const id = href.split('/').pop();
+                uni.navigateTo({
+                    url: `/pages/Detail?id=${id}`
+                });
+                return;
+            }
+            // 链接为节点链接
+            if (href.indexOf('/go/') > -1) {
+                const val = href.split('/').pop();
+                uni.navigateTo({
+                    url: `/pages/Tag?value=${val}`
+                });
+            }
         }
     }
     // 跳转tag

@@ -20,7 +20,9 @@
             <template v-else>
                 <view class="topic-header">
                     <view class="header-top">
-                        <text class="name">{{ title }}</text>
+                        <text class="name">
+                            {{ title || nodeInfo.topic_title || '' }}
+                        </text>
                         主题总数 {{ nodeInfo.topic_count || 0 }}
                     </view>
                     <view class="header-bottom">
@@ -53,6 +55,7 @@ import Topic from '@/components/Topic.vue';
 import Skeleton from '@/components/Skeleton.vue';
 import { $getAllTopics } from '@/services/Common.http';
 import { Mutation, State } from 'vuex-class';
+
 @Component({
     name: 'Tag',
     components: {
@@ -68,7 +71,8 @@ export default class Tag extends Vue {
     private tagList: any = []; // 主题内容
     private nodeInfo: any = {
         topic_count: 0,
-        topic_intro: ''
+        topic_intro: '',
+        topic_title: ''
     };
     private pageNum = 1; // 页码
     private value = ''; // 参数
@@ -79,7 +83,7 @@ export default class Tag extends Vue {
 
     private onLoad(options: any) {
         const { value, title } = options;
-        uni.setNavigationBarTitle({ title });
+        uni.setNavigationBarTitle({ title: title || '节点' });
         this.value = value;
         this.title = title;
         this.getAllTopics();
@@ -97,6 +101,11 @@ export default class Tag extends Vue {
             const visited: any = this.visited;
             const { data, nodeInfo } = res;
             this.nodeInfo = nodeInfo;
+            if (!this.title) {
+                uni.setNavigationBarTitle({
+                    title: nodeInfo.topic_title || '节点'
+                });
+            }
             const tagArr = data.map((item: any) => {
                 let beVisited = false;
                 if (visited.includes(item.id)) {

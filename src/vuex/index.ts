@@ -25,6 +25,8 @@ const RootProjectPersisted = createPersistedState({
 export default new Vuex.Store({
     state: {
         cookie: '',
+        theme: 'deep',
+        autoNavigate: false,
         userInfo: {
             avatar: '',
             balance: [],
@@ -101,6 +103,9 @@ export default new Vuex.Store({
         },
         toggleAutoSign(state, data) {
             state.autoSign = data;
+        },
+        toggleAutoNavigate(state, data) {
+            state.autoNavigate = data;
         },
         clearAllStorage(state) {
             state.cookie = '';
