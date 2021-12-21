@@ -4,7 +4,7 @@
             <Skeleton type="list"></Skeleton>
         </template>
         <template v-else>
-            <view class="load-failed" v-if="!topicsDetail.title">
+            <view v-if="!topicsDetail.title" class="load-failed">
                 <view class="reload">
                     <view class="reload">
                         <image
@@ -35,7 +35,7 @@
                         </view>
                     </view>
                     <view class="title">{{ topicsDetail.title }}</view>
-                    <view class="content" v-if="topicsDetail.content">
+                    <view v-if="topicsDetail.content" class="content">
                         <mp-html
                             :content="topicsDetail.content"
                             markdown
@@ -45,14 +45,14 @@
                     </view>
                 </view>
                 <view
-                    class="subtle-wrap"
                     v-if="topicsDetail.subtle_list.length"
+                    class="subtle-wrap"
                 >
                     <template v-for="(item, index) in topicsDetail.subtle_list">
                         <view class="title">
                             第{{ index + 1 }}条附言 {{ item.time }}
                         </view>
-                        <view class="content" :key="index">
+                        <view :key="index" class="content">
                             <mp-html
                                 :content="item.content"
                                 markdown
@@ -70,7 +70,7 @@
                         </view>
                     </view>
                 </view>
-                <view class="reply-num" v-if="topicsDetail.reply_num">
+                <view v-if="topicsDetail.reply_num" class="reply-num">
                     {{ topicsDetail.reply_num }}条回复
                 </view>
                 <view
@@ -81,10 +81,10 @@
                     回到现在
                 </view>
                 <view
-                    class="topic-wrap topic-reply"
-                    :class="item.author"
                     v-for="(item, index) in topicsDetail.reply_list"
                     :key="index"
+                    :class="item.author"
+                    class="topic-wrap topic-reply"
                 >
                     <view class="user-info">
                         <view class="user">
@@ -95,7 +95,7 @@
                             >
                                 {{ item.author }}
                             </text>
-                            <text class="op" v-if="item.is_master">OP</text>
+                            <text v-if="item.is_master" class="op">OP</text>
                             <text class="time">
                                 {{ item.reply_time }}
                             </text>
@@ -150,8 +150,8 @@ dayjs.locale('zh-cn'); // 使用本地化语言
     }
 })
 export default class Detail extends Vue {
-    @State('autoNagivate')
-    private autoNagivate!: boolean;
+    @State('autoNavigate')
+    private autoNavigate!: boolean;
     @Mutation('saveHistoryTopics')
     private saveHistoryTopics!: (data: any) => void;
     private topicsDetail: any = {}; // 主题详情
@@ -194,7 +194,7 @@ export default class Detail extends Vue {
                 });
                 return;
             }
-            if (!this.autoNagivate) {
+            if (!this.autoNavigate) {
                 return;
             }
             // 链接为主题详情
