@@ -94,10 +94,10 @@
                     </view>
                 </view>
                 <switch
-                    :checked="autoNagivate"
+                    :checked="autoNavigate"
                     color="#ffc413"
                     style="transform: scale(0.7); margin-right: -30rpx"
-                    @change="onAutoNagivateChange"
+                    @change="onAutoNavigateChange"
                 />
             </view>
             <view class="cell van-hairline--bottom" @click="clearStorage()">
@@ -124,8 +124,8 @@ import { Action, Getter, Mutation, State } from 'vuex-class';
 export default class Set extends Vue {
     @State('autoSign')
     private autoSign!: boolean;
-    @State('autoNagivate')
-    private autoNagivate!: boolean;
+    @State('autoNavigate')
+    private autoNavigate!: boolean;
     @State('userInfo')
     private userInfo!: any;
     @State('cookie')
@@ -166,7 +166,7 @@ export default class Set extends Vue {
         }
         this.toggleAutoSign(value);
     }
-    private onAutoNagivateChange({ detail }: any) {
+    private onAutoNavigateChange({ detail }: any) {
         const { value } = detail;
         uni.vibrateShort({});
         if (!this.cookie && value) {
