@@ -441,7 +441,7 @@ export default {
             if (!this.childs[i].w) {
                 // 设置原宽度
                 this.$set(this.ctrl, i, e.detail.width);
-            } /* #endif */ else if (
+            } else /* #endif */ if (
                 (this.opts[1] && !this.ctrl[i]) ||
                 this.ctrl[i] === -1
             ) {

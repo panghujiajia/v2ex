@@ -97,7 +97,7 @@ export default class Login extends Vue {
             this.signinData = data;
             this.captchaBase64 =
                 'data:image/png;base64,' +
-                uni.arrayBufferToBase64(codeUrl.data);
+                uni.arrayBufferToBase64(new Uint8Array(codeUrl.data));
         } else {
             uni.showToast({
                 title: '验证码获取失败，请重试',
