@@ -189,9 +189,12 @@ export default class Detail extends Vue {
             // 点击 @用户 跳转对应楼层
             if (href.indexOf('/member/') > -1) {
                 this.lastScrollTop = this.scrollTop;
-                uni.pageScrollTo({
-                    selector: `.${innerText}`
-                });
+				const query = uni.createSelectorQuery().in(this);
+				query.select(`.${innerText}`).boundingClientRect(data => {
+					uni.pageScrollTo({
+						scrollTop: this.scrollTop + data.top
+					});
+				}).exec();
                 return;
             }
             if (!this.autoNavigate) {
