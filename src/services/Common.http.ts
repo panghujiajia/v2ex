@@ -35,7 +35,11 @@ export const $getTopicDetail = async (params: {
     p: string | number;
 }) => {
     try {
-        const res = await http.get(`/topics/detail/${params.id}/${params.p}`);
+        const res = await http.get(`/topics/detail/${params.id}/${params.p}`, {
+            custom: {
+                auth: !!store.state.cookie
+            }
+        });
         return res.data.data;
     } catch (error) {
         return false;
