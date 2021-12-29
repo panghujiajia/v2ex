@@ -129,19 +129,26 @@ export default class Hot extends Vue {
     private getLoginRewardInfo!: () => void;
     @Action('getV2exConfig')
     private getV2exConfig!: () => void;
+    @Action('getUserNotifications')
+    private getUserNotifications!: () => void;
     private curTag = 'top';
     private tagList: any = []; // 主题内容
     private loading = true;
     private activeTab = 0;
 
     private onShow() {
-        this.cookie && this.getLoginRewardInfo();
+        if (this.cookie) {
+            this.getUserNotifications();
+        }
         // #ifdef APP-PLUS
         // 监听设备网络状态变化事件
         console.log((plus as any).networkinfo.isSetProxy());
         // #endif
     }
     private async onLoad() {
+        if (this.cookie) {
+            this.getLoginRewardInfo();
+        }
         await this.getV2exConfig();
         this.getData();
     }

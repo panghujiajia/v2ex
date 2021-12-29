@@ -180,3 +180,17 @@ export const $getUserBalance = async () => {
         return false;
     }
 };
+
+export const $getUserNotifications = async () => {
+    try {
+        const res = await http.get('/notifications', {
+            custom: {
+                auth: true,
+                loading: false
+            }
+        });
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};

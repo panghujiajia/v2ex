@@ -7,6 +7,7 @@ import {
     $getLoginRewardInfo,
     $getUserBalance,
     $getUserInfo,
+    $getUserNotifications,
     $getV2exConfig
 } from '@/services/Common.http';
 import topTags from '@/config/topTag.config';
@@ -25,6 +26,7 @@ const RootProjectPersisted = createPersistedState({
 export default new Vuex.Store({
     state: {
         cookie: '',
+        notifications: 0,
         theme: 'deep',
         autoNavigate: true,
         userInfo: {
@@ -127,6 +129,9 @@ export default new Vuex.Store({
         },
         saveAllTag(state, data) {
             state.allTag = data;
+        },
+        saveNotifications(state, data) {
+            state.notifications = data;
         }
     },
     actions: {
@@ -176,6 +181,16 @@ export default new Vuex.Store({
                     icon: 'none'
                 });
                 commit('saveUserInfo', data);
+            }
+        },
+        async getUserNotifications({ commit }) {
+            const data = await $getUserNotifications();
+            if (data) {
+                uni.setTabBarBadge({
+                    index: 2,
+                    text: data
+                });
+                commit('saveNotifications', data);
             }
         }
     },
