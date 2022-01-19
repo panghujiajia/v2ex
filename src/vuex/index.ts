@@ -188,9 +188,14 @@ export default new Vuex.Store({
             if (data) {
                 uni.setTabBarBadge({
                     index: 2,
-                    text: data
+                    text: data.toString()
                 });
                 commit('saveNotifications', data);
+            } else {
+                uni.removeTabBarBadge({
+                    index: 2
+                });
+                commit('saveNotifications', 0);
             }
         }
     },
