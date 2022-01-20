@@ -136,6 +136,25 @@ export const $getUserTopics = async (params: {
     }
 };
 
+export const $getUserReplys = async (params: {
+    username: string;
+    p: string | number;
+}) => {
+    try {
+        const res = await http.get(
+            `/member/${params.username}/replies/${params.p}`,
+            {
+                custom: {
+                    auth: !!store.state.cookie
+                }
+            }
+        );
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
 export const $getLoginRewardInfo = async () => {
     try {
         const res = await http.get('/mission/daily', {

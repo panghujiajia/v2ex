@@ -63,13 +63,13 @@
                 <view>我的主题</view>
                 <view class="icon-arrow"></view>
             </view>
-            <!--            <view-->
-            <!--                class="cell van-hairline&#45;&#45;bottom"-->
-            <!--                @click="navigateTo('reply', true)"-->
-            <!--            >-->
-            <!--                <view>我的回复</view>-->
-            <!--                <view class="icon-arrow"></view>-->
-            <!--            </view>-->
+            <view
+                class="cell van-hairline--bottom"
+                @click="navigateTo('reply', true)"
+            >
+                <view>我的回复</view>
+                <view class="icon-arrow"></view>
+            </view>
             <!--            <view-->
             <!--                class="cell van-hairline&#45;&#45;bottom"-->
             <!--                @click="navigateTo('collect', true)"-->
