@@ -175,11 +175,18 @@ export default new Vuex.Store({
         async getLoginReward({ commit }) {
             const data = await $getLoginReward();
             if (data) {
-                const { sign_in_day } = data;
-                uni.showToast({
-                    title: `签到成功，${sign_in_day}`,
-                    icon: 'none'
-                });
+                const { sign_in_day, is_sign_in } = data;
+                if (is_sign_in) {
+                    uni.showToast({
+                        title: `签到成功，${sign_in_day}`,
+                        icon: 'none'
+                    });
+                } else {
+                    uni.showToast({
+                        title: '多次签到不成功可尝试重新登录再试',
+                        icon: 'none'
+                    });
+                }
                 commit('saveUserInfo', data);
             }
         },
