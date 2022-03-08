@@ -92,7 +92,7 @@ export default class UserTopic extends Vue {
     @State('autoNavigate')
     private autoNavigate!: boolean;
     @Mutation('saveNotifications')
-    private saveNotifications!: () => void;
+    private saveNotifications!: (data: any) => void;
     private loading = true;
     private noMore = false; // 没有更多了
     private loadFaild = false;
