@@ -96,7 +96,11 @@ export const $getV2exConfig = async () => {
 
 export const $getAllTagConfig = async () => {
     try {
-        const res = await http.get('/config/tag/all');
+        const res = await http.get('/config/tag/all', {
+            custom: {
+                loading: false
+            }
+        });
         return res.data.data;
     } catch (error) {
         return false;

@@ -79,7 +79,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import Topic from '@/components/Topic.vue';
 import { $getUserReplys } from '@/services/Common.http';
 import Skeleton from '@/components/Skeleton.vue';
-import { State } from 'vuex-class';
+import { Mutation, State } from 'vuex-class';
 
 @Component({
     name: 'UserTopic',
@@ -91,6 +91,8 @@ import { State } from 'vuex-class';
 export default class UserTopic extends Vue {
     @State('autoNavigate')
     private autoNavigate!: boolean;
+    @Mutation('saveNotifications')
+    private saveNotifications!: () => void;
     private loading = true;
     private noMore = false; // 没有更多了
     private loadFaild = false;
@@ -102,6 +104,7 @@ export default class UserTopic extends Vue {
         topic_count: 0
     };
     private onLoad(option: any) {
+        this.saveNotifications(0);
         this.username = option.username;
         uni.setNavigationBarTitle({ title: `${this.username}的回复` });
         this.getUserReplys();

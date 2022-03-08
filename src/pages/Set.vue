@@ -68,7 +68,12 @@
                 @click="navigateTo('reply', true)"
             >
                 <view>我的回复</view>
-                <view class="icon-arrow"></view>
+                <view class="dot-wrap">
+                    <view v-if="notifications" class="dot">
+                        {{ notifications }}
+                    </view>
+                    <view class="icon-arrow"></view>
+                </view>
             </view>
             <!--            <view-->
             <!--                class="cell van-hairline&#45;&#45;bottom"-->
@@ -130,6 +135,8 @@ export default class Set extends Vue {
     private userInfo!: any;
     @State('cookie')
     private cookie!: string;
+    @State('notifications')
+    private notifications!: number;
     @Getter('toasts')
     private toasts!: any;
     @Mutation('clearHistory')
@@ -148,6 +155,9 @@ export default class Set extends Vue {
     private getLoginReward!: () => void;
     private toastTitle = '';
     private onShow() {
+        uni.removeTabBarBadge({
+            index: 2
+        });
         if (this.cookie) {
             this.getUserBalance();
             if (!this.userInfo.info) {
@@ -389,6 +399,18 @@ export default class Set extends Vue {
                 }
             }
         }
+    }
+}
+.dot-wrap {
+    display: flex;
+    align-items: center;
+    .dot {
+        border-radius: 20rpx;
+        padding: 0 16rpx;
+        background: #fa5151;
+        color: #fff;
+        font-size: 22rpx;
+        font-weight: bold;
     }
 }
 .cell-group {
