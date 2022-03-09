@@ -2,6 +2,7 @@
     <view class="topic-wrap" :class="[item.beVisited ? 'cur' : '']">
         <view class="user-info">
             <view class="user">
+                <image class="avatar" :src="item.avatar"></image>
                 <text class="name">{{ item.author }}</text>
                 <text class="time">{{ item.last_reply_time }}</text>
             </view>
@@ -21,7 +22,8 @@
     </view>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
 @Component({
     name: 'Topic'
 })
@@ -46,6 +48,16 @@ export default class Topic extends Vue {
         justify-content: space-between;
         align-items: center;
         height: 40rpx;
+        .user {
+            display: flex;
+            align-items: center;
+            .avatar {
+                width: 40rpx;
+                height: 40rpx;
+                margin-right: 14rpx;
+                border-radius: 8rpx;
+            }
+        }
         .name {
             font-size: 28rpx;
             color: #666;

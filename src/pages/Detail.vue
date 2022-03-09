@@ -23,6 +23,10 @@
                 <view class="topic-wrap topic-header">
                     <view class="user-info">
                         <view class="user">
+                            <image
+                                class="avatar"
+                                :src="topicsDetail.avatar"
+                            ></image>
                             <text
                                 class="name"
                                 @click="getUserTopic(topicsDetail.author)"
@@ -90,7 +94,7 @@
                 >
                     <view class="user-info">
                         <view class="user">
-                            <!--                            <image :src="item.avatar"></image>-->
+                            <image class="avatar" :src="item.avatar"></image>
                             <text
                                 class="name"
                                 @click="getUserTopic(item.author)"
@@ -368,6 +372,12 @@ text {
         .user {
             display: flex;
             align-items: center;
+            .avatar {
+                width: 40rpx;
+                height: 40rpx;
+                margin-right: 14rpx;
+                border-radius: 8rpx;
+            }
         }
         .like-icon {
             width: 20rpx;
