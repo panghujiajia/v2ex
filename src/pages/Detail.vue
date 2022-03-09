@@ -1,5 +1,25 @@
 <template>
     <view class="container">
+        <view class="reply-wrap" v-if="replyBox">
+            <textarea
+                class="textarea"
+                fixed
+                :maxlength="-1"
+                placeholder="请尽量让自己的回复能够对别人有帮助"
+                :show-confirm-bar="false"
+                :value="content"
+                :hold-keyboard="true"
+                auto-focus
+                @input="onInputChange"
+                @keyboardheightchange="onKeyboardChange"
+            />
+            <view class="btn-wrap">
+                <view class="reply-btn cancel-btn" @click="cancelReply()">
+                    取消回复
+                </view>
+                <view class="reply-btn">回复</view>
+            </view>
+        </view>
         <template v-if="loading && loadType === 'refresh'">
             <Skeleton type="list"></Skeleton>
         </template>
@@ -115,8 +135,15 @@
                                 </text>
                             </template>
                         </view>
-                        <view class="floor">
-                            {{ `${index + 1}楼` }}
+                        <view class="floor-wrap">
+                            <image
+                                class="reply-icon"
+                                src="https://cdn.todayhub.cn/lib/image/reply_neue.png"
+                                @click="replyTopic(item)"
+                            ></image>
+                            <view class="floor">
+                                {{ `${index + 1}楼` }}
+                            </view>
                         </view>
                     </view>
                     <mp-html
@@ -170,9 +197,39 @@ export default class Detail extends Vue {
     private loadType = 'refresh'; // 加载类型
     private scrollTop = 0;
     private lastScrollTop = 0;
+    private replyBox = false;
+    private content = '';
     private onLoad(options: any) {
         this.params = options;
         this.loadData();
+    }
+    // private onKeyboardChange(e: any) {
+    //     const {
+    //         detail: { height }
+    //     } = e;
+    //     if (height) {
+    //         this.replyBox = true;
+    //     } else {
+    //         this.replyBox = false;
+    //         this.content = '';
+    //     }
+    // }
+    private onInputChange(e: any) {
+        const {
+            detail: { value }
+        } = e;
+        this.content = value;
+    }
+    private cancelReply() {
+        this.replyBox = false;
+        this.content = '';
+    }
+    private replyTopic(item: any) {
+        const { id, author } = item;
+        this.content = this.content
+            ? `${this.content}\n@${author} `
+            : `@${author} `;
+        this.replyBox = true;
     }
     private getUserTopic(username: string) {
         uni.navigateTo({
@@ -260,12 +317,13 @@ export default class Detail extends Vue {
             p: this.pageNum
         });
         if (res) {
-            let { reply_list, page } = res;
+            let { reply_list, page, once } = res;
             if (this.pageNum === 1) {
                 this.topicsDetail = res;
                 this.page = page || 1;
                 this.saveHistoryTopics(res);
             }
+            this.topicsDetail.once = once;
             reply_list = reply_list.map((item: any) => {
                 return {
                     ...item,
@@ -349,6 +407,46 @@ text {
     }
     .content {
         padding: 0 30rpx;
+    }
+}
+.reply-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 400rpx;
+    padding: 20rpx 30rpx;
+    box-sizing: border-box;
+    background: #fff;
+    box-shadow: 0 0 20rpx #dedede;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    .textarea {
+        background: #fff;
+        width: 100%;
+        flex: 1;
+        border: 1rpx solid #dedede;
+        margin-bottom: 20rpx;
+    }
+    .btn-wrap {
+        align-self: flex-end;
+    }
+    .reply-btn {
+        display: inline-block;
+        padding: 0 20rpx;
+        height: 50rpx;
+        text-align: center;
+        line-height: 50rpx;
+        background: #4474ff;
+        color: #fff;
+        font-size: 28rpx;
+        border-radius: 8rpx;
+    }
+    .cancel-btn {
+        background: #efefef;
+        color: #999;
+        margin-right: 20rpx;
     }
 }
 .topic-wrap {
@@ -460,9 +558,18 @@ text {
         font-size: 22rpx;
     }
 }
-.floor {
-    color: #999;
-    font-size: 22rpx;
+.floor-wrap {
+    display: flex;
+    align-items: center;
+    .reply-icon {
+        width: 30rpx;
+        height: 30rpx;
+        margin-right: 15rpx;
+    }
+    .floor {
+        color: #999;
+        font-size: 22rpx;
+    }
 }
 .reply-num {
     height: 50rpx;
