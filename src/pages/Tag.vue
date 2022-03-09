@@ -175,7 +175,7 @@ export default class Tag extends Vue {
     private onShareAppMessage(e: any) {
         // #ifdef MP-WEIXIN
         return {
-            title: 'v2ex mini',
+            title: 'v2ex',
             path: `/pages/Tag?value=${this.value}&title=${this.title}`
         };
         // #endif

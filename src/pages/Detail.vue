@@ -312,7 +312,7 @@ export default class Detail extends Vue {
     private onShareAppMessage(e: any) {
         const { id } = this.params;
         return {
-            title: 'v2ex mini',
+            title: 'v2ex',
             path: `/pages/Detail?id=${id}`
         };
     }

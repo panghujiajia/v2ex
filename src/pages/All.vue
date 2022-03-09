@@ -129,7 +129,7 @@ export default class All extends Vue {
     // #ifdef MP-WEIXIN
     private onShareAppMessage(e: any) {
         return {
-            title: 'v2ex mini',
+            title: 'v2ex',
             path: '/pages/Hot'
         };
     }
