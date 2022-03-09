@@ -61,6 +61,13 @@
             }
         },
         {
+            "path": "pages/About",
+            "style": {
+                "navigationBarTitleText": "关于",
+                "usingComponents": {}
+            }
+        },
+        {
             "path": "pages/UserTopic",
             "style": {
                 "enablePullDownRefresh": true,

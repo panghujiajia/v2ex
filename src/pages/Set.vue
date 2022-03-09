@@ -109,13 +109,13 @@
                 <view>清空缓存</view>
                 <view class="icon-arrow"></view>
             </view>
-            <!--            <view-->
-            <!--                class="cell van-hairline&#45;&#45;bottom"-->
-            <!--                @click="navigateTo('about')"-->
-            <!--            >-->
-            <!--                <view>关于</view>-->
-            <!--                <view class="icon-arrow"></view>-->
-            <!--            </view>-->
+            <view
+                class="cell van-hairline--bottom"
+                @click="navigateTo('about')"
+            >
+                <view>关于</view>
+                <view class="icon-arrow"></view>
+            </view>
         </view>
     </view>
 </template>
