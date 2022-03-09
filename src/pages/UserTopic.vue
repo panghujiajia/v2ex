@@ -137,6 +137,9 @@ export default class UserTopic extends Vue {
                 margin-bottom: 0;
             }
         }
+        /deep/.avatar {
+            display: none;
+        }
     }
 }
 </style>
