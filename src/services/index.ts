@@ -52,7 +52,7 @@ const createInterceptor = (instance: any) => {
             return response;
         },
         (response: any) => {
-            if (response.custom.loading) {
+            if (response.config.custom.loading) {
                 uni.hideLoading();
             }
             /*  对响应错误做点什么 （statusCode !== 200）*/

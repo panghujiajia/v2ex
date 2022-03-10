@@ -98,6 +98,7 @@ export const $getAllTagConfig = async () => {
     try {
         const res = await http.get('/config/tag/all', {
             custom: {
+                auth: !!store.state.cookie,
                 loading: false
             }
         });
@@ -210,6 +211,19 @@ export const $getUserNotifications = async () => {
             custom: {
                 auth: true,
                 loading: false
+            }
+        });
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const $replyTopic = async (params: any) => {
+    try {
+        const res = await http.post('/t', params, {
+            custom: {
+                auth: true
             }
         });
         return res.data.data;

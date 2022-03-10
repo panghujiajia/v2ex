@@ -1,25 +1,5 @@
 <template>
     <view class="container">
-        <view class="reply-wrap" v-if="replyBox">
-            <textarea
-                class="textarea"
-                fixed
-                :maxlength="-1"
-                placeholder="请尽量让自己的回复能够对别人有帮助"
-                :show-confirm-bar="false"
-                :value="content"
-                :hold-keyboard="true"
-                auto-focus
-                @input="onInputChange"
-                @keyboardheightchange="onKeyboardChange"
-            />
-            <view class="btn-wrap">
-                <view class="reply-btn cancel-btn" @click="cancelReply()">
-                    取消回复
-                </view>
-                <view class="reply-btn">回复</view>
-            </view>
-        </view>
         <template v-if="loading && loadType === 'refresh'">
             <Skeleton type="list"></Skeleton>
         </template>
@@ -95,6 +75,14 @@
                             <text>{{ topicsDetail.tag_name }}</text>
                         </view>
                     </view>
+                    <view class="floor-wrap">
+                        <image
+                            class="reply-icon"
+                            src="https://cdn.todayhub.cn/lib/image/reply_neue.png"
+                            @click="replyTopic(topicsDetail)"
+                        ></image>
+                        <view class="floor">OP</view>
+                    </view>
                 </view>
                 <view v-if="topicsDetail.reply_num" class="reply-num">
                     {{ topicsDetail.reply_num }}条回复
@@ -154,6 +142,32 @@
                         @linktap="linktap"
                     />
                 </view>
+                <view class="reply-wrap" v-if="replyBox">
+                    <textarea
+                        class="textarea"
+                        fixed
+                        :maxlength="-1"
+                        placeholder="请输入内容"
+                        placeholder-style="font-size: 24rpx;color: #999;"
+                        :show-confirm-bar="false"
+                        :value="content"
+                        :hold-keyboard="true"
+                        auto-focus
+                        @input="onInputChange"
+                    />
+                    <view class="tip">请尽量让自己的回复能够对别人有帮助</view>
+                    <view class="btn-wrap">
+                        <view
+                            class="reply-btn cancel-btn"
+                            @click="cancelReply()"
+                        >
+                            取消
+                        </view>
+                        <view class="reply-btn" @click="confirmReply()">
+                            提交
+                        </view>
+                    </view>
+                </view>
                 <!-- #ifdef MP-WEIXIN -->
                 <ad unit-id="adunit-6996f541fca34984"></ad>
                 <!-- #endif -->
@@ -166,7 +180,7 @@
 </template>
 
 <script lang="ts">
-import { $getTopicDetail } from '@/services/Common.http';
+import { $getTopicDetail, $replyTopic } from '@/services/Common.http';
 import dayjs from 'dayjs';
 import isLeapYear from 'dayjs/plugin/isLeapYear'; // 导入插件
 import 'dayjs/locale/zh-cn'; // 导入本地化语言
@@ -184,6 +198,8 @@ dayjs.locale('zh-cn'); // 使用本地化语言
     }
 })
 export default class Detail extends Vue {
+    @State('cookie')
+    private cookie!: string;
     @State('autoNavigate')
     private autoNavigate!: boolean;
     @Mutation('saveHistoryTopics')
@@ -220,12 +236,55 @@ export default class Detail extends Vue {
         } = e;
         this.content = value;
     }
+    private async confirmReply() {
+        const { once, id } = this.topicsDetail;
+        const content = this.content;
+        if (!content) {
+            uni.showToast({
+                title: '回复内容不能为空',
+                icon: 'none'
+            });
+            return;
+        }
+        const params = {
+            once,
+            id,
+            content: this.content
+        };
+        const data = await $replyTopic(params);
+        if (data) {
+            this.replyBox = false;
+            this.content = '';
+            this.pageNum = 1;
+            this.loadType = 'loadMore';
+            this.loadData();
+        } else {
+            uni.showToast({
+                title: '回复失败，请重试',
+                icon: 'none'
+            });
+        }
+    }
     private cancelReply() {
         this.replyBox = false;
         this.content = '';
     }
     private replyTopic(item: any) {
-        const { id, author } = item;
+        if (!this.cookie) {
+            uni.showModal({
+                title: '提示',
+                content: '登录后才能回帖',
+                confirmText: '去登录',
+                cancelText: '算了',
+                success: ({ confirm }) => {
+                    if (confirm) {
+                        uni.navigateTo({ url: '/pages/Login' });
+                    }
+                }
+            });
+            return;
+        }
+        const { author } = item;
         this.content = this.content
             ? `${this.content}\n@${author} `
             : `@${author} `;
@@ -320,6 +379,7 @@ export default class Detail extends Vue {
             let { reply_list, page, once } = res;
             if (this.pageNum === 1) {
                 this.topicsDetail = res;
+                uni.setNavigationBarTitle({ title: this.topicsDetail.title });
                 this.page = page || 1;
                 this.saveHistoryTopics(res);
             }
@@ -409,13 +469,23 @@ text {
         padding: 0 30rpx;
     }
 }
+.reply-btn {
+    padding: 0 20rpx;
+    height: 50rpx;
+    text-align: center;
+    line-height: 50rpx;
+    background: #4474ff;
+    color: #fff;
+    font-size: 28rpx;
+    border-radius: 8rpx;
+}
 .reply-wrap {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 400rpx;
-    padding: 20rpx 30rpx;
+    padding: 20rpx;
     box-sizing: border-box;
     background: #fff;
     box-shadow: 0 0 20rpx #dedede;
@@ -427,7 +497,14 @@ text {
         width: 100%;
         flex: 1;
         border: 1rpx solid #dedede;
-        margin-bottom: 20rpx;
+        margin-bottom: 10rpx;
+        padding: 10rpx;
+        box-sizing: border-box;
+    }
+    .tip {
+        font-size: 24rpx;
+        color: #999;
+        margin-bottom: 10rpx;
     }
     .btn-wrap {
         align-self: flex-end;
@@ -552,10 +629,6 @@ text {
             font-size: 24rpx;
             margin-right: 5rpx;
         }
-    }
-    .reply {
-        color: #999;
-        font-size: 22rpx;
     }
 }
 .floor-wrap {
