@@ -22,6 +22,15 @@
             </view>
         </view>
         <view class="tag-wrap">
+            <view v-if="cookie">
+                <view class="title">测试节点</view>
+                <view
+                    class="tag"
+                    @click="handleClick({ value: 'sandbox', title: '沙盒' })"
+                >
+                    沙盒
+                </view>
+            </view>
             <view v-for="key in Object.keys(allTag)" :key="key">
                 <view class="title">{{ key }}</view>
                 <view
@@ -54,6 +63,8 @@ export default class All extends Vue {
     private myTags!: string[];
     @State('allTag')
     private allTag!: any;
+    @State('cookie')
+    private cookie!: string;
     @Mutation('updateMyTags')
     private updateMyTags!: (data: any) => void;
     @Mutation('saveAllTag')

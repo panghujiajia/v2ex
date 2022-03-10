@@ -148,14 +148,17 @@
                         fixed
                         :maxlength="-1"
                         placeholder="请输入内容"
-                        placeholder-style="font-size: 24rpx;color: #999;"
+                        placeholder-style="font-size: 28rpx;color: #999;"
                         :show-confirm-bar="false"
                         :value="content"
                         :hold-keyboard="true"
                         auto-focus
                         @input="onInputChange"
                     />
-                    <view class="tip">请尽量让自己的回复能够对别人有帮助</view>
+                    <view class="tip">
+                        <view>请尽量让自己的回复能够对别人有帮助</view>
+                        <view>若提交失败请尝试重新登录</view>
+                    </view>
                     <view class="btn-wrap">
                         <view
                             class="reply-btn cancel-btn"
@@ -257,7 +260,10 @@ export default class Detail extends Vue {
             this.content = '';
             this.pageNum = 1;
             this.loadType = 'loadMore';
-            this.loadData();
+            await this.loadData();
+            uni.pageScrollTo({
+                scrollTop: 999999
+            });
         } else {
             uni.showToast({
                 title: '回复失败，请重试',
@@ -504,7 +510,7 @@ text {
         box-sizing: border-box;
     }
     .tip {
-        font-size: 24rpx;
+        font-size: 26rpx;
         color: #999;
         margin-bottom: 10rpx;
     }
