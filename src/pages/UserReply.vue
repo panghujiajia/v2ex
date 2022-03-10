@@ -195,6 +195,12 @@ export default class UserTopic extends Vue {
         const len = list.length;
         if (len >= topic_count) {
             this.noMore = true;
+        } else {
+            if (len < 19) {
+                this.pageNum = ++this.pageNum;
+                this.loadType = 'loadMore';
+                this.getUserReplys();
+            }
         }
     }
     // 跳转主题详情
