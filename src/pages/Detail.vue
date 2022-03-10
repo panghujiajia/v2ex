@@ -79,7 +79,7 @@
                         <image
                             class="reply-icon"
                             src="https://cdn.todayhub.cn/lib/image/reply_neue.png"
-                            @click="replyTopic(topicsDetail)"
+                            @click="replyTopic()"
                         ></image>
                         <view class="floor">OP</view>
                     </view>
@@ -269,7 +269,7 @@ export default class Detail extends Vue {
         this.replyBox = false;
         this.content = '';
     }
-    private replyTopic(item: any) {
+    private replyTopic(item?: any) {
         if (!this.cookie) {
             uni.showModal({
                 title: '提示',
@@ -284,10 +284,12 @@ export default class Detail extends Vue {
             });
             return;
         }
-        const { author } = item;
-        this.content = this.content
-            ? `${this.content}\n@${author} `
-            : `@${author} `;
+        if (item) {
+            const { author } = item;
+            this.content = this.content
+                ? `${this.content}\n@${author} `
+                : `@${author} `;
+        }
         this.replyBox = true;
     }
     private getUserTopic(username: string) {
