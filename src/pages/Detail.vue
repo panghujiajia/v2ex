@@ -260,6 +260,7 @@ export default class Detail extends Vue {
             this.content = '';
             this.pageNum = 1;
             this.loadType = 'loadMore';
+            this.noMore = false;
             await this.loadData();
             uni.pageScrollTo({
                 scrollTop: 999999
