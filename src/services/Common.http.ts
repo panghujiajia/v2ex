@@ -160,6 +160,19 @@ export const $getUserReplys = async (params: {
     }
 };
 
+export const $getUserMessage = async (p: string | number) => {
+    try {
+        const res = await http.get(`/message/${p}`, {
+            custom: {
+                auth: true
+            }
+        });
+        return res.data.data;
+    } catch (error) {
+        return false;
+    }
+};
+
 export const $getLoginRewardInfo = async () => {
     try {
         const res = await http.get('/mission/daily', {

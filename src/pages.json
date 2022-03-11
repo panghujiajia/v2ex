@@ -82,6 +82,14 @@
             }
         },
         {
+            "path": "pages/UserMessage",
+            "style": {
+                "navigationBarTitleText": "我的消息",
+                "enablePullDownRefresh": true,
+                "usingComponents": {}
+            }
+        },
+        {
             "path": "pages/All",
             "style": {
                 "navigationBarTitleText": "节点",

@@ -12,7 +12,7 @@
                     >
                     </image>
                     <view class="empty-desc">加载失败</view>
-                    <view class="empty-button" @click="getUserReplys()">
+                    <view class="empty-button" @click="getUserMessage()">
                         再试一次
                     </view>
                 </view>
@@ -22,7 +22,7 @@
                         src="https://img01.yzcdn.cn/vant/empty-image-default.png"
                     >
                     </image>
-                    <view class="empty-desc">暂无回复记录</view>
+                    <view class="empty-desc">暂无消息记录</view>
                 </view>
             </view>
             <view v-else>
@@ -32,24 +32,64 @@
                         :key="index"
                         class="item"
                     >
-                        <view class="reply-info">
-                            <text class="reply-time">
+                        <view class="message-info">
+                            <text class="message-time">
                                 {{ item.last_reply_time }}
                             </text>
-                            <view class="reply-title">
-                                <text class="gray">回复了</text>
+                            <view
+                                class="message-title"
+                                v-if="item.messageType === 'reply'"
+                            >
+                                <image :src="item.avatar"></image>
                                 <text
-                                    class="light chevron"
+                                    class="light"
                                     @click="getUserTopic(item.author)"
                                 >
                                     {{ item.author }}
                                 </text>
-                                <text class="gray">创建的主题</text>
-                                <text class="gray chevron"> › </text>
-                                <text class="light" @click="getTags(item)">
-                                    {{ item.tag_name }}
+                                <text class="gray">在</text>
+                                <text
+                                    class="light"
+                                    @click="getTopicsDetail(item.id)"
+                                >
+                                    {{ item.title }}
                                 </text>
-                                <text class="gray chevron"> › </text>
+                                <text class="gray">里回复了你</text>
+                            </view>
+                            <view
+                                class="message-title"
+                                v-if="item.messageType === 'thanks'"
+                            >
+                                <image :src="item.avatar"></image>
+                                <text
+                                    class="light"
+                                    @click="getUserTopic(item.author)"
+                                >
+                                    {{ item.author }}
+                                </text>
+                                <text class="gray">感谢了你在主题</text>
+                                <text class="gray"> › </text>
+                                <text
+                                    class="light"
+                                    @click="getTopicsDetail(item.id)"
+                                >
+                                    {{ item.title }}
+                                </text>
+                                <text class="gray">里的回复</text>
+                            </view>
+                            <view
+                                class="message-title"
+                                v-if="item.messageType === 'collection'"
+                            >
+                                <image :src="item.avatar"></image>
+                                <text
+                                    class="light"
+                                    @click="getUserTopic(item.author)"
+                                >
+                                    {{ item.author }}
+                                </text>
+                                <text class="gray"> 收藏了你发布的主题 </text>
+                                <text class="gray"> › </text>
                                 <text
                                     class="light"
                                     @click="getTopicsDetail(item.id)"
@@ -58,7 +98,7 @@
                                 </text>
                             </view>
                         </view>
-                        <view class="reply-content">
+                        <view class="message-content" v-if="item.content">
                             <mp-html
                                 :content="item.content"
                                 markdown
@@ -77,9 +117,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Topic from '@/components/Topic.vue';
-import { $getUserReplys } from '@/services/Common.http';
+import { $getUserMessage } from '@/services/Common.http';
 import Skeleton from '@/components/Skeleton.vue';
-import { State } from 'vuex-class';
+import { Mutation, State } from 'vuex-class';
 
 @Component({
     name: 'UserTopic',
@@ -91,20 +131,20 @@ import { State } from 'vuex-class';
 export default class UserTopic extends Vue {
     @State('autoNavigate')
     private autoNavigate!: boolean;
+    @Mutation('saveNotifications')
+    private saveNotifications!: (data: any) => void;
     private loading = true;
     private noMore = false; // 没有更多了
     private loadFaild = false;
     private loadType = 'refresh'; // 加载类型
     private list: any = [];
-    private username = '';
     private pageNum = 1; // 页码
-    private topicInfo: any = {
-        topic_count: 0
+    private messageInfo: any = {
+        message_count: 0
     };
     private onLoad(option: any) {
-        this.username = option.username;
-        uni.setNavigationBarTitle({ title: `${this.username}的回复` });
-        this.getUserReplys();
+        this.saveNotifications(0);
+        this.getUserMessage();
     }
     // 点击链接
     private linktap(e: any) {
@@ -126,14 +166,6 @@ export default class UserTopic extends Vue {
                     });
                     return;
                 }
-                // 链接为节点链接
-                if (href.indexOf('/go/') > -1) {
-                    const val = href.split('/').pop();
-                    uni.navigateTo({
-                        url: `/pages/Tag?value=${val}`
-                    });
-                    return;
-                }
             }
         }
         // #ifdef MP-WEIXIN
@@ -151,24 +183,23 @@ export default class UserTopic extends Vue {
         plus.runtime.openURL(href);
         // #endif
     }
-    private async getUserReplys() {
+    private async getUserMessage() {
         this.loading = true;
         const list = this.list;
-        const res = await $getUserReplys({
-            username: this.username,
-            p: this.pageNum
-        });
+        const res = await $getUserMessage(this.pageNum);
         if (res) {
-            const { topicInfo, data } = res;
-            this.topicInfo = topicInfo;
+            const { messageInfo, data } = res;
+            this.messageInfo = messageInfo;
             if (this.loadType === 'refresh') {
                 this.list = data.map((item: any) => {
                     return {
                         ...item,
-                        content: item.content.replace(
-                            /(@.*?>)(.*?)(<\/a>)/g,
-                            '<text class="user-name">$1$2$3</text>'
-                        )
+                        content:
+                            item.content &&
+                            item.content.replace(
+                                /(@.*?>)(.*?)(<\/a>)/g,
+                                '<text class="user-name">$1$2$3</text>'
+                            )
                     };
                 });
                 this.loadFaild = false;
@@ -186,16 +217,16 @@ export default class UserTopic extends Vue {
     }
     // 判断是否最后一页
     private isLastPage() {
-        const { topic_count } = this.topicInfo;
+        const { message_count } = this.messageInfo;
         const list = this.list;
         const len = list.length;
-        if (len >= topic_count) {
+        if (len >= message_count) {
             this.noMore = true;
         } else {
             if (len && len < 19) {
                 this.pageNum = ++this.pageNum;
                 this.loadType = 'loadMore';
-                this.getUserReplys();
+                this.getUserMessage();
             }
         }
     }
@@ -203,11 +234,6 @@ export default class UserTopic extends Vue {
     private getTopicsDetail(id: string) {
         uni.navigateTo({
             url: `/pages/Detail?id=${id}`
-        });
-    }
-    private getTags(item: any) {
-        uni.navigateTo({
-            url: `/pages/Tag?value=${item.tag_link}&title=${item.tag_name}`
         });
     }
     private getUserTopic(username: string) {
@@ -219,7 +245,7 @@ export default class UserTopic extends Vue {
         this.pageNum = 1;
         this.loadType = 'refresh';
         this.noMore = false;
-        this.getUserReplys();
+        this.getUserMessage();
     }
     private onReachBottom() {
         if (this.noMore) {
@@ -227,7 +253,7 @@ export default class UserTopic extends Vue {
         }
         this.pageNum = ++this.pageNum;
         this.loadType = 'loadMore';
-        this.getUserReplys();
+        this.getUserMessage();
     }
 }
 </script>
@@ -257,18 +283,25 @@ export default class UserTopic extends Vue {
             color: #4474ff;
             font-weight: 500;
         }
-        .reply-info {
-            .reply-time {
+        .message-info {
+            .message-time {
                 color: #999;
             }
-            .reply-title {
+            .message-title {
                 margin: 10rpx 0 15rpx;
-                .chevron {
+                line-height: 40rpx;
+                image {
+                    width: 40rpx;
+                    height: 40rpx;
+                    border-radius: 8rpx;
+                    vertical-align: -11rpx;
+                }
+                text {
                     margin: 0 10rpx;
                 }
             }
         }
-        .reply-content {
+        .message-content {
             background: #f9f9f9;
             padding: 0 20rpx;
         }

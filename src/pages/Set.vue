@@ -68,6 +68,13 @@
                 @click="navigateTo('reply', true)"
             >
                 <view>我的回复</view>
+                <view class="icon-arrow"></view>
+            </view>
+            <view
+                class="cell van-hairline--bottom"
+                @click="navigateTo('message', true)"
+            >
+                <view>我的消息</view>
                 <view class="dot-wrap">
                     <view v-if="notifications" class="dot">
                         {{ notifications }}
@@ -209,6 +216,7 @@ export default class Set extends Vue {
             history: '/pages/History',
             topic: '/pages/UserTopic',
             reply: '/pages/UserReply',
+            message: '/pages/UserMessage',
             collect: '/pages/MyCollect',
             about: '/pages/About'
         };
