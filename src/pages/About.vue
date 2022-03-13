@@ -4,13 +4,6 @@
         <view>
             做这个小程序的目的是方便在移动设备上看帖，同时也给自己在技术上的成长。
         </view>
-        <view>如果你觉得做的不错，可以通过下面的打赏码请我喝茶。</view>
-        <image
-            class="payment-img"
-            @click="previewImg(paymentImg)"
-            :src="paymentImg"
-        >
-        </image>
         <view>
             如果你有任何问题、意见想与我交流探讨，你可以通过复制我的
             <text class="link" @click="setClipboard(wechat, 'wechat')">
@@ -39,8 +32,6 @@ import { Component, Vue } from 'vue-property-decorator';
     name: 'Login'
 })
 export default class Login extends Vue {
-    private paymentImg =
-        'https://cdn.todayhub.cn/lib/image/my-payment-code.jpeg';
     private v2ex = 'https://github.com/panghujiajia/v2ex.git';
     private v2exApi = 'https://github.com/panghujiajia/v2ex-api-nestjs.git';
     private wechat = 'GooodTimes';

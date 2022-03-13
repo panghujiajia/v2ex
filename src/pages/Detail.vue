@@ -75,14 +75,14 @@
                             <text>{{ topicsDetail.tag_name }}</text>
                         </view>
                     </view>
-                    <view class="floor-wrap">
-                        <image
-                            class="reply-icon"
-                            src="https://cdn.todayhub.cn/lib/image/reply_neue.png"
-                            @click="replyTopic()"
-                        ></image>
-                        <view class="floor">OP</view>
-                    </view>
+<!--                    <view class="floor-wrap">-->
+<!--                        <image-->
+<!--                            class="reply-icon"-->
+<!--                            src="https://cdn.todayhub.cn/lib/image/reply_neue.png"-->
+<!--                            @click="replyTopic()"-->
+<!--                        ></image>-->
+<!--                        <view class="floor">OP</view>-->
+<!--                    </view>-->
                 </view>
                 <view v-if="topicsDetail.reply_num" class="reply-num">
                     {{ topicsDetail.reply_num }}条回复
@@ -124,11 +124,11 @@
                             </template>
                         </view>
                         <view class="floor-wrap">
-                            <image
-                                class="reply-icon"
-                                src="https://cdn.todayhub.cn/lib/image/reply_neue.png"
-                                @click="replyTopic(item)"
-                            ></image>
+<!--                            <image-->
+<!--                                class="reply-icon"-->
+<!--                                src="https://cdn.todayhub.cn/lib/image/reply_neue.png"-->
+<!--                                @click="replyTopic(item)"-->
+<!--                            ></image>-->
                             <view class="floor">
                                 {{ `${index + 1}楼` }}
                             </view>
@@ -142,35 +142,35 @@
                         @linktap="linktap"
                     />
                 </view>
-                <view class="reply-wrap" v-if="replyBox">
-                    <textarea
-                        class="textarea"
-                        fixed
-                        :maxlength="-1"
-                        placeholder="请输入内容"
-                        placeholder-style="font-size: 28rpx;color: #999;"
-                        :show-confirm-bar="false"
-                        :value="content"
-                        :hold-keyboard="true"
-                        auto-focus
-                        @input="onInputChange"
-                    />
-                    <view class="tip">
-                        <view>请尽量让自己的回复能够对别人有帮助</view>
-                        <view>若提交失败请尝试重新登录</view>
-                    </view>
-                    <view class="btn-wrap">
-                        <view
-                            class="reply-btn cancel-btn"
-                            @click="cancelReply()"
-                        >
-                            取消
-                        </view>
-                        <view class="reply-btn" @click="confirmReply()">
-                            提交
-                        </view>
-                    </view>
-                </view>
+<!--                <view class="reply-wrap" v-if="replyBox">-->
+<!--                    <textarea-->
+<!--                        class="textarea"-->
+<!--                        fixed-->
+<!--                        :maxlength="-1"-->
+<!--                        placeholder="请输入内容"-->
+<!--                        placeholder-style="font-size: 28rpx;color: #999;"-->
+<!--                        :show-confirm-bar="false"-->
+<!--                        :value="content"-->
+<!--                        :hold-keyboard="true"-->
+<!--                        auto-focus-->
+<!--                        @input="onInputChange"-->
+<!--                    />-->
+<!--                    <view class="tip">-->
+<!--                        <view>请尽量让自己的回复能够对别人有帮助</view>-->
+<!--                        <view>若提交失败请尝试重新登录</view>-->
+<!--                    </view>-->
+<!--                    <view class="btn-wrap">-->
+<!--                        <view-->
+<!--                            class="reply-btn cancel-btn"-->
+<!--                            @click="cancelReply()"-->
+<!--                        >-->
+<!--                            取消-->
+<!--                        </view>-->
+<!--                        <view class="reply-btn" @click="confirmReply()">-->
+<!--                            提交-->
+<!--                        </view>-->
+<!--                    </view>-->
+<!--                </view>-->
                 <!-- #ifdef MP-WEIXIN -->
                 <ad unit-id="adunit-6996f541fca34984"></ad>
                 <!-- #endif -->
