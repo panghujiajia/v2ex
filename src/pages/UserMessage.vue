@@ -223,7 +223,7 @@ export default class UserTopic extends Vue {
         if (len >= message_count) {
             this.noMore = true;
         } else {
-            if (len && len < 19) {
+            if (len && len < 10) {
                 this.pageNum = ++this.pageNum;
                 this.loadType = 'loadMore';
                 this.getUserMessage();
