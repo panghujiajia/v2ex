@@ -98,6 +98,10 @@
                     @change="onAutoSignChange"
                 />
             </view>
+            <view class="cell van-hairline--bottom" @click="subscribeMsg">
+                <view>订阅消息</view>
+                <view class="icon-arrow"></view>
+            </view>
             <view class="cell van-hairline--bottom">
                 <view>
                     <view>站内链接跳转</view>
@@ -123,12 +127,16 @@
                 <view>关于</view>
                 <view class="icon-arrow"></view>
             </view>
+            <!-- #ifdef MP-WEIXIN -->
+            <ad unit-id="adunit-5dede007095ed080"></ad>
+            <!-- #endif -->
         </view>
     </view>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Action, Getter, Mutation, State } from 'vuex-class';
+import { http1 } from '@/services';
 
 @Component({
     name: 'Set'
@@ -171,6 +179,21 @@ export default class Set extends Vue {
                 this.getUserInfo();
             }
         }
+    }
+    subscribeMsg() {
+        uni.requestSubscribeMessage({
+            tmplIds: ['sl1-Uo9R6udJ5ve3NsoAFbfjW38KW66b88NVAbMaAs8'],
+            success: async res => {
+                const { errMsg } = res;
+                console.log(errMsg);
+                if (errMsg === 'requestSubscribeMessage:ok') {
+                }
+                await http1.post(`http://192.168.0.12:8888/wx/subscribe`);
+            },
+            fail: res => {
+                console.log(res);
+            }
+        });
     }
     private onAutoSignChange({ detail }: any) {
         const { value } = detail;

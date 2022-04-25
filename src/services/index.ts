@@ -82,3 +82,12 @@ export const http = new Request({
     }
 });
 createInterceptor(http);
+
+export const http1 = new Request({
+    baseURL: '',
+    timeout: 10000,
+    custom: {
+        loading: true // 是否需要loading
+    }
+});
+createInterceptor(http1);
