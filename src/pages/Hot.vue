@@ -92,7 +92,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { Action, Getter, Mutation, State } from 'vuex-class';
 import { Component, Vue } from 'vue-property-decorator';
 import { $getTabTopics } from '@/services/Common.http';
-import { http } from '@/services';
 
 dayjs.extend(relativeTime);
 
@@ -152,16 +151,16 @@ export default class Hot extends Vue {
         }
         await this.getV2exConfig();
         this.getData();
-        await uni.login({
-            success: async res => {
-                const { code } = res;
-                console.log(code);
-                const data = await http.get(
-                    `https://api.weixin.qq.com/sns/jscode2session?appid=wx3f56c5b9471bde01&secret=2455337806e715bfafceda9c53485078&js_code=${code}&grant_type=authorization_code`
-                );
-                console.log(data);
-            }
-        });
+        // await uni.login({
+        //     success: async res => {
+        //         const { code } = res;
+        //         console.log(code);
+        //         const data = await http.get(
+        //             `https://api.weixin.qq.com/sns/jscode2session?appid=wx3f56c5b9471bde01&secret=2455337806e715bfafceda9c53485078&js_code=${code}&grant_type=authorization_code`
+        //         );
+        //         console.log(data);
+        //     }
+        // });
     }
     // 获取数据
     private getData() {

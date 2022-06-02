@@ -43,6 +43,7 @@ export default new Vuex.Store({
             tag: topTags,
             toast: []
         },
+        signFaildNum: 0,
         allTag: allTags,
         historyTopic: [],
         stroageTime: 15, // 缓存时长 分钟
@@ -106,6 +107,9 @@ export default new Vuex.Store({
         },
         toggleAutoSign(state, data) {
             state.autoSign = data;
+        },
+        updateSignFaildNum(state, data) {
+            state.signFaildNum = data;
         },
         toggleAutoNavigate(state, data) {
             state.autoNavigate = data;
@@ -173,7 +177,7 @@ export default new Vuex.Store({
                 commit('saveUserInfo', data);
             }
         },
-        async getLoginReward({ commit }) {
+        async getLoginReward({ commit, state }) {
             const data = await $getLoginReward();
             if (data) {
                 const { sign_in_day, is_sign_in } = data;
@@ -182,11 +186,21 @@ export default new Vuex.Store({
                         title: `签到成功，${sign_in_day}`,
                         icon: 'none'
                     });
+                    commit('updateSignFaildNum', 0);
                 } else {
-                    uni.showToast({
-                        title: '多次签到不成功可尝试重新登录再试',
-                        icon: 'none'
-                    });
+                    const { signFaildNum } = state;
+                    if (signFaildNum <= 2) {
+                        uni.showToast({
+                            title: '签到失败',
+                            icon: 'none'
+                        });
+                        commit('updateSignFaildNum', signFaildNum + 1);
+                    } else {
+                        uni.showToast({
+                            title: '多次签到不成功可尝试重新登录',
+                            icon: 'none'
+                        });
+                    }
                 }
                 commit('saveUserInfo', data);
             }
