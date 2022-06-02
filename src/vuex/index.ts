@@ -35,7 +35,8 @@ export default new Vuex.Store({
             sign_in_day: '',
             info: '',
             is_sign_in: '',
-            username: ''
+            username: '',
+            password: ''
         },
         autoSign: false,
         v2exConfig: {

@@ -63,6 +63,8 @@ import { Action, Mutation, State } from 'vuex-class';
 export default class Login extends Vue {
     @State('cookie')
     private cookie!: string;
+    @State('userInfo')
+    private userInfo!: any;
     @Mutation('saveCookie')
     private saveCookie!: (cookie: string) => void;
     @Mutation('saveUserInfo')
@@ -91,6 +93,8 @@ export default class Login extends Vue {
     }
     private async getLoginParams() {
         this.captchaBase64 = '';
+        this.username = this.userInfo.username || '';
+        this.password = this.userInfo.password || '';
         const data = await $getLoginParams();
         if (data) {
             const { codeUrl } = data;
@@ -164,7 +168,7 @@ export default class Login extends Vue {
                 duration: 1000 * 30
             });
             this.saveCookie(cookie + ';' + data);
-            this.saveUserInfo({ username });
+            this.saveUserInfo({ username, password });
             await this.getUserInfo();
             await this.getUserBalance();
             await this.getLoginRewardInfo();

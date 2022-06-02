@@ -98,10 +98,10 @@
                     @change="onAutoSignChange"
                 />
             </view>
-            <view class="cell van-hairline--bottom" @click="subscribeMsg">
-                <view>订阅消息</view>
-                <view class="icon-arrow"></view>
-            </view>
+            <!--            <view class="cell van-hairline&#45;&#45;bottom" @click="subscribeMsg">-->
+            <!--                <view>订阅消息</view>-->
+            <!--                <view class="icon-arrow"></view>-->
+            <!--            </view>-->
             <view class="cell van-hairline--bottom">
                 <view>
                     <view>站内链接跳转</view>
@@ -116,8 +116,12 @@
                     @change="onAutoNavigateChange"
                 />
             </view>
-            <view class="cell van-hairline--bottom" @click="clearStorage()">
-                <view>清空缓存</view>
+            <view
+                v-if="cookie"
+                class="cell van-hairline--bottom"
+                @click="login()"
+            >
+                <view>重新登录</view>
                 <view class="icon-arrow"></view>
             </view>
             <view
@@ -259,6 +263,9 @@ export default class Set extends Vue {
         }
         uni.navigateTo({ url });
     }
+    private login() {
+        uni.navigateTo({ url: '/pages/Login' });
+    }
     // 清理缓存
     private clearStorage() {
         const res = uni.getStorageInfoSync();
@@ -302,7 +309,7 @@ export default class Set extends Vue {
     // 点击头像
     private showTip() {
         if (!this.cookie) {
-            uni.navigateTo({ url: '/pages/Login' });
+            this.login();
             return;
         }
         if (this.toastTitle) {
