@@ -1,3 +1,11 @@
+#### 技术栈
+- vue2
+- vue-class-component
+- vue-property-decorator
+- vuex
+- vuex-persistedstate
+- vuex-class
+
 #### 产品截图
 <img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1669.PNG" style="zoom:25%;display:'inline-block';width:25%;" /><img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1670.PNG" style="zoom:25%;display:'inline-block';width:25%" /><img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1671.PNG" style="zoom:25%;display:'inline-block';width:25%" /><img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1672.PNG" style="zoom:25%;display:'inline-block';width:25%" /><img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1673.PNG" style="zoom:25%;display:'inline-block';width:25%" /><img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1674.PNG" style="zoom:25%;display:'inline-block';width:25%" /><img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1676.PNG" style="zoom:25%;display:'inline-block';width:25%" /><img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1679.PNG" style="zoom:25%;display:'inline-block';width:25%" /><img src="https://xab-edu.oss-cn-shanghai.aliyuncs.com/yunibao/creation/pic/20211217/IMG_1680.PNG" style="zoom:25%;display:'inline-block';width:25%" />
 
